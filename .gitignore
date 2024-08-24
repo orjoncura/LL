@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/LL
+/.vscode
+/LL.API/bin/Debug/net8.0
+/LL.API/obj
+/LL.Core/bin/Debug/net8.0
+/LL.Core/obj
+/LL.Data/bin/Debug/net8.0
+/LL.Data/obj
+/LL.Definitions/bin/Debug/net8.0
+/LL.Definitions/obj
+/LL.Extensions/bin/Debug/net8.0
+/LL.Extensions/obj
+/ll.webui/.vs
+/ll.webui/obj/Debug
+/LL.Core/GGUF/7B-chat.gguf
