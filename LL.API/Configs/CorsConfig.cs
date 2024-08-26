@@ -5,7 +5,7 @@ namespace LL.API.Configs
 {
     public static class CorsConfig
     {
-        public static IServiceCollection AddCorsConfig(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCorsConfig(this IServiceCollection services)
         {
             services.AddCors(options =>
             {

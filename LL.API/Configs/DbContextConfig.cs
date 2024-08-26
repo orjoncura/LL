@@ -1,13 +1,16 @@
-﻿using LL.Data.Contexts;
+﻿using LL.API.Constants;
+using LL.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace LL.API.Configs
 {
     public static class DbContextConfig
     {
-        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, string? connectionString)
+        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, WebApplicationBuilder builder)
         {
-            if(connectionString == null) throw new Exception("Connection String is null");
+            string? connectionString = builder.Configuration.GetConnectionString(AppSettings.DefaultConnectionString);
+
+            if (connectionString == null) throw new Exception("Connection String is null");
 
             services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connectionString));
 

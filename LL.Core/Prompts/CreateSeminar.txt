@@ -1,0 +1,25 @@
+Create 3 sentences in Spanish for each of the following words {@words}
+and return a JSON file that contains the words, the sentences, and their translation to English.
+The JSON file should have the following format:
+{
+    "TargetWord": {
+        "OriginalStatement": "example",
+        "TranslatedStatement": "ejemplo",
+        "LanguageFrom": 1,
+        "LanguageTo": 2
+    },
+    "Sentence": [
+        {
+            "OriginalStatement": "This is an example sentence.",
+            "TranslatedStatement": "Esta es una oración de ejemplo.",
+            "LanguageFrom": 1,
+            "LanguageTo": 2
+        },
+        {
+            "OriginalStatement": "Another example sentence.",
+            "TranslatedStatement": "Otra oración de ejemplo.",
+            "LanguageFrom": 1,
+            "LanguageTo": 2
+        }
+    ]
+}

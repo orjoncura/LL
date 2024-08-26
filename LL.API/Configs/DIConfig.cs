@@ -5,7 +5,7 @@ namespace LL.API.Configs
 {
     public static class DIConfig
     {
-        public static IServiceCollection AddDIConfig(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDIConfig(this IServiceCollection services)
         {
             services.AddScoped<IChatService, ChatService>();
 

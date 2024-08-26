@@ -9,15 +9,14 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
         builder.Services
-            .AddDbContextConfig(builder.Configuration.GetConnectionString(AppSettings.DefaultConnectionString))
-            .AddCorsConfig(builder.Configuration)
-            .AddDIConfig(builder.Configuration)
-            .AddJwtConfig(builder.Configuration);
+            .AddDbContextConfig(builder)
+            .AddCorsConfig()
+            .AddDIConfig()
+            .AddJwtConfig()
+            .AddSwaggerGen()
+            .AddEndpointsApiExplorer()
+            .AddControllers();
 
         var app = builder.Build();
 

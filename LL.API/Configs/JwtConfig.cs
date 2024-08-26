@@ -6,7 +6,7 @@ namespace LL.API.Configs
 {
     public static class JwtConfig
     {
-        public static IServiceCollection AddJwtConfig(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtConfig(this IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
