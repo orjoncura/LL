@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
+import Constants from '../scripts/Constants'
 
-function Login() {
+export default function Login() {
   const router = useRouter()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +19,7 @@ function Login() {
     <Container>
       <Row className="justify-content-md-center mt-5">
         <Col xs={12} md={6}>
-          <h2 className="text-center mb-4">Fluente</h2>
+          <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
@@ -49,5 +50,3 @@ function Login() {
     </Container>
   );
 }
-
-export default Login;

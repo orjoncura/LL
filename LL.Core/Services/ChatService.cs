@@ -20,7 +20,7 @@ namespace LL.Core.Services
                 " \"TranslatedStatement\": \"Otra oración de ejemplo.\",\r\n    " +
                 "        \"LanguageFrom\": 1,\r\n            \"LanguageTo\": 2\r\n        }\r\n    ]\r\n}\r\n";
 
-            string t = await Agent.Run(input);
+            string t = await Agent.Run(input, "\"D:\\GGUF\\7B-chat.gguf\"");
             
             return new SeminarViewModel();
         }

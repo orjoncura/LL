@@ -2,23 +2,31 @@
 import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar/Navbar/Navbar';
+import Constants from '@/scripts/Constants'
 
 export default function Home() {
   const [text, setText] = useState<string>('');
   const [response, setResponse] = useState<string | null>(null);
 
+    function createListFromText(value: string) {
+        // Remove special symbols using a regular expression
+        const cleanedArticle = value.replace(/[^\w\s.]/g, '');
+
+        const sentences = cleanedArticle.split(' ').map(sentence => sentence.trim()).filter(sentence => sentence.length > 0);
+
+        return sentences;
+    }
+
   const handleSubmit = async () => {
 
     try {
         const data = {
-            "words": [
-                "string"
-            ],
+            "words": createListFromText(text),
             "languageIdFrom": 0,
             "langaugeIdTo": 0
         };
 
-        fetch('http://localhost:5197/api/Seminar/CreateSeminar', { 
+        fetch(Constants().API + '/Seminar/CreateSeminar', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -32,14 +40,6 @@ export default function Home() {
         .catch(error => {
             console.error('Error sending data:', error);
         });
-
-        const response = await fetch('http://localhost:5197/api/Seminar/CreateSeminar');
-
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const result = await response.json();
-
-        setResponse(result);
 
     } catch (error) {
       console.error('Error making API call:', error);

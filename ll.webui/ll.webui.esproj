@@ -7,6 +7,7 @@
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+    <BuildCommand>npm run build</BuildCommand>
   </PropertyGroup>
   <ItemGroup>
     <None Remove=".vs\**" />
@@ -10871,5 +10872,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".next\cache\swc\plugins\v7_linux_x86_64_0.106.15\" />
+    <Folder Include="src\scripts\" />
   </ItemGroup>
 </Project>

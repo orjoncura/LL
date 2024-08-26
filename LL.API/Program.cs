@@ -15,6 +15,7 @@ internal class Program
 
         builder.Services
             .AddDbContextConfig(builder.Configuration.GetConnectionString(AppSettings.DefaultConnectionString))
+            .AddCorsConfig(builder.Configuration)
             .AddDIConfig(builder.Configuration)
             .AddJwtConfig(builder.Configuration);
 
@@ -27,6 +28,7 @@ internal class Program
             app.UseSwaggerUI();
         }
 
+        app.UseCors("AllowSpecificOrigin");
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseAuthentication();

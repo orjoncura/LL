@@ -5,10 +5,8 @@ namespace LL.Extensions
 {
     public class Agent
     {
-        public static async Task<string> Run(string input)
+        public static async Task<string> Run(string input, string modelPath)
         {
-            string modelPath = @"GGUF\7B-chat.gguf";
-
             var parameters = new ModelParams(modelPath)
             {
                 ContextSize = 1024, // The longest length of chat as memory.

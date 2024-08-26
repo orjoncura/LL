@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Constants from '../scripts/Constants'
 
 const inter = Inter({ subsets: ["latin"]});
 
 export const metadata: Metadata = {
-  title: "Fluente",
+    title: Constants().ApplicationName,
   description: "Become your own teacher",
 };
 
