@@ -14,9 +14,9 @@ namespace LL.Core.Services
 
             string input = contents.Replace("{@words}", string.Join(',', seminarRequest.Words));
 
-            SeminarViewModel? seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(input, @"D:\GGUF\7B-chat.gguf\"));
+            SeminarViewModel? seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(input));
             
-            return seminarViewModel == null ? new SeminarViewModel() : seminarViewModel;
+            return seminarViewModel ?? new SeminarViewModel();
         }
     }
 }

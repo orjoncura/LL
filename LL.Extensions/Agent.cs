@@ -5,9 +5,9 @@ namespace LL.Extensions
 {
     public class Agent
     {
-        public static async Task<string> Run(string input, string modelPath)
+        private static async Task<string> RunLocalLlama(string input)
         {
-            var parameters = new ModelParams(modelPath)
+            var parameters = new ModelParams(@"D:\GGUF\7B-chat.gguf")
             {
                 ContextSize = 1024, // The longest length of chat as memory.
                 GpuLayerCount = 5 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
@@ -35,6 +35,11 @@ namespace LL.Extensions
                 output += text;
 
             return output;
+        }
+
+        public static async Task<string> Run(string input)
+        {
+            return await RunLocalLlama(input);
         }
     }
 }

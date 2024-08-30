@@ -16,20 +16,18 @@ namespace LL.Extensions
             return JsonConvert.DeserializeObject<T>(value);
         }
 
-        public static T? Extract<T>(string text)
+        public static T? Extract<T>(string text) where T : class
         {
-            T? output;
-
             // Regular expression to match JSON objects
-            string pattern = @"\{.*?\}";
+            var matches = Regex.Matches(text, @"\{.*?\}");
 
-            Match match = Regex.Match(text, pattern);
+            if (matches.Count > 0)
+            {
+                var json = string.Join("", matches.Select(m => m.Value));
+                return DeserializeObject<T>(json);
+            }
 
-            if (match.Success)
-                output = DeserializeObject<T>(match.Value);
-            
-
-            return output;
+            return null;
         }
     }
 }
