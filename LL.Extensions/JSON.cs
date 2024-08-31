@@ -19,12 +19,11 @@ namespace LL.Extensions
         public static T? Extract<T>(string text) where T : class
         {
             // Regular expression to match JSON objects
-            var matches = Regex.Matches(text, @"\{.*?\}");
+            var match = Regex.Match(text, @"\{(?:[^{}]|(?<open>\{)|(?<-open>\}))*\}(?(open)(?!))", RegexOptions.Singleline);
 
-            if (matches.Count > 0)
+            if (match.Success)
             {
-                var json = string.Join("", matches.Select(m => m.Value));
-                return DeserializeObject<T>(json);
+                return DeserializeObject<T>(match.Value);
             }
 
             return null;

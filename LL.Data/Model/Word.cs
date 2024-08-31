@@ -10,9 +10,14 @@ namespace LL.Data.Model
     {
         public int Id {  get; set; }
         public string Name { get; set; } = string.Empty;
-        public string Transaltion { get; set; } = string.Empty;
-        public int LanguageFrom { get; set; }
-        public int LanguageTo { get; set; }
+        public string Translation { get; set; } = string.Empty;
+
+        public int LanguageFromId { get; set; }
+        public virtual Language LanguageFrom { get; set; } = new Language();
+
+        public int LanguageToId { get; set; }
+        public virtual Language LanguageTo { get; set; } = new Language();
+
         public bool IsActive { get; set; }
 
         public int CreatedById { get; set; }

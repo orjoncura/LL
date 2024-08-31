@@ -4,6 +4,6 @@ namespace LL.Core.Interfaces
 {
     public interface IChatService
     {
-        Task<SeminarViewModel> CreateSeminar(SeminarRequestModel seminarRequest);
+        Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest);
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LL.Data.Model;
 
 namespace LL.SharedDefinitions.Model
 {
@@ -10,7 +6,18 @@ namespace LL.SharedDefinitions.Model
     {
         public string OriginalStatement { get; set; } = string.Empty;
         public string TranslatedStatement { get; set; } = string.Empty;
-        public int LanguageFrom { get; set; }
-        public int LanguageTo { get; set; }
+
+        public StatementModel() { }
+        public StatementModel(Statement statement) 
+        {
+            OriginalStatement = statement.OriginalStatement;
+            TranslatedStatement = statement.OriginalStatement;
+        }
+
+        public StatementModel(string original, string translated) 
+        {
+            OriginalStatement = original;
+            TranslatedStatement = translated;
+        }
     }
 }

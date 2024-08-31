@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LL.Data.Model
+﻿namespace LL.Data.Model
 {
     public class Statement
     {
@@ -14,8 +8,13 @@ namespace LL.Data.Model
 
         public string OriginalStatement { get; set; } = string.Empty;
         public string TranslatedStatement { get; set; } = string.Empty;
-        public int LanguageFrom { get; set; }
-        public int LanguageTo { get; set; }
+
+        public int LanguageFromId { get; set; }
+        public virtual Language LanguageFrom { get; set; } = new Language();
+
+        public int LanguageToId { get; set; }
+        public virtual Language LanguageTo { get; set; } = new Language();
+
         public bool IsActive { get; set; }
 
         public int CreatedById { get; set; }

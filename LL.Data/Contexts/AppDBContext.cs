@@ -16,6 +16,7 @@ namespace LL.Data.Contexts
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<UserTokenLog> UserTokenLogs { get; set; }
         public DbSet<LoginHistory> LoginHistory { get; set; }
+        public DbSet<Language> Languages { get; set; }
         public DbSet<Word> Words { get; set; }
         public DbSet<Statement> Statements { get; set; }
 
@@ -124,14 +125,35 @@ namespace LL.Data.Contexts
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
+            modelBuilder.Entity<Language>(entity =>
+            {
+                entity.Property(ut => ut.Name).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.CreatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
             modelBuilder.Entity<Word>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
-                entity.Property(ut => ut.Transaltion).IsRequired();
                 entity.Property(ut => ut.LanguageFrom).IsRequired();
                 entity.Property(ut => ut.LanguageTo).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.LanguageFrom)
+                .WithMany()
+                .HasForeignKey(ut => ut.LanguageFromId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ut => ut.LanguageTo)
+                .WithMany()
+                .HasForeignKey(ut => ut.LanguageToId)
+                .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.HasOne(ut => ut.CreatedBy)
@@ -153,6 +175,16 @@ namespace LL.Data.Contexts
                 entity.HasOne(ut => ut.Word)
                 .WithMany()
                 .HasForeignKey(ut => ut.WordId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ut => ut.LanguageFrom)
+                .WithMany()
+                .HasForeignKey(ut => ut.LanguageFromId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ut => ut.LanguageTo)
+                .WithMany()
+                .HasForeignKey(ut => ut.LanguageToId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ut => ut.CreatedBy)

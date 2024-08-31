@@ -1,6 +1,4 @@
 using LL.API.Configs;
-using LL.API.Constants;
-using Microsoft.EntityFrameworkCore;
 
 internal class Program
 {

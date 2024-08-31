@@ -9,8 +9,7 @@ namespace LL.Extensions
         {
             var parameters = new ModelParams(@"D:\GGUF\7B-chat.gguf")
             {
-                ContextSize = 1024, // The longest length of chat as memory.
-                GpuLayerCount = 5 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
+                GpuLayerCount = 12 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
             };
 
             using var model = LLamaWeights.LoadFromFile(parameters);
@@ -25,7 +24,6 @@ namespace LL.Extensions
 
             InferenceParams inferenceParams = new InferenceParams()
             {
-                MaxTokens = 256, // No more than 256 tokens should appear in answer. Remove it if antiprompt is enough for control.
                 AntiPrompts = new List<string> { "User:" } // Stop generation once antiprompts appear.
             };
 
