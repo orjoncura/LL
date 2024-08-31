@@ -1,9 +1,10 @@
 ﻿using LL.Data.Contexts;
+using LL.Data.Interfaces;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories
 {
-    public class StatementRepository(AppDBContext appDBContext)
+    public class StatementRepository(AppDBContext appDBContext) : IStatementRepository
     {
         public List<Statement> GetByWordId(int wordId) 
         {

@@ -8,7 +8,10 @@ column and their values shouldn't change.
 
 Add migration
 
-1.Go to 'Package Manager Console'
-2.Select 'LL.Data'
-3.Type 'Add-Migration Name'
-4.Type 'Update-Database'
+Package Mangager Console
+	Add-Migration YourMigrationName' --project LL.Data  --startup-project LL.API'
+	Update-Database' --project LL.Data  --startup-project LL.API'
+
+Command Line
+	dotnet ef migrations add YourMigrationName --project LL.Data  --startup-project LL.API
+	dotnet ef database update --project LL.Data  --startup-project LL.API

@@ -140,8 +140,8 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Word>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
-                entity.Property(ut => ut.LanguageFrom).IsRequired();
-                entity.Property(ut => ut.LanguageTo).IsRequired();
+                entity.Property(ut => ut.LanguageFromId).IsRequired();
+                entity.Property(ut => ut.LanguageToId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
 
@@ -166,8 +166,8 @@ namespace LL.Data.Contexts
             {
                 entity.Property(ut => ut.OriginalStatement).IsRequired();
                 entity.Property(ut => ut.TranslatedStatement).IsRequired();
-                entity.Property(ut => ut.LanguageFrom).IsRequired();
-                entity.Property(ut => ut.LanguageTo).IsRequired();
+                entity.Property(ut => ut.LanguageFromId).IsRequired();
+                entity.Property(ut => ut.LanguageToId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
