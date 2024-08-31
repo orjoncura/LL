@@ -5,7 +5,7 @@ using LL.SharedDefinitions.Model;
 
 namespace LL.Core.Services
 {
-    public class ChatService(IWordRepository wordRepository, IStatementRepository statementRepository) : IChatService
+    public class SeminarService(IWordRepository wordRepository, IStatementRepository statementRepository) : ISeminarService
     {
         public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest)
         {
@@ -28,7 +28,6 @@ namespace LL.Core.Services
                 }
                 else 
                 {
-
                     string input = File.ReadAllText(@"D:\repos\LL\LL.Core\\Prompts\CreateSeminar.txt").Replace("{@targetWord}", word);
                     seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(input));
                 }

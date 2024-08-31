@@ -13,7 +13,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SeminarController(IChatService chatService) : Controller
+    public class SeminarController(ISeminarService seminarService) : Controller
     {
         /// <summary>
         /// Pass a list of words and get a seminat in the selcted language
@@ -26,11 +26,11 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<SeminarViewModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult> CreateSeminar([FromBody] SeminarRequestModel seminarRequest)
         {
-            SeminarViewModel seminarViewModel = new SeminarViewModel();
+            List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
 
             try
             {
-                seminarViewModel = await chatService.CreateSeminar(seminarRequest);
+                seminarViewModels = await seminarService.CreateSeminar(seminarRequest);
             }
             catch (Exception ex)
             {
@@ -46,7 +46,7 @@ namespace LL.API.Controllers
                 Error.Export(ex, exceptionData);
             }
 
-            return Ok(seminarViewModel);
+            return Ok(seminarViewModels);
         }
     }
 }
