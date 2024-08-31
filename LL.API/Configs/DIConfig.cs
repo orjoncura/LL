@@ -7,7 +7,7 @@ namespace LL.API.Configs
     {
         public static IServiceCollection AddDIConfig(this IServiceCollection services)
         {
-            services.AddScoped<ISeminarService, ChatService>();
+            services.AddScoped<ISeminarService, SeminarService>();
 
             return services;
         }
