@@ -12,8 +12,4 @@
     <ProjectReference Include="..\LL.Extensions\LL.Extensions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Prompts\" />
-  </ItemGroup>
-
 </Project>

@@ -6,5 +6,6 @@ namespace LL.Data.Interfaces
     {
         List<Statement> GetByWordId(int wordId);
         int Insert(int wordId, string original, string translated, int fromId, int toId, int userId);
+        bool InsertRange(List<Statement> statements);
     }
 }

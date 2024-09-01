@@ -12,11 +12,12 @@ namespace LL.Data.Repositories
                 .Where(w => w.Name == name.Trim()).FirstOrDefault();
         }
 
-        public int Insert(string name, int fromId, int toId, int userId)
+        public int Insert(string name, string translation, int fromId, int toId, int userId)
         {
             var word = new Word
             { 
                 Name = name.Trim(),
+                Translation = translation.Trim(),
                 LanguageFromId = fromId,
                 LanguageToId = toId,
                 CreatedById = userId,

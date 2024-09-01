@@ -29,5 +29,17 @@ namespace LL.Data.Repositories
 
             return statement.Id;
         }
+
+        public bool InsertRange(List<Statement> statements)
+        {
+            statements = statements
+                .Where(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false 
+                && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false)
+                .ToList();
+
+            appDBContext.AddRange(statements);
+
+            return true;
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace LL.Extensions
     {
         private static async Task<string> RunLocalLlama(string input)
         {
-            var parameters = new ModelParams(@"D:\GGUF\7B-chat.gguf")
+            var parameters = new ModelParams(@"/media/orjon/Win Data/GGUF/7B-chat.gguf")
             {
                 GpuLayerCount = 12 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
             };
