@@ -28,7 +28,7 @@ namespace LL.Core.Services
                 }
                 else 
                 {
-                    string input = File.ReadAllText(@"D:\repos\LL\LL.Core\\Prompts\CreateSeminar.txt").Replace("{@targetWord}", word);
+                    string input = File.ReadAllText(@"/media/orjon/Win Data/repos/LL/LL.Core/Prompts/CreateSeminar.txt").Replace("{@targetWord}", word);
                     seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(input));
                 }
 
