@@ -8,26 +8,26 @@
                 and return a JSON file that contains the word, the sentences, and their translation to English.
                 The JSON file should have the following format:
 
-                {
-                    ""TargetWord"": {
+                {{
+                    ""TargetWord"": {{
                         ""OriginalStatement"": ""{0}"",
-                        ""TranslatedStatement"": ""ejemplo"",
-                    },
+                        ""TranslatedStatement"": """",
+                    }},
                     ""Sentence"": [
-                        {
-                            ""OriginalStatement"": ""This is an example with the word {0}."",
-                            ""TranslatedStatement"": ""Esta es una oraci�n de ejemplo."",
-                        },
-                        {
-                            ""OriginalStatement"": ""Another example with the word {0}."",
-                            ""TranslatedStatement"": ""Otra oraci�n de ejemplo."",
-                        },
-                        {
-                            ""OriginalStatement"": ""A third example with the word {0}."",
-                            ""TranslatedStatement"": ""Otra oraci�n de ejemplo."",
-                        }
+                        {{
+                            ""OriginalStatement"": """",
+                            ""TranslatedStatement"": """",
+                        }},
+                        {{
+                            ""OriginalStatement"": """",
+                            ""TranslatedStatement"": """",
+                        }},
+                        {{
+                            ""OriginalStatement"": """",
+                            ""TranslatedStatement"": """",
+                        }}
                     ]
-                }", word);
+                }}", word);
 
             return prompt;
         }

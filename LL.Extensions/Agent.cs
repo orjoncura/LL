@@ -7,7 +7,7 @@ namespace LL.Extensions
     {
         private static async Task<string> RunLocalLlama(string input)
         {
-            var parameters = new ModelParams(@"/media/orjon/Win Data/GGUF/7B-chat.gguf")
+            var parameters = new ModelParams(@"D:\GGUF\7B-chat.gguf")
             {
                 GpuLayerCount = 12 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
             };
@@ -16,11 +16,7 @@ namespace LL.Extensions
             using var context = model.CreateContext(parameters);
             var executor = new InteractiveExecutor(context);
 
-            // Add chat histories as prompt to tell AI how to act.
-            var chatHistory = new ChatHistory();
-            //chatHistory.AddMessage(AuthorRole.System, "Transcript of a dialog, where the User interacts with an Assistant named Bob. Bob is helpful, kind, honest, good at writing, and never fails to answer the User's requests immediately and with precision.");
-
-            ChatSession session = new(executor, chatHistory);
+            ChatSession session = new(executor);
 
             InferenceParams inferenceParams = new InferenceParams()
             {

@@ -30,7 +30,9 @@ namespace LL.API.Controllers
 
             try
             {
-                seminarViewModels = await seminarService.CreateSeminar(seminarRequest);
+                seminarRequest.LanguageIdFrom = 1;
+                seminarRequest.LangaugeIdTo = 2;
+                seminarViewModels = await seminarService.CreateSeminar(seminarRequest, 1);
             }
             catch (Exception ex)
             {
