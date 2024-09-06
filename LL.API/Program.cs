@@ -1,10 +1,15 @@
 using LL.API.Configs;
+using LL.SharedDefinitions.Static;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Configuration.AddUserSecrets<Program>();
+
+        Secret.Configuration = builder.Configuration;
 
         // Add services to the container.
         builder.Services

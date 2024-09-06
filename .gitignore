@@ -18,3 +18,8 @@
 /ll.webui/obj/Debug
 /LL.Core/GGUF/7B-chat.gguf
 /.vs/ProjectEvaluation
+/LL.Test/obj
+/LL.Test/bin/Debug/net8.0
+/LL.Test/obj/Debug/net8.0/ref
+/LL.Test/obj/Debug/net8.0/refint/
+

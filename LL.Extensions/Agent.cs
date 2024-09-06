@@ -1,6 +1,7 @@
 ﻿using LLama.Common;
 using System.Text;
 using LLama;
+using LL.SharedDefinitions.Static;
 
 namespace LL.Extensions
 {
@@ -9,8 +10,7 @@ namespace LL.Extensions
         private static async Task<string> RunGeminiAPI(string input)
         {
             // Replace with your actual Google API key
-            string apiKey = "";
-            string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={apiKey}";
+            string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={Secret.GenimiAPI}";
 
             var payload = new
             {

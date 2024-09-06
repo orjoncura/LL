@@ -3,17 +3,26 @@ using LL.Data.Interfaces;
 using LL.SharedDefinitions.Model;
 using LL.Core.Enums;
 using Moq;
+using LL.SharedDefinitions.Static;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Microsoft.Extensions.Configuration;
 
 namespace LL.Test.Services
 {
-    public class SeminarServiceTest()
+    public class SeminarServiceTest
     {
+        public SeminarServiceTest()
+        {
+            Secret.Configuration = new ConfigurationBuilder().AddUserSecrets<SeminarServiceTest>().Build();
+        }
+
         [Fact]
         public async Task CreateSeminar_ShouldCreateSeminar()
         {
             // Arrange
             var wordRepository = new Mock<IWordRepository>();
             var statementRepository = new Mock<IStatementRepository>();
+
             var service = new SeminarService(wordRepository.Object, statementRepository.Object);
 
             SeminarRequestModel seminarRequest = new SeminarRequestModel(){
