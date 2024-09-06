@@ -31,7 +31,7 @@ namespace LL.Core.Services
                 {
                     seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(PromptFactory.CreateSeminarPrompt(word)));
 
-                    if (seminarViewModel != null)
+                    if (seminarViewModel != null && seminarViewModel.IsValid)
                     {
                         int wordId = wordRepository.Insert(seminarViewModel.TargetWord.OriginalStatement,
                             seminarViewModel.TargetWord.TranslatedStatement,

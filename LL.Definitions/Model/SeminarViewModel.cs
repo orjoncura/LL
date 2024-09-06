@@ -9,6 +9,12 @@ namespace LL.SharedDefinitions.Model
 {
     public class SeminarViewModel
     {
+        public bool IsValid => 
+            string.IsNullOrWhiteSpace(TargetWord.OriginalStatement) == false
+            && string.IsNullOrWhiteSpace(TargetWord.TranslatedStatement) == false
+            && Sentences.Any(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false
+                && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false);
+
         public StatementModel TargetWord { get; set; } = new StatementModel();
 
         public List<StatementModel> Sentences { get; set; } = new List<StatementModel>();

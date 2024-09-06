@@ -1,8 +1,7 @@
 using LL.Core.Services;
-using LL.Data.Contexts;
 using LL.Data.Interfaces;
 using LL.SharedDefinitions.Model;
-using Microsoft.EntityFrameworkCore;
+using LL.Core.Enums;
 using Moq;
 
 namespace LL.Test.Services
@@ -17,15 +16,17 @@ namespace LL.Test.Services
             var statementRepository = new Mock<IStatementRepository>();
             var service = new SeminarService(wordRepository.Object, statementRepository.Object);
 
-            SeminarRequestModel seminarRequest = new SeminarRequestModel();
+            SeminarRequestModel seminarRequest = new SeminarRequestModel(){
+                LanguageIdFrom = (int)LanguageEnum.English,
+                LangaugeIdTo = (int)LanguageEnum.Spanish,
+                Words = new List<string>(){ "Creo", "en", "los", "milagros", "desde", "que" }
+            };
 
             // Act
             List<SeminarViewModel> seminars = await service.CreateSeminar(seminarRequest, 1);
 
             // Assert
-            Assert.True(seminars.Where(s => string.IsNullOrWhiteSpace(s.TargetWord.OriginalStatement) == false
-                && string.IsNullOrWhiteSpace(s.TargetWord.TranslatedStatement) == false).Any());
-
+            Assert.True(seminars.All(s => s.IsValid));
         }
-    }
+    }   
 }
