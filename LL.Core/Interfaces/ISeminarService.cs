@@ -1,4 +1,4 @@
-﻿using LL.SharedDefinitions.Model;
+﻿using LL.SharedDefinitions.Models;
 
 namespace LL.Core.Interfaces
 {

@@ -1,12 +1,10 @@
 using LL.Core.Services;
 using LL.Data.Interfaces;
-using LL.SharedDefinitions.Model;
+using LL.SharedDefinitions.Models;
 using LL.Core.Enums;
 using Moq;
 using LL.SharedDefinitions.Static;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.Extensions.Configuration;
-using LL.Extensions.JSON;
 
 namespace LL.Test.Services
 {
@@ -28,8 +26,8 @@ namespace LL.Test.Services
 
             SeminarRequestModel seminarRequest = new SeminarRequestModel()
             {
-                LanguageIdFrom = (int)LanguageEnum.English,
-                LangaugeIdTo = (int)LanguageEnum.Spanish,
+                LanguageFromId = (int)LanguageEnum.English,
+                LangaugeToId = (int)LanguageEnum.Spanish,
                 Words = new List<string>(){ "Creo", "en", "los", "milagros", "desde", "que" }
             };
 

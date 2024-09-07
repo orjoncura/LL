@@ -11,7 +11,7 @@ namespace LL.Data.Model
         public long Id { get; set; }
 
         public int UserId { get; set; }
-        public virtual User User { get; set; } = new User();
+        public virtual User? User { get; set; }
 
         public int PersonId { get; set; }
         public string Username { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ namespace LL.Data.Model
         public bool IsActive { get; set; }
 
         public int CreatedById { get; set; }
-        public virtual Person CreatedBy { get; set; } = new Person();
+        public virtual Person? CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
     }
 }

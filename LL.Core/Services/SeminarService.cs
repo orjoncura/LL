@@ -1,8 +1,9 @@
-﻿using LL.Core.Factories;
+﻿using LL.Core.Enums;
+using LL.Core.Factories;
 using LL.Core.Interfaces;
 using LL.Data.Interfaces;
 using LL.Extensions;
-using LL.SharedDefinitions.Model;
+using LL.SharedDefinitions.Models;
 
 namespace LL.Core.Services
 {
@@ -12,37 +13,43 @@ namespace LL.Core.Services
         {
             List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
 
+            if(seminarRequest == null || seminarRequest.IsValid == false) 
+                return seminarViewModels;
+
             foreach (var word in seminarRequest.Words) 
             {
                 var seminarViewModel = new SeminarViewModel();
 
-                if (wordRepository.Exist(word, seminarRequest.LanguageIdFrom, seminarRequest.LangaugeIdTo))
+                if (wordRepository.Exist(word, seminarRequest.LanguageFromId, seminarRequest.LangaugeToId))
                 {
                     var targetWord = wordRepository.GetSingleByName(word);
 
                     if (targetWord != null)
                     {
-                        seminarViewModel.TargetWord = new StatementModel(targetWord.Name, targetWord.Translation);
+                        seminarViewModel.TargetWord = new TargetWordViewModel(targetWord);
                         seminarViewModel.Sentences = statementRepository
                             .GetByWordId(targetWord.Id).Select(s => new StatementModel(s)).ToList();
                     }
                 }
-                else 
+                else if(seminarViewModel != null)
                 {
-                    seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(PromptFactory.CreateSeminarPrompt(word)));
+                    string prompt = PromptFactory.CreateSeminarPrompt(word, seminarRequest.LanguageFromId, seminarRequest.LangaugeToId);
+                    seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(prompt));
 
                     if (seminarViewModel != null && seminarViewModel.IsValid)
                     {
-                        int wordId = wordRepository.Insert(seminarViewModel.TargetWord.OriginalStatement,
-                            seminarViewModel.TargetWord.TranslatedStatement,
-                            seminarRequest.LanguageIdFrom,
-                            seminarRequest.LangaugeIdTo,
+                        int wordId = wordRepository.Insert(seminarViewModel.TargetWord.Name,
+                            seminarViewModel.TargetWord.Translation,
+                            seminarViewModel.TargetWord.Definition,
+                            seminarViewModel.TargetWord.Type,
+                            seminarRequest.LanguageFromId,
+                            seminarRequest.LangaugeToId,
                             userId);
 
                         statementRepository.InsertRange(
                             seminarViewModel.ConvertToStatements(wordId,
-                            seminarRequest.LanguageIdFrom,
-                            seminarRequest.LangaugeIdTo,
+                            seminarRequest.LanguageFromId,
+                            seminarRequest.LangaugeToId,
                             userId));
                     }
                 }

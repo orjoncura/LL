@@ -1,5 +1,5 @@
 using LL.Core.Interfaces;
-using LL.SharedDefinitions.Model;
+using LL.SharedDefinitions.Models;
 using LL.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
@@ -30,8 +30,8 @@ namespace LL.API.Controllers
 
             try
             {
-                seminarRequest.LanguageIdFrom = 1;
-                seminarRequest.LangaugeIdTo = 2;
+                seminarRequest.LanguageFromId = 1;
+                seminarRequest.LangaugeToId = 2;
                 seminarViewModels = await seminarService.CreateSeminar(seminarRequest, 1);
             }
             catch (Exception ex)
@@ -41,8 +41,8 @@ namespace LL.API.Controllers
                 if (seminarRequest != null)
                 {
                     exceptionData["Words"] = seminarRequest.Words;
-                    exceptionData["LanguageIdFrom"] = seminarRequest.LanguageIdFrom;
-                    exceptionData["LangaugeIdTo"] = seminarRequest.LangaugeIdTo;
+                    exceptionData["LanguageIdFrom"] = seminarRequest.LanguageFromId;
+                    exceptionData["LangaugeIdTo"] = seminarRequest.LangaugeToId;
                 }
 
                 Error.Export(ex, exceptionData);

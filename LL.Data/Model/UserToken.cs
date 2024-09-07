@@ -7,7 +7,7 @@
         public DateTimeOffset Expiration { get; set; }
 
         public int UserId { get; set; }
-        public virtual User User { get; set; } = new User();
+        public virtual User? User { get; set; }
 
         public bool IsActive { get; set; }
     }

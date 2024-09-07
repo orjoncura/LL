@@ -12,19 +12,23 @@ namespace LL.Data.Repositories
                 .Where(w => w.Name == name.Trim()).FirstOrDefault();
         }
 
-        public int Insert(string name, string translation, int fromId, int toId, int userId)
+        public int Insert(string name, string translation, string definition, string type, int fromId, int toId, int userId)
         {
             var word = new Word
             { 
                 Name = name.Trim(),
                 Translation = translation.Trim(),
+                Definition = definition.Trim(),
+                Type = type.Trim(),
                 LanguageFromId = fromId,
                 LanguageToId = toId,
+                IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,
             };
 
             appDBContext.Add(word);
+            appDBContext.SaveChanges();
 
             return word.Id;
         }

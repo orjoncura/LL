@@ -11,7 +11,7 @@ namespace LL.Data.Model
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public int CreatedById { get; set; }
-        public virtual Person CreatedBy { get; set; } = new Person();
+        public virtual Person? CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
     }
 }

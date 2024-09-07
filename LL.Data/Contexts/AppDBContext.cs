@@ -140,6 +140,9 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Word>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
+                entity.Property(ut => ut.Translation).IsRequired();
+                entity.Property(ut => ut.Definition).IsRequired();
+                entity.Property(ut => ut.Type).IsRequired();
                 entity.Property(ut => ut.LanguageFromId).IsRequired();
                 entity.Property(ut => ut.LanguageToId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
@@ -156,6 +159,7 @@ namespace LL.Data.Contexts
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(ut => ut.CreatedById).IsRequired();
+
                 entity.HasOne(ut => ut.CreatedBy)
                 .WithMany()
                 .HasForeignKey(ut => ut.CreatedById)
@@ -166,8 +170,6 @@ namespace LL.Data.Contexts
             {
                 entity.Property(ut => ut.OriginalStatement).IsRequired();
                 entity.Property(ut => ut.TranslatedStatement).IsRequired();
-                entity.Property(ut => ut.LanguageFromId).IsRequired();
-                entity.Property(ut => ut.LanguageToId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
@@ -175,16 +177,6 @@ namespace LL.Data.Contexts
                 entity.HasOne(ut => ut.Word)
                 .WithMany()
                 .HasForeignKey(ut => ut.WordId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ut => ut.LanguageFrom)
-                .WithMany()
-                .HasForeignKey(ut => ut.LanguageFromId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ut => ut.LanguageTo)
-                .WithMany()
-                .HasForeignKey(ut => ut.LanguageToId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ut => ut.CreatedBy)

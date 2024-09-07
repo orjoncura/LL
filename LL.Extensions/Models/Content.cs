@@ -5,8 +5,8 @@ namespace LL.Extensions.Models;
 public class Content
 {
     [JsonPropertyName("parts")]
-    public Part[] Parts { get; set; }
+    public Part[]? Parts { get; set; }
 
     [JsonPropertyName("role")]
-    public string Role { get; set; }
+    public string? Role { get; set; }
 }

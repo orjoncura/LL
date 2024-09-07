@@ -19,13 +19,13 @@ namespace LL.Data.Repositories
                 WordId = wordId,
                 OriginalStatement = original,
                 TranslatedStatement = translated,  
-                LanguageFromId = fromId,
-                LanguageToId = toId,
+                IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,
             };
 
             appDBContext.Add(statement);
+            appDBContext.SaveChanges();
 
             return statement.Id;
         }
@@ -38,6 +38,7 @@ namespace LL.Data.Repositories
                 .ToList();
 
             appDBContext.AddRange(statements);
+            appDBContext.SaveChanges();
 
             return true;
         }

@@ -54,8 +54,8 @@ namespace LL.Extensions
                 // Ensure the request was successful
                 response.EnsureSuccessStatusCode();
 
-                Candidate? candidate = JSON.Extract<JsonData>(response.Content.ReadAsStringAsync().Result)?.Candidates.FirstOrDefault();
-                string output = candidate?.Content.Parts.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
+                Candidate? candidate = JSON.Extract<JsonData>(response.Content.ReadAsStringAsync().Result)?.Candidates?.FirstOrDefault();
+                string output = candidate?.Content?.Parts?.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
 
                 // Read the response
                 return output;
