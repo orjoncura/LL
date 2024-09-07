@@ -16,6 +16,8 @@ namespace LL.Core.Services
             if(seminarRequest == null || seminarRequest.IsValid == false) 
                 return seminarViewModels;
 
+            seminarRequest.Words = seminarRequest.Words.Select(w => w.ToLower()).Distinct().ToList();
+
             foreach (var word in seminarRequest.Words) 
             {
                 var seminarViewModel = new SeminarViewModel();

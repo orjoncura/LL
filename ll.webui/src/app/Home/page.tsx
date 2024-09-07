@@ -22,8 +22,8 @@ export default function Home() {
     try {
         const data = {
             "words": createListFromText(text),
-            "languageIdFrom": 0,
-            "langaugeIdTo": 0
+            "languageIdFrom": 1,
+            "langaugeIdTo": 2
         };
 
         fetch(Constants().API + '/Seminar/CreateSeminar', { 

@@ -36,7 +36,7 @@ namespace LL.Data.Repositories
         public bool Exist(string name, int fromId, int toId)
         {
             return appDBContext.Words
-                .Where(w => w.Name == name.Trim()
+                .Where(w => w.Name.ToLower() == name.Trim().ToLower()
                 && w.LanguageFromId == fromId
                 && w.LanguageToId == toId).Any();
         }
