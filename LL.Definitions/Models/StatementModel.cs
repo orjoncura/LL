@@ -1,6 +1,6 @@
 ﻿using LL.Data.Model;
 
-namespace LL.SharedDefinitions.Model
+namespace LL.SharedDefinitions.Models
 {
     public class StatementModel
     {

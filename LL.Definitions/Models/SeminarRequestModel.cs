@@ -1,4 +1,4 @@
-﻿namespace LL.SharedDefinitions.Model
+﻿namespace LL.SharedDefinitions.Models
 {
     public class SeminarRequestModel
     {

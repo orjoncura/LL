@@ -2,6 +2,7 @@
 using System.Text;
 using LLama;
 using LL.SharedDefinitions.Static;
+using LL.Extensions.Models;
 
 namespace LL.Extensions
 {
@@ -23,6 +24,18 @@ namespace LL.Extensions
                             new { text = input } // Pass the text input here
                         }
                     }
+                },
+                safety_settings = new {
+                    category = "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    threshold = "BLOCK_LOW_AND_ABOVE"
+                },
+                generation_config = new
+                {
+                    temperature = 1,
+                    topP = 0.95,
+                    topK = 64,
+                    maxOutputTokens = 8192,
+                    response_mime_type = "application/json"
                 }
             };
 
@@ -41,8 +54,11 @@ namespace LL.Extensions
                 // Ensure the request was successful
                 response.EnsureSuccessStatusCode();
 
+                Candidate? candidate = JSON.Extract<JsonData>(response.Content.ReadAsStringAsync().Result)?.Candidates.FirstOrDefault();
+                string output = candidate?.Content.Parts.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
+
                 // Read the response
-                return await response.Content.ReadAsStringAsync();
+                return output;
             }
         }
 

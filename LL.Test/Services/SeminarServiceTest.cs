@@ -6,6 +6,7 @@ using Moq;
 using LL.SharedDefinitions.Static;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.Extensions.Configuration;
+using LL.Extensions.JSON;
 
 namespace LL.Test.Services
 {
@@ -25,7 +26,8 @@ namespace LL.Test.Services
 
             var service = new SeminarService(wordRepository.Object, statementRepository.Object);
 
-            SeminarRequestModel seminarRequest = new SeminarRequestModel(){
+            SeminarRequestModel seminarRequest = new SeminarRequestModel()
+            {
                 LanguageIdFrom = (int)LanguageEnum.English,
                 LangaugeIdTo = (int)LanguageEnum.Spanish,
                 Words = new List<string>(){ "Creo", "en", "los", "milagros", "desde", "que" }
@@ -36,6 +38,7 @@ namespace LL.Test.Services
 
             // Assert
             Assert.True(seminars.All(s => s.IsValid));
-        }
+        } 
+          
     }   
 }

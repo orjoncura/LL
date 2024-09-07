@@ -18,15 +18,13 @@ namespace LL.Extensions
 
         public static T? Extract<T>(string text) where T : class
         {
-            // Regular expression to match JSON objects
-            var match = Regex.Match(text, @"\{(?:[^{}]|(?<open>\{)|(?<-open>\}))*\}(?(open)(?!))", RegexOptions.Singleline);
+            // Regex to match JSON enclosed in curly braces or triple backticks
+            var match = Regex.Match(text, @"(?<json>{(?:[^{}]|(?<Nested>{)|(?<-Nested>}))*(?(Nested)(?!))})", RegexOptions.Multiline);
 
-            if (match.Success)
-            {
+            if (match.Success) 
                 return DeserializeObject<T>(match.Value);
-            }
-
-            return null;
+            
+            return default;
         }
     }
 }
