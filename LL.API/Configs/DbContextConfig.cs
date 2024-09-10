@@ -6,9 +6,9 @@ namespace LL.API.Configs
 {
     public static class DbContextConfig
     {
-        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, WebApplicationBuilder builder)
+        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            string? connectionString = builder.Configuration.GetConnectionString(AppSettings.DefaultConnectionString);
+            string? connectionString = configuration.GetConnectionString(AppSettings.DefaultConnectionString);
 
             if (connectionString == null) throw new Exception("Connection String is null");
 

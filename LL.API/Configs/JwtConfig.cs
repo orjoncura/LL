@@ -1,27 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿using LL.Core.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LL.API.Configs
 {
     public static class JwtConfig
     {
-        public static IServiceCollection AddJwtConfig(this IServiceCollection services)
+
+        public static IServiceCollection AddJwtConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            services.Configure<TokenConfigModel>(configuration.GetSection("Jwt"));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
+            services.AddAuthorization(opts =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "yourIssuer",
-                    ValidAudience = "yourAudience",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey"))
-                };
+                var defaultAuthBuilder = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme);
+
+                opts.DefaultPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
+                opts.FallbackPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
             });
+
+            services.ConfigureOptions<ConfigureJwtBearerOptions>();
 
             return services;
         }
