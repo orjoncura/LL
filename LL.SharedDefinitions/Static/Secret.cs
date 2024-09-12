@@ -10,5 +10,6 @@ namespace LL.SharedDefinitions.Static
         public static IConfiguration? Configuration { private get; set; }
 
         public static string GenimiAPI => Configuration?["GeminiAPI"] ?? string.Empty;
+        public static string LLamaModeLocation => Configuration?["LLamaModeLocation"] ?? string.Empty;
     }
 }

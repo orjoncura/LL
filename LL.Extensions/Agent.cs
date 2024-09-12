@@ -64,7 +64,7 @@ namespace LL.Extensions
 
         private static async Task<string> RunLocalLlama(string input)
         {
-            var parameters = new ModelParams(@"D:\GGUF\7B-chat.gguf")
+            var parameters = new ModelParams(Secret.LLamaModeLocation)
             {
                 GpuLayerCount = 12 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
             };
@@ -90,7 +90,7 @@ namespace LL.Extensions
 
         public static async Task<string> Run(string input)
         {
-            return await RunGeminiAPI(input);
+            return await RunLocalLlama(input);
         }
     }
 }
