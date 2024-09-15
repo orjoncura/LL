@@ -12,6 +12,7 @@ namespace LL.API.Configs
             services.AddScoped<ISeminarService, SeminarService>();
             services.AddScoped<IWordRepository, WordRepository>();
             services.AddScoped<IStatementRepository, StatementRepository>();
+            services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
 
             return services;
         }

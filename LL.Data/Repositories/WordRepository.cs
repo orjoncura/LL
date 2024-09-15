@@ -6,12 +6,10 @@ namespace LL.Data.Repositories
 {
     public class WordRepository(AppDBContext appDBContext) : IWordRepository
     {
-        public Word? GetSingleByName(string name) 
-        {
-            return appDBContext.Words
-                .Where(w => w.Name == name.Trim()).FirstOrDefault();
-        }
-
+        public Word? GetSingleByName(string name) =>
+            appDBContext.Words.FirstOrDefault(w => 
+                w.Name == name.Trim());
+        
         public int Insert(string name, string translation, string definition, string type, int fromId, int toId, int userId)
         {
             var word = new Word
@@ -33,13 +31,10 @@ namespace LL.Data.Repositories
             return word.Id;
         }
 
-        public bool Exist(string name, int fromId, int toId)
-        {
-            return appDBContext.Words
-                .Where(w => w.Name.ToLower() == name.Trim().ToLower()
+        public bool Exist(string name, int fromId, int toId) => 
+            appDBContext.Words.Any(w => 
+                w.Name.ToLower() == name.Trim().ToLower() 
                 && w.LanguageFromId == fromId
-                && w.LanguageToId == toId).Any();
-        }
-
+                && w.LanguageToId == toId);
     }
 }

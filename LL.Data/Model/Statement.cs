@@ -3,12 +3,9 @@
 public class Statement
 {
     public int Id { get; set; }
-    public int WordId { get; set; }
-    public virtual Word? Word { get; set; }
-    
-    public int SeminarId { get; set; }
-    public virtual Seminar? Seminar { get; set; }
 
+    public int SeminarWordId { get; set; }
+    public virtual SeminarWord? SeminarWord { get; set; }
     public string OriginalStatement { get; set; } = string.Empty;
     public string TranslatedStatement { get; set; } = string.Empty;
 

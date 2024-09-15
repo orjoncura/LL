@@ -88,9 +88,6 @@ namespace LL.Extensions
             return output;
         }
 
-        public static async Task<string> Run(string input)
-        {
-            return await RunLocalLlama(input);
-        }
+        public static async Task<string> Run(string input) => await RunGeminiAPI(input);
     }
 }

@@ -1,8 +1,9 @@
-﻿using LL.Core.Enums;
-using LL.Core.Factories;
+﻿using LL.Core.Factories;
 using LL.Core.Interfaces;
+using LL.Core.Models;
 using LL.Data.Interfaces;
 using LL.Extensions;
+using LL.Extensions.Models;
 using LL.SharedDefinitions.Models;
 
 namespace LL.Core.Services
@@ -16,16 +17,16 @@ namespace LL.Core.Services
             if(seminarRequest == null || seminarRequest.IsValid == false) 
                 return seminarViewModels;
             
-            string rankingPrompt = PromptFactory.CreateRankingPrompt(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId); 
-            var words = JSON.Extract<List<string>>(await Agent.Run(rankingPrompt));
+            string rankingPrompt = PromptFactory.CreateSeminarWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
+            var seminarWords = JSON.Extract<List<SeminarWordsModel>>(await Agent.Run(rankingPrompt));
             
-            foreach (var word in words) 
+            foreach (var seminarWord in seminarWords) 
             {
                 var seminarViewModel = new SeminarViewModel();
 
-                if (wordRepository.Exist(word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId))
+                if (wordRepository.Exist(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId))
                 {
-                    var targetWord = wordRepository.GetSingleByName(word);
+                    var targetWord = wordRepository.GetSingleByName(seminarWord.Word);
 
                     if (targetWord != null)
                     {
@@ -36,7 +37,7 @@ namespace LL.Core.Services
                 }
                 else if(seminarViewModel != null)
                 {
-                    string prompt = PromptFactory.CreateSeminarPrompt(word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
+                    string prompt = PromptFactory.CreateSeminarPrompt(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
                     seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(prompt));
 
                     if (seminarViewModel != null && seminarViewModel.IsValid)

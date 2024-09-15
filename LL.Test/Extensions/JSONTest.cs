@@ -4,6 +4,7 @@ using LL.Extensions;
 using LL.Core.Factories;
 using LL.Data.Model;
 using LL.Core.Enums;
+using LL.Core.Models;
 
 namespace LL.Test.Extensions
 {
@@ -19,6 +20,18 @@ namespace LL.Test.Extensions
             seminarViewModel = JSON.Extract<SeminarViewModel>(jsonString);
 
             Assert.True(seminarViewModel?.Sentences.Any());
+        }
+        
+        [Fact]
+        public void JSON_ExtractSeminarWordsModel()
+        {
+            List<SeminarWordsModel> seminarWordsModel = new List<SeminarWordsModel>();
+
+            string jsonString = PromptFactory.CreateSeminarWordsPrompt(string.Empty, (int)LanguageEnum.Spanish);
+
+            seminarWordsModel = JSON.Extract<List<SeminarWordsModel>>(jsonString);
+
+            Assert.True(seminarWordsModel?.Any());
         }
     }   
 }

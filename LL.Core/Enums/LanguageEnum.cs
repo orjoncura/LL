@@ -1,8 +1,7 @@
-namespace LL.Core.Enums
+namespace LL.Core.Enums;
+
+public enum LanguageEnum
 {
-    public enum LanguageEnum
-    {
-        English = 1,
-        Spanish = 2
-    }
+    English = 1,
+    Spanish = 2
 }

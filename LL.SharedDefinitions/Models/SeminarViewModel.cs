@@ -15,7 +15,7 @@ namespace LL.SharedDefinitions.Models
             && string.IsNullOrWhiteSpace(TargetWord.Type) == false
             && Sentences.Any(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false
                                   && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false);
-        public List<Statement> ConvertToStatements(int wordId, int fromId, int toId, int userId)
+        public List<Statement> ConvertToStatements(int seminarWordId, int fromId, int toId, int userId)
         {
             var statements = new List<Statement>();
 
@@ -23,7 +23,7 @@ namespace LL.SharedDefinitions.Models
             {
                 var statement = new Statement
                 {
-                    WordId = wordId,
+                    SeminarWordId = seminarWordId,
                     OriginalStatement = sentence.OriginalStatement,
                     TranslatedStatement = sentence.TranslatedStatement,
                     IsActive = true,

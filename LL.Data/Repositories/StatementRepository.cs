@@ -6,17 +6,14 @@ namespace LL.Data.Repositories
 {
     public class StatementRepository(AppDBContext appDBContext) : IStatementRepository
     {
-        public List<Statement> GetByWordId(int wordId) 
-        {
-            return appDBContext.Statements
-                .Where(s => s.WordId == wordId).ToList();
-        }
-
+        public List<Statement> GetByWordId(int wordId) =>
+            appDBContext.Statements
+                .Where(s => s.SeminarWord.WordId == wordId).ToList();
+        
         public int Insert(int wordId, string original, string translated, int fromId, int toId, int userId)
         {
             var statement = new Statement
             {
-                WordId = wordId,
                 OriginalStatement = original,
                 TranslatedStatement = translated,  
                 IsActive = true,
