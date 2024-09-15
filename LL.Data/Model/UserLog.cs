@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace LL.Data.Model;
 
-namespace LL.Data.Model
+public class UserLog 
 {
-    public class UserLog 
-    {
-        public long Id { get; set; }
+    public long Id { get; set; }
 
-        public int UserId { get; set; }
-        public virtual User? User { get; set; }
+    public int UserId { get; set; }
+    public virtual User? User { get; set; }
 
-        public int PersonId { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
+    public int PersonId { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
 
-        public int CreatedById { get; set; }
-        public virtual Person? CreatedBy { get; set; }
-        public DateTimeOffset CreatedDate { get; set; }
-    }
+    public int CreatedById { get; set; }
+    public virtual Person? CreatedBy { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }
+

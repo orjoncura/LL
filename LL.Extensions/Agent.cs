@@ -66,7 +66,7 @@ namespace LL.Extensions
         {
             var parameters = new ModelParams(Secret.LLamaModeLocation)
             {
-                GpuLayerCount = 12 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
+                GpuLayerCount = 16 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
             };
 
             using var model = LLamaWeights.LoadFromFile(parameters);

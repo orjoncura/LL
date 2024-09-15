@@ -27,8 +27,8 @@ namespace LL.Test.Services
             SeminarRequestModel seminarRequest = new SeminarRequestModel()
             {
                 LanguageFromId = (int)LanguageEnum.English,
-                LangaugeToId = (int)LanguageEnum.Spanish,
-                Words = new List<string>(){ "Creo", "en", "los", "milagros", "desde", "que" }
+                LanguageToId = (int)LanguageEnum.Spanish,
+                Text = "Creo en los milagros desde que"
             };
 
             // Act

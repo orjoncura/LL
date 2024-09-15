@@ -14,7 +14,7 @@ internal class Program
         // Add services to the container.
         builder.Services
             .AddDbContextConfig(builder.Configuration)
-            .AddJwtConfig(builder.Configuration)
+            //.AddJwtConfig(builder.Configuration)
             .AddCorsConfig()
             .AddDIConfig()
             .AddSwaggerGen()

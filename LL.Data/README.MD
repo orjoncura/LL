@@ -13,5 +13,6 @@ Package Mangager Console
 	Update-Database' --project LL.Data  --startup-project LL.API'
 
 Command Line
+	Linux: export DOTNET_ROOT=/user/bit/dotnet
 	dotnet ef migrations add YourMigrationName --project LL.Data  --startup-project LL.API
 	dotnet ef database update --project LL.Data  --startup-project LL.API

@@ -1,9 +1,13 @@
-﻿namespace LL.Data.Model;
+namespace LL.Data.Model;
 
-public class Language
+public class Seminar
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    
+    public string Value { get; set; }
+    
+    public bool IsActive { get; set; }
+
     public int CreatedById { get; set; }
     public virtual Person? CreatedBy { get; set; }
     public DateTimeOffset CreatedDate { get; set; }

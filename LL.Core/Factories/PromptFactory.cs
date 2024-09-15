@@ -38,7 +38,18 @@ namespace LL.Core.Factories
                             ""TranslatedStatement"": """",
                         }}
                     ]
-                }}", word, languageFrom, languageToId, numberOfSentences);
+                }}", word, languageFrom, languageTo, numberOfSentences);
+
+            return prompt;
+        }
+
+        public static string CreateRankingPrompt(string text, int languageFromId, int languageToId)
+        {
+            string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
+            string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
+
+            string prompt = string.Format(@"Rank the following word by their importance in the sentence. 
+                By importance i mean, how important they are to understand the given sentence", text, languageFrom, languageTo);
 
             return prompt;
         }

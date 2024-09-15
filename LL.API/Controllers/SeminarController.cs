@@ -9,7 +9,7 @@ namespace LL.API.Controllers
     /// <response code="401">Either your security token is invalid or your permissions do not allow the requested action.</response>
     /// <response code="500">There is a bug in the system somewhere.</response>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -38,9 +38,9 @@ namespace LL.API.Controllers
 
                 if (seminarRequest != null)
                 {
-                    exceptionData["Words"] = seminarRequest.Words;
+                    exceptionData["Text"] = seminarRequest.Text;
                     exceptionData["LanguageIdFrom"] = seminarRequest.LanguageFromId;
-                    exceptionData["LangaugeIdTo"] = seminarRequest.LangaugeToId;
+                    exceptionData["LanguageIdTo"] = seminarRequest.LanguageToId;
                 }
 
                 Error.Export(ex, exceptionData);

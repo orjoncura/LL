@@ -15,14 +15,15 @@ namespace LL.Core.Services
 
             if(seminarRequest == null || seminarRequest.IsValid == false) 
                 return seminarViewModels;
-
-            seminarRequest.Words = seminarRequest.Words.Select(w => w.ToLower()).Distinct().ToList();
-
-            foreach (var word in seminarRequest.Words) 
+            
+            string rankingPrompt = PromptFactory.CreateRankingPrompt(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId); 
+            var words = JSON.Extract<List<string>>(await Agent.Run(rankingPrompt));
+            
+            foreach (var word in words) 
             {
                 var seminarViewModel = new SeminarViewModel();
 
-                if (wordRepository.Exist(word, seminarRequest.LanguageFromId, seminarRequest.LangaugeToId))
+                if (wordRepository.Exist(word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId))
                 {
                     var targetWord = wordRepository.GetSingleByName(word);
 
@@ -35,7 +36,7 @@ namespace LL.Core.Services
                 }
                 else if(seminarViewModel != null)
                 {
-                    string prompt = PromptFactory.CreateSeminarPrompt(word, seminarRequest.LanguageFromId, seminarRequest.LangaugeToId);
+                    string prompt = PromptFactory.CreateSeminarPrompt(word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
                     seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(prompt));
 
                     if (seminarViewModel != null && seminarViewModel.IsValid)
@@ -45,13 +46,13 @@ namespace LL.Core.Services
                             seminarViewModel.TargetWord.Definition,
                             seminarViewModel.TargetWord.Type,
                             seminarRequest.LanguageFromId,
-                            seminarRequest.LangaugeToId,
+                            seminarRequest.LanguageToId,
                             userId);
 
                         statementRepository.InsertRange(
                             seminarViewModel.ConvertToStatements(wordId,
                             seminarRequest.LanguageFromId,
-                            seminarRequest.LangaugeToId,
+                            seminarRequest.LanguageToId,
                             userId));
                     }
                 }

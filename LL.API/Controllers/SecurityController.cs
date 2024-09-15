@@ -11,7 +11,7 @@ namespace LL.API.Controllers
     /// <response code="401">Either your security token is invalid or your permissions do not allow the requested action.</response>
     /// <response code="500">There is a bug in the system somewhere.</response>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

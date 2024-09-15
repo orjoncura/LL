@@ -2,10 +2,13 @@
 {
     public class SeminarRequestModel
     {
-        public List<string> Words { get; set; } = new List<string>();
+        public string Text { get; set; } = string.Empty;
         public int LanguageFromId { get; set; }
-        public int LangaugeToId { get; set; }
+        public int LanguageToId { get; set; }
 
-        public bool IsValid => Words.Any() && LanguageFromId > 0 && LangaugeToId > 0;
+        public bool IsValid => 
+            string.IsNullOrWhiteSpace(Text) == false 
+            && LanguageFromId > 0 
+            && LanguageToId > 0;
     }
 }
