@@ -23,4 +23,17 @@ public class SeminarWordRepository(AppDBContext appDBContext) : ISeminarWordRepo
 
         return seminarWord.Id;
     }
+    
+    public bool InsertRange(List<SeminarWord> seminarWords)
+    {
+        seminarWords = seminarWords.Where(s => 
+            s.WordId > 0 
+            & s.SeminarWordRankId > 0
+            & s.SeminarId > 0 ).ToList();
+        
+        appDBContext.AddRange(seminarWords);
+        appDBContext.SaveChanges();
+
+        return seminarWords.All(s => s.Id > 0);
+    }
 }

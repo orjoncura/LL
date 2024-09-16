@@ -12,7 +12,7 @@ namespace LL.SharedDefinitions.Models
             string.IsNullOrWhiteSpace(TargetWord.Name) == false
             && string.IsNullOrWhiteSpace(TargetWord.Translation) == false
             && string.IsNullOrWhiteSpace(TargetWord.Definition) == false
-            && string.IsNullOrWhiteSpace(TargetWord.Type) == false
+            && TargetWord.Type > 0
             && Sentences.Any(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false
                                   && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false);
         public List<Statement> ConvertToStatements(int seminarWordId, int fromId, int toId, int userId)

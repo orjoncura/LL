@@ -5,7 +5,7 @@ namespace LL.Data.Interfaces
     public interface IWordRepository
     {
         public Word? GetSingleByName(string name);
-        int Insert(string name, string translation, string definition, string type, int fromId, int toId, int userId);
+        int Insert(string name, string translation, string definition, int typeId, int fromId, int toId, int userId);
         bool Exist(string name, int fromId, int toId);
     }
 }

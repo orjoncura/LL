@@ -140,6 +140,34 @@ namespace LL.Data.Migrations
                     b.ToTable("PeopleLogs");
                 });
 
+            modelBuilder.Entity("LL.Data.Model.Seminar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Seminar");
+                });
+
             modelBuilder.Entity("LL.Data.Model.Statement", b =>
                 {
                     b.Property<int>("Id")
@@ -161,6 +189,9 @@ namespace LL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SeminarId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TranslatedStatement")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -171,6 +202,8 @@ namespace LL.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("SeminarId");
 
                     b.HasIndex("WordId");
 
@@ -407,11 +440,28 @@ namespace LL.Data.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("LL.Data.Model.Seminar", b =>
+                {
+                    b.HasOne("LL.Data.Model.Person", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
             modelBuilder.Entity("LL.Data.Model.Statement", b =>
                 {
                     b.HasOne("LL.Data.Model.Person", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LL.Data.Model.Seminar", "Seminar")
+                        .WithMany()
+                        .HasForeignKey("SeminarId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -422,6 +472,8 @@ namespace LL.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Seminar");
 
                     b.Navigation("Word");
                 });

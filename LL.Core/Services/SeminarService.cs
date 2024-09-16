@@ -8,7 +8,11 @@ using LL.SharedDefinitions.Models;
 
 namespace LL.Core.Services
 {
-    public class SeminarService(IWordRepository wordRepository, IStatementRepository statementRepository) : ISeminarService
+    public class SeminarService(
+        ISeminarRepository seminarRepository,
+        IWordRepository wordRepository,
+        IStatementRepository statementRepository,
+        ISeminarWordRepository seminarWordRepository) : ISeminarService
     {
         public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
         {

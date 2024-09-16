@@ -12,16 +12,14 @@ namespace LL.SharedDefinitions.Models
         public string Name { get; set; } = string.Empty;
         public string Translation { get; set; } = string.Empty;
         public string Definition { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
+        public int Type { get; set; }
 
         public TargetWordViewModel() { }
 
         public TargetWordViewModel(Word word)
         {
             Name = word.Name;
-            Translation = word.Translation;
             Definition = word.Definition;
-            Type = word.Type;
         }
     }
 }

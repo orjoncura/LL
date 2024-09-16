@@ -12,6 +12,9 @@ namespace LL.Data.Repositories
         
         public int Insert(int wordId, string original, string translated, int fromId, int toId, int userId)
         {
+            if (string.IsNullOrEmpty(original) && string.IsNullOrEmpty(translated))
+                return 0;
+            
             var statement = new Statement
             {
                 OriginalStatement = original,
@@ -27,7 +30,7 @@ namespace LL.Data.Repositories
             return statement.Id;
         }
 
-        public bool InsertRange(List<Statement> statements)
+        public List<int> InsertRange(List<Statement> statements)
         {
             statements = statements
                 .Where(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false 
@@ -37,7 +40,7 @@ namespace LL.Data.Repositories
             appDBContext.AddRange(statements);
             appDBContext.SaveChanges();
 
-            return true;
+            return statements.Select(s => s.Id).ToList();
         }
     }
 }

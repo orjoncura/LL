@@ -18,6 +18,8 @@ namespace LL.Data.Contexts
         public DbSet<LoginHistory> LoginHistory { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Word> Words { get; set; }
+        public DbSet<WordType> WordTypes { get; set; }
+        public DbSet<WordLink> WordLinks { get; set; }
         public DbSet<Statement> Statements { get; set; }
         public DbSet<SeminarWord> SeminarWords { get; set; }
         public DbSet<SeminarWordRank> SeminarWordRank { get; set; }
@@ -142,22 +144,14 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Word>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
-                entity.Property(ut => ut.Translation).IsRequired();
                 entity.Property(ut => ut.Definition).IsRequired();
-                entity.Property(ut => ut.Type).IsRequired();
-                entity.Property(ut => ut.LanguageFromId).IsRequired();
-                entity.Property(ut => ut.LanguageToId).IsRequired();
+                entity.Property(ut => ut.TypeId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
 
-                entity.HasOne(ut => ut.LanguageFrom)
+                entity.HasOne(ut => ut.Type)
                     .WithMany()
-                    .HasForeignKey(ut => ut.LanguageFromId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ut => ut.LanguageTo)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.LanguageToId)
+                    .HasForeignKey(ut => ut.TypeId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(ut => ut.CreatedById).IsRequired();
@@ -168,6 +162,41 @@ namespace LL.Data.Contexts
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            modelBuilder.Entity<WordType>(entity =>
+            {
+                entity.Property(ut => ut.Name).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.CreatedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
+            modelBuilder.Entity<WordLink>(entity =>
+            {
+                entity.Property(ut => ut.SourceId).IsRequired();
+                entity.HasOne(ut => ut.Source)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.SourceId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.Property(ut => ut.TargetId).IsRequired();
+                entity.HasOne(ut => ut.Target)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.TargetId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.CreatedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
             modelBuilder.Entity<Statement>(entity =>
             {
                 entity.Property(ut => ut.OriginalStatement).IsRequired();
@@ -191,9 +220,22 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Seminar>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
+                entity.Property(ut => ut.LanguageFromId).IsRequired();
+                entity.Property(ut => ut.LanguageToId).IsRequired();
+                
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
+                
+                entity.HasOne(ut => ut.LanguageFrom)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.LanguageFromId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ut => ut.LanguageTo)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.LanguageToId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 
                 entity.HasOne(ut => ut.CreatedBy)
                     .WithMany()
@@ -204,7 +246,6 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<SeminarWordRank>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
-                entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
                 

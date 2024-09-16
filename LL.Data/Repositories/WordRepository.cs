@@ -10,16 +10,13 @@ namespace LL.Data.Repositories
             appDBContext.Words.FirstOrDefault(w => 
                 w.Name == name.Trim());
         
-        public int Insert(string name, string translation, string definition, string type, int fromId, int toId, int userId)
+        public int Insert(string name, string translation, string definition, int typeId, int fromId, int toId, int userId)
         {
             var word = new Word
             { 
                 Name = name.Trim(),
-                Translation = translation.Trim(),
                 Definition = definition.Trim(),
-                Type = type.Trim(),
-                LanguageFromId = fromId,
-                LanguageToId = toId,
+                TypeId = typeId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,
@@ -33,8 +30,6 @@ namespace LL.Data.Repositories
 
         public bool Exist(string name, int fromId, int toId) => 
             appDBContext.Words.Any(w => 
-                w.Name.ToLower() == name.Trim().ToLower() 
-                && w.LanguageFromId == fromId
-                && w.LanguageToId == toId);
+                w.Name.ToLower() == name.Trim().ToLower());
     }
 }
