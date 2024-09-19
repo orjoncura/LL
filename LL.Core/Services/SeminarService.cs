@@ -1,72 +1,67 @@
 ﻿using LL.Core.Factories;
-using LL.Core.Interfaces;
-using LL.Core.Models;
-using LL.Data.Interfaces;
-using LL.Extensions;
-using LL.Extensions.Models;
-using LL.SharedDefinitions.Models;
+using LL.Core.Helpers;
+using LL.Core.Interfaces.Extensions;
+using LL.Core.Interfaces.Repositories;
+using LL.Core.Interfaces.Services;
+using LL.Core.Models.Arguments;
+using LL.Core.Models.Short;
+using LL.Core.Models.ViewModels;
 
-namespace LL.Core.Services
+namespace LL.Core.Services;
+
+public class SeminarService(
+    ISeminarRepository seminarRepository,
+    IWordRepository wordRepository,
+    IStatementRepository statementRepository,
+    ISeminarWordRepository seminarWordRepository,
+    IAgentService agentService,
+    ITranslation translation) : ISeminarService
 {
-    public class SeminarService(
-        ISeminarRepository seminarRepository,
-        IWordRepository wordRepository,
-        IStatementRepository statementRepository,
-        ISeminarWordRepository seminarWordRepository) : ISeminarService
+    public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
     {
-        public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
-        {
-            List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
+        List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
 
-            if(seminarRequest == null || seminarRequest.IsValid == false) 
-                return seminarViewModels;
-            
-            string rankingPrompt = PromptFactory.CreateSeminarWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
-            var seminarWords = JSON.Extract<List<SeminarWordsModel>>(await Agent.Run(rankingPrompt));
-            
-            foreach (var seminarWord in seminarWords) 
-            {
-                var seminarViewModel = new SeminarViewModel();
-
-                if (wordRepository.Exist(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId))
-                {
-                    var targetWord = wordRepository.GetSingleByName(seminarWord.Word);
-
-                    if (targetWord != null)
-                    {
-                        seminarViewModel.TargetWord = new TargetWordViewModel(targetWord);
-                        seminarViewModel.Sentences = statementRepository
-                            .GetByWordId(targetWord.Id).Select(s => new StatementModel(s)).ToList();
-                    }
-                }
-                else if(seminarViewModel != null)
-                {
-                    string prompt = PromptFactory.CreateSeminarPrompt(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
-                    seminarViewModel = JSON.Extract<SeminarViewModel>(await Agent.Run(prompt));
-
-                    if (seminarViewModel != null && seminarViewModel.IsValid)
-                    {
-                        int wordId = wordRepository.Insert(seminarViewModel.TargetWord.Name,
-                            seminarViewModel.TargetWord.Translation,
-                            seminarViewModel.TargetWord.Definition,
-                            seminarViewModel.TargetWord.Type,
-                            seminarRequest.LanguageFromId,
-                            seminarRequest.LanguageToId,
-                            userId);
-
-                        statementRepository.InsertRange(
-                            seminarViewModel.ConvertToStatements(wordId,
-                            seminarRequest.LanguageFromId,
-                            seminarRequest.LanguageToId,
-                            userId));
-                    }
-                }
-
-                if (seminarViewModel != null)
-                    seminarViewModels.Add(seminarViewModel);
-            }
-
+        if(seminarRequest == null || seminarRequest.IsValid == false) 
             return seminarViewModels;
+        
+        int seminarId = seminarRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        string rankingPrompt = PromptFactory.CreateSeminarWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
+        
+        List<SeminarWordsModel> seminarWords = 
+            JsonHelper.Extract<List<SeminarWordsModel>>(await agentService.Run(rankingPrompt)) 
+            ?? new List<SeminarWordsModel>();
+        
+        foreach (var seminarWord in seminarWords) 
+        {
+            var seminarViewModel = new SeminarViewModel();
+
+            int wordId = wordRepository.Insert(seminarViewModel.TargetWord.Name,
+                seminarViewModel.TargetWord.Definition,
+                seminarViewModel.TargetWord.TypeId,
+                seminarRequest.LanguageFromId,
+                userId);
+
+            int translatedWordId = wordRepository.Insert(
+                translation.TranslateText(seminarViewModel.TargetWord.Name,
+                    seminarRequest.LanguageFromId, 
+                    seminarRequest.LanguageToId), 
+             translation.TranslateText(seminarViewModel.TargetWord.Definition, 
+                 seminarRequest.LanguageFromId, 
+                 seminarRequest.LanguageToId),
+                seminarViewModel.TargetWord.TypeId,
+                seminarRequest.LanguageToId,
+                userId);
+            
+            int seminarWordId = seminarWordRepository.Insert(wordId, seminarId, seminarWord.Importance, userId);
+            
+            string prompt = PromptFactory.CreateSeminarPrompt(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
+            var statements = JsonHelper.Extract<List<StatementShort>>(await agentService.Run(prompt));
+
+            if (statements != null && statements.Any(s => s.IsValid))
+                statementRepository.InsertRange(seminarWordId, statements, userId);
         }
+
+        return seminarViewModels;
     }
 }
+

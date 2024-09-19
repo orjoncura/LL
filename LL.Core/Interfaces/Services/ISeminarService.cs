@@ -1,6 +1,7 @@
-﻿using LL.SharedDefinitions.Models;
+﻿using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModels;
 
-namespace LL.Core.Interfaces
+namespace LL.Core.Interfaces.Services
 {
     public interface ISeminarService
     {

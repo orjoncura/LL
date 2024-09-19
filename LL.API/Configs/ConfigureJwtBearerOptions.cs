@@ -1,8 +1,8 @@
 using System.Text;
+using LL.Core.Models.ViewModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using LL.Core.Models;
 
 namespace LL.API.Configs
 {

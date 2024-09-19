@@ -1,5 +1,4 @@
 using LL.API.Configs;
-using LL.SharedDefinitions.Static;
 
 internal class Program
 {
@@ -8,15 +7,14 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Configuration.AddUserSecrets<Program>();
-
-        Secret.Configuration = builder.Configuration;
-
+        
         // Add services to the container.
         builder.Services
             .AddDbContextConfig(builder.Configuration)
             //.AddJwtConfig(builder.Configuration)
             .AddCorsConfig()
             .AddDependencyInjectionConfig()
+            .AddSingletonCongig(builder.Configuration)
             .AddSwaggerGen()
             .AddEndpointsApiExplorer()
             .AddControllers();

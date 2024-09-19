@@ -1,5 +1,5 @@
 using LL.Data.Contexts;
-using LL.Data.Interfaces;
+using LL.Core.Interfaces.Repositories;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;

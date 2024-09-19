@@ -1,14 +1,15 @@
-﻿using LL.Core.Helpers;
-using LL.Core.Interfaces;
-using LL.Core.Models;
-using LL.Data.Interfaces;
-using LL.Data.Model;
-using LL.SharedDefinitions.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
+using LL.Core.Helpers;
 using System.Security.Claims;
 using System.Text;
+using LL.Core.Interfaces.Repositories;
+using LL.Core.Interfaces.Services;
+using LL.Core.Models.Arguments;
+using LL.Core.Models.Short;
+using LL.Core.Models.ViewModel;
+using LL.Core.Models.ViewModels;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LL.Core.Services
 {
@@ -37,7 +38,7 @@ namespace LL.Core.Services
             return GenerateToken(user);
         }
 
-        public TokenViewModel GenerateToken(User user)
+        public TokenViewModel GenerateToken(UserShort user)
         {
             var expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_tokenConfig.Expires));
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfig.Key ?? string.Empty));
@@ -59,7 +60,7 @@ namespace LL.Core.Services
         }
 
 
-        private static Claim[] GetClaims(User user)
+        private static Claim[] GetClaims(UserShort user)
         {
             return
             [

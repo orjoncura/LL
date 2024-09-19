@@ -1,21 +1,22 @@
 ﻿using LL.Data.Contexts;
-using LL.Data.Interfaces;
+using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.ViewModels;
 using LL.Data.Model;
 
-namespace LL.Data.Repositories
+namespace LL.Data.Repositories;
+public class WordRepository(AppDBContext appDBContext) : IWordRepository
 {
-    public class WordRepository(AppDBContext appDBContext) : IWordRepository
+    public int Insert(string name, string definition, int typeId, int languageId, int userId)
     {
-        public Word? GetSingleByName(string name) =>
-            appDBContext.Words.FirstOrDefault(w => 
-                w.Name == name.Trim());
+        var word = GetSingleByName(name, languageId);
         
-        public int Insert(string name, string translation, string definition, int typeId, int fromId, int toId, int userId)
+        if (word == null)
         {
-            var word = new Word
+            word = new Word
             { 
                 Name = name.Trim(),
                 Definition = definition.Trim(),
+                LanguageId = languageId,
                 TypeId = typeId,
                 IsActive = true,
                 CreatedById = userId,
@@ -24,12 +25,14 @@ namespace LL.Data.Repositories
 
             appDBContext.Add(word);
             appDBContext.SaveChanges();
-
-            return word.Id;
         }
-
-        public bool Exist(string name, int fromId, int toId) => 
-            appDBContext.Words.Any(w => 
-                w.Name.ToLower() == name.Trim().ToLower());
+        
+        return word.Id;
     }
+
+    private Word? GetSingleByName(string name, int fromId) => 
+        appDBContext.Words.FirstOrDefault(w => 
+            w.Name.ToLower() == name.Trim().ToLower()
+            & w.LanguageId == fromId);
 }
+

@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LL.SharedDefinitions\LL.SharedDefinitions.csproj" />
+    <ProjectReference Include="..\LL.Core\LL.Core.csproj" />
   </ItemGroup>
 
 </Project>

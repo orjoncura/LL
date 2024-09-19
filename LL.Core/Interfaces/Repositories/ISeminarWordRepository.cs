@@ -1,4 +1,4 @@
-namespace LL.Data.Interfaces;
+namespace LL.Core.Interfaces.Repositories;
 
 public interface ISeminarWordRepository
 { 

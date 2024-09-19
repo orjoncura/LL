@@ -1,29 +1,28 @@
-﻿using LL.Core.Models;
+﻿using LL.Core.Models.ViewModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 
-namespace LL.API.Configs
+namespace LL.API.Configs;
+
+public static class JwtConfig
 {
-    public static class JwtConfig
+    public static IServiceCollection AddJwtConfig(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<TokenConfigModel>(configuration.GetSection("Jwt"));
 
-        public static IServiceCollection AddJwtConfig(this IServiceCollection services, IConfiguration configuration)
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
+        services.AddAuthorization(opts =>
         {
-            services.Configure<TokenConfigModel>(configuration.GetSection("Jwt"));
+            var defaultAuthBuilder = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            opts.DefaultPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
+            opts.FallbackPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
+        });
 
-            services.AddAuthorization(opts =>
-            {
-                var defaultAuthBuilder = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme);
+        services.ConfigureOptions<ConfigureJwtBearerOptions>();
 
-                opts.DefaultPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
-                opts.FallbackPolicy = defaultAuthBuilder.RequireClaim("UserId").Build();
-            });
-
-            services.ConfigureOptions<ConfigureJwtBearerOptions>();
-
-            return services;
-        }
+        return services;
     }
 }
+

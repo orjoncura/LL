@@ -1,8 +1,9 @@
-using LL.Core.Interfaces;
-using LL.SharedDefinitions.Models;
-using LL.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using LL.Core.Interfaces.Extensions;
+using LL.Core.Interfaces.Services;
+using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModels;
 
 namespace LL.API.Controllers
 {
@@ -13,7 +14,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SeminarController(ISeminarService seminarService) : Controller
+    public class SeminarController(ISeminarService seminarService, IAppMonitoring appMonitoring) : Controller
     {
         /// <summary>
         /// Pass a list of words and get a seminat in the selcted language
@@ -43,7 +44,7 @@ namespace LL.API.Controllers
                     exceptionData["LanguageIdTo"] = seminarRequest.LanguageToId;
                 }
 
-                Error.Export(ex, exceptionData);
+                appMonitoring.ExportError(ex, exceptionData);
             }
 
             return Ok(seminarViewModels);

@@ -1,4 +1,4 @@
-namespace LL.Core.Models;
+namespace LL.Core.Models.Arguments;
 
 public class SeminarWordsModel
 {

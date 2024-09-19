@@ -1,46 +1,58 @@
 ﻿using LL.Data.Contexts;
-using LL.Data.Interfaces;
+using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.Short;
+using LL.Core.Models.ViewModels;
 using LL.Data.Model;
 
-namespace LL.Data.Repositories
+namespace LL.Data.Repositories;
+public class StatementRepository(AppDBContext appDBContext) : IStatementRepository
 {
-    public class StatementRepository(AppDBContext appDBContext) : IStatementRepository
+    public int Insert(int seminarWordId, string original, string translated, int userId)
     {
-        public List<Statement> GetByWordId(int wordId) =>
-            appDBContext.Statements
-                .Where(s => s.SeminarWord.WordId == wordId).ToList();
+        if (string.IsNullOrEmpty(original) && string.IsNullOrEmpty(translated))
+            return 0;
         
-        public int Insert(int wordId, string original, string translated, int fromId, int toId, int userId)
+        var statement = new Statement
         {
-            if (string.IsNullOrEmpty(original) && string.IsNullOrEmpty(translated))
-                return 0;
-            
+            SeminarWordId = seminarWordId,
+            OriginalStatement = original,
+            TranslatedStatement = translated,  
+            IsActive = true,
+            CreatedById = userId,
+            CreatedDate = DateTime.Now,
+        };
+
+        appDBContext.Add(statement);
+        appDBContext.SaveChanges();
+
+        return statement.Id;
+    }
+
+    public List<int> InsertRange(int seminarWordId, List<StatementShort> statementShorts, int userId)
+    {
+        var statements = new List<Statement>();
+        
+        foreach (StatementShort s in statementShorts.Where(s => s.IsValid).ToList())
+        {
             var statement = new Statement
             {
-                OriginalStatement = original,
-                TranslatedStatement = translated,  
+                SeminarWordId = seminarWordId,
+                OriginalStatement = s.OriginalStatement,
+                TranslatedStatement = s.TranslatedStatement,
                 IsActive = true,
-                CreatedById = userId,
-                CreatedDate = DateTime.Now,
+                CreatedById = userId
             };
-
-            appDBContext.Add(statement);
-            appDBContext.SaveChanges();
-
-            return statement.Id;
+            
+            statements.Add(statement);
         }
 
-        public List<int> InsertRange(List<Statement> statements)
+        if (statements.Any())
         {
-            statements = statements
-                .Where(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false 
-                && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false)
-                .ToList();
-
             appDBContext.AddRange(statements);
             appDBContext.SaveChanges();
-
-            return statements.Select(s => s.Id).ToList();
         }
+
+        return statements.Select(s => s.Id).ToList();
     }
 }
+

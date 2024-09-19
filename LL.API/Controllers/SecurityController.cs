@@ -1,10 +1,10 @@
-﻿using LL.Core.Interfaces;
-using LL.Core.Services;
-using LL.Data.Model;
-using LL.Extensions;
-using LL.SharedDefinitions.Models;
+﻿using LL.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using LL.Core.Interfaces.Extensions;
+using LL.Core.Interfaces.Services;
+using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModels;
 
 namespace LL.API.Controllers
 {    
@@ -15,7 +15,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SecurityController(ISecurityService securityService) : Controller
+    public class SecurityController(ISecurityService securityService, IAppMonitoring appMonitoring) : Controller
     {
         /// <summary>
         /// Pass username and password and get a security token.
@@ -42,7 +42,7 @@ namespace LL.API.Controllers
                     exceptionData["Username"] = loginModel.Username;
                 }
 
-                Error.Export(ex, exceptionData);
+                appMonitoring.ExportError(ex, exceptionData);
             }
 
             return Ok(tokenViewModel);
