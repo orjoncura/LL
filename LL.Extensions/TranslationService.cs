@@ -3,7 +3,7 @@ using LL.Core.Interfaces.Extensions;
 
 namespace LL.Extensions;
 
-public class Translation: ITranslation
+public class TranslationService: ITranslationService
 {
     public string TranslateText(string text, int fromId, int toId) => 
         TranslationClient.Create().TranslateText(text, GetLanguageCode(fromId), GetLanguageCode(toId)).TranslatedText;

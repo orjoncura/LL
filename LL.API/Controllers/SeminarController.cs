@@ -14,7 +14,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SeminarController(ISeminarService seminarService, IAppMonitoring appMonitoring) : Controller
+    public class SeminarController(ISeminarService seminarService, IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
         /// Pass a list of words and get a seminat in the selcted language
@@ -44,7 +44,7 @@ namespace LL.API.Controllers
                     exceptionData["LanguageIdTo"] = seminarRequest.LanguageToId;
                 }
 
-                appMonitoring.ExportError(ex, exceptionData);
+                appMonitoringService.ExportError(ex, exceptionData);
             }
 
             return Ok(seminarViewModels);

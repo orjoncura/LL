@@ -18,13 +18,14 @@ namespace LL.API.Configs
             //Repositories
             services.AddScoped<ISeminarRepository, SeminarRepository>();
             services.AddScoped<IWordRepository, WordRepository>();
+            services.AddScoped<IWordLinkRepository, WordLinkRepository>();
             services.AddScoped<IStatementRepository, StatementRepository>();
             services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
             
             //Extensions
-            services.AddScoped<IAppMonitoring, AppMonitoring>();
+            services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IAgentService, AgentService>();
-            services.AddScoped<ITranslation, Translation>();
+            services.AddScoped<ITranslationService, TranslationService>();
             
             return services;
         }

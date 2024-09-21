@@ -12,10 +12,11 @@ namespace LL.Core.Services;
 public class SeminarService(
     ISeminarRepository seminarRepository,
     IWordRepository wordRepository,
+    IWordLinkRepository wordLinkRepository,
     IStatementRepository statementRepository,
     ISeminarWordRepository seminarWordRepository,
     IAgentService agentService,
-    ITranslation translation) : ISeminarService
+    ITranslationService translationService) : ISeminarService
 {
     public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
     {
@@ -42,15 +43,17 @@ public class SeminarService(
                 userId);
 
             int translatedWordId = wordRepository.Insert(
-                translation.TranslateText(seminarViewModel.TargetWord.Name,
+                translationService.TranslateText(seminarViewModel.TargetWord.Name,
                     seminarRequest.LanguageFromId, 
                     seminarRequest.LanguageToId), 
-             translation.TranslateText(seminarViewModel.TargetWord.Definition, 
+             translationService.TranslateText(seminarViewModel.TargetWord.Definition, 
                  seminarRequest.LanguageFromId, 
                  seminarRequest.LanguageToId),
                 seminarViewModel.TargetWord.TypeId,
                 seminarRequest.LanguageToId,
                 userId);
+
+            wordLinkRepository.Insert(wordId, translatedWordId, userId);
             
             int seminarWordId = seminarWordRepository.Insert(wordId, seminarId, seminarWord.Importance, userId);
             

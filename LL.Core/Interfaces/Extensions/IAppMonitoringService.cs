@@ -1,6 +1,6 @@
 namespace LL.Core.Interfaces.Extensions;
 
-public interface IAppMonitoring
+public interface IAppMonitoringService
 {
     void ExportError(Exception exception);
 

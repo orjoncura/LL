@@ -2,7 +2,7 @@
 
 namespace LL.Extensions;
 
-public class AppMonitoring : IAppMonitoring
+public class AppMonitoringService : IAppMonitoringService
 {
     public void ExportError(Exception exception)
     {

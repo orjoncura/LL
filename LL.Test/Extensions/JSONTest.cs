@@ -1,10 +1,8 @@
-using LL.SharedDefinitions.Models;
-using LL.Extensions.Models;
-using LL.Extensions;
 using LL.Core.Factories;
-using LL.Data.Model;
 using LL.Core.Enums;
-using LL.Core.Models;
+using LL.Core.Helpers;
+using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModels;
 
 namespace LL.Test.Extensions
 {
@@ -17,7 +15,7 @@ namespace LL.Test.Extensions
 
             string jsonString = PromptFactory.CreateSeminarPrompt("Creo", (int)LanguageEnum.English, (int)LanguageEnum.Spanish);
 
-            seminarViewModel = JSON.Extract<SeminarViewModel>(jsonString);
+            seminarViewModel = JsonHelper.Extract<SeminarViewModel>(jsonString);
 
             Assert.True(seminarViewModel?.Sentences.Any());
         }
@@ -29,7 +27,7 @@ namespace LL.Test.Extensions
 
             string jsonString = PromptFactory.CreateSeminarWordsPrompt(string.Empty, (int)LanguageEnum.Spanish);
 
-            seminarWordsModel = JSON.Extract<List<SeminarWordsModel>>(jsonString);
+            seminarWordsModel = JsonHelper.Extract<List<SeminarWordsModel>>(jsonString);
 
             Assert.True(seminarWordsModel?.Any());
         }

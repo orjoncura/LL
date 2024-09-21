@@ -15,7 +15,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SecurityController(ISecurityService securityService, IAppMonitoring appMonitoring) : Controller
+    public class SecurityController(ISecurityService securityService, IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
         /// Pass username and password and get a security token.
@@ -42,7 +42,7 @@ namespace LL.API.Controllers
                     exceptionData["Username"] = loginModel.Username;
                 }
 
-                appMonitoring.ExportError(ex, exceptionData);
+                appMonitoringService.ExportError(ex, exceptionData);
             }
 
             return Ok(tokenViewModel);
