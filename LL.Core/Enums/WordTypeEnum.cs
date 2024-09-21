@@ -5,5 +5,6 @@ public enum WordTypeEnum
     Nouns = 1,
     Verbs = 2,
     Adjectives = 3,
-    Adverbs = 4
+    Adverbs = 4,
+    Interjections = 5
 }

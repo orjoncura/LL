@@ -19,6 +19,8 @@ namespace LL.API.Configs
             services.AddScoped<ISeminarRepository, SeminarRepository>();
             services.AddScoped<IWordRepository, WordRepository>();
             services.AddScoped<IWordLinkRepository, WordLinkRepository>();
+            services.AddScoped<IWordMeaningRepository, WordMeaningRepository>();
+            services.AddScoped<IWordDefinitionRepository, WordDefinitionRepository>();
             services.AddScoped<IStatementRepository, StatementRepository>();
             services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
             
@@ -26,6 +28,7 @@ namespace LL.API.Configs
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<ITranslationService, TranslationService>();
+            services.AddScoped<IDictionaryService, DictionaryService>();
             
             return services;
         }

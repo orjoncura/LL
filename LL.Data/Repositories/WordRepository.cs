@@ -6,7 +6,7 @@ using LL.Data.Model;
 namespace LL.Data.Repositories;
 public class WordRepository(AppDBContext appDBContext) : IWordRepository
 {
-    public int Insert(string name, string definition, int typeId, int languageId, int userId)
+    public int Insert(string name, int languageId, int userId)
     {
         var word = GetSingleByName(name, languageId);
         
@@ -15,9 +15,7 @@ public class WordRepository(AppDBContext appDBContext) : IWordRepository
             word = new Word
             { 
                 Name = name.Trim(),
-                Definition = definition.Trim(),
                 LanguageId = languageId,
-                TypeId = typeId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

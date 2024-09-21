@@ -3,7 +3,7 @@
 public class Language
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
     
     public int CreatedById { get; set; }
     public virtual Person? CreatedBy { get; set; }

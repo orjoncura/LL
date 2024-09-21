@@ -3,6 +3,6 @@
 namespace LL.Core.Interfaces.Repositories;
 public interface IWordRepository
 {
-    int Insert(string name, string definition, int typeId, int languageId, int userId);
+    int Insert(string name, int languageId, int userId);
 }
 
