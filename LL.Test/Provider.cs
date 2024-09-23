@@ -1,3 +1,4 @@
+using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -40,7 +41,7 @@ public static class Provider
         services.AddScoped<IDictionaryService, DictionaryService>();
 
         //Singletons
-        services.AddSingleton(new AgentModel(config["GeminiAPI"], config["LLamaModeLocation"]));
+        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
             
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));

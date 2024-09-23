@@ -1,5 +1,5 @@
-using System.Text.Json;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace LL.Core.Helpers;
 
@@ -7,12 +7,12 @@ public static class JsonHelper
 {
     public static string SerializeObject(object obj)
     {
-        return JsonSerializer.Serialize(obj);
+        return JsonConvert.SerializeObject(obj);
     }
 
     public static T? DeserializeObject<T>(string value)
     {
-        return JsonSerializer.Deserialize<T>(value);
+        return JsonConvert.DeserializeObject<T>(value);
     }
 
     public static T? Extract<T>(string text) where T : class

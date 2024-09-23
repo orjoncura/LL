@@ -63,7 +63,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
             return output;
         }
     }
-
+    
     private async Task<string> RunLocalLlama(string input)
     {
         var parameters = new ModelParams(agentModel.LLamaModeLocation)

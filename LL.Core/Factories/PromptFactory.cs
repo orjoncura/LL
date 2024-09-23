@@ -4,41 +4,34 @@ namespace LL.Core.Factories
 {
     public static class PromptFactory
     {
-        public static string CreateSeminarPrompt(string word, int languageFromId, int languageToId, int numberOfSentences = 3)
+        public static string CreateSeminarPrompt(string word, int languageFromId, int languageToId, string text, int numberOfSentences = 3)
         {
             string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
-            string prompt = string.Format(@"Create {3} sentences in {2} for the word:{0} 
-                and return a JSON file that contains the word, the sentences, 
-                their translation to {1}, its definition and its type (verb and noun).
+            string prompt = string.Format(@"Create {4} sentences in {1} for the word:{0} 
+                and return a JSON file that contains the new statement and its translation to {2}
                 If the word is in different language, explicit or isn't understandable, just ignore it.
-                Please correct the grammar of the TargetWord if you have to and make sure all words start with a capital letter.
                 Please make sure what you return is appropriate for kids.
+                Please make sure {0} in the new sentences has the same meaning, it has in the text,
+                also try to use only words that are included in the text.
+                The text is {3}
                 The JSON file should have the following format:
 
-                {{
-                    ""TargetWord"": {{
-                        ""Name"": ""{0}"",
-                        ""Translation"": """",
-                        ""Definition"": """",
-                        ""Type"": """",
+                [
+                    {{
+                        ""OriginalStatement"": """",
+                        ""TranslatedStatement"": """",
                     }},
-                    ""Sentences"": [
-                        {{
-                            ""OriginalStatement"": """",
-                            ""TranslatedStatement"": """",
-                        }},
-                        {{
-                            ""OriginalStatement"": """",
-                            ""TranslatedStatement"": """",
-                        }},
-                        {{
-                            ""OriginalStatement"": """",
-                            ""TranslatedStatement"": """",
-                        }}
-                    ]
-                }}", word, languageFrom, languageTo, numberOfSentences);
+                    {{
+                        ""OriginalStatement"": """",
+                        ""TranslatedStatement"": """",
+                    }},
+                    {{
+                        ""OriginalStatement"": """",
+                        ""TranslatedStatement"": """",
+                    }}
+                ]", word, languageFrom, languageTo, text, numberOfSentences);
 
             return prompt;
         }

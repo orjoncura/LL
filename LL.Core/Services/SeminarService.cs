@@ -41,7 +41,12 @@ public class SeminarService(
             int wordId = InsertWord(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
             int seminarWordId = seminarWordRepository.Insert(wordId, seminarId, seminarWord.Importance, userId);
             
-            string prompt = PromptFactory.CreateSeminarPrompt(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
+            string prompt = PromptFactory.CreateSeminarPrompt(
+                seminarWord.Word,
+                seminarRequest.LanguageFromId, 
+                seminarRequest.LanguageToId,
+                seminarRequest.Text);
+            
             var statements = JsonHelper.Extract<List<StatementShort>>(await agentService.Run(prompt));
 
             if (statements != null && statements.Any(s => s.IsValid))
