@@ -4,7 +4,7 @@ using LL.Core.Models.ViewModels;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
-public class WordRepository(AppDBContext appDBContext) : IWordRepository
+public class WordRepository(AppDBContext db) : IWordRepository
 {
     public int Insert(string name, int languageId, int userId)
     {
@@ -21,15 +21,15 @@ public class WordRepository(AppDBContext appDBContext) : IWordRepository
                 CreatedDate = DateTime.Now,
             };
 
-            appDBContext.Add(word);
-            appDBContext.SaveChanges();
+            db.Add(word);
+            db.SaveChanges();
         }
         
         return word.Id;
     }
 
     private Word? GetSingleByName(string name, int fromId) => 
-        appDBContext.Words.FirstOrDefault(w => 
+        db.Words.FirstOrDefault(w => 
             w.Name.ToLower() == name.Trim().ToLower()
             & w.LanguageId == fromId);
 }

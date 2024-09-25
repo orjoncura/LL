@@ -18,8 +18,8 @@ namespace LL.Test.Services
         {           
             SeminarRequestModel seminarRequest = new SeminarRequestModel()
             {
-                LanguageFromId = (int)LanguageEnum.English,
-                LanguageToId = (int)LanguageEnum.Spanish,
+                LanguageFromId = (int)LanguageEnum.Spanish,
+                LanguageToId = (int)LanguageEnum.English,
                 Text = "Creo en los milagros desde que te vi\nEn esta noche de tequila boom boom" +
                        "Eres tan sexy eres sexy thing\nMis ojos te persiguen sólo a ti\n\nY debe haber un caos dentro de ti" +
                        "Para que brote así una estrella que baila\nInfierno y paraíso dentro de ti\nLa luna es un sol, mira cómo brilla" +

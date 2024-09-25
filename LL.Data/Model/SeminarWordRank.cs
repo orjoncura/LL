@@ -6,6 +6,6 @@ public class SeminarWordRank
     public string Value { get; set; }
     
     public int CreatedById { get; set; }
-    public virtual Person? CreatedBy { get; set; }
+    public virtual User? CreatedBy { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
 }

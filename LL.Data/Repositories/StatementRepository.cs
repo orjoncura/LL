@@ -5,7 +5,7 @@ using LL.Core.Models.ViewModels;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
-public class StatementRepository(AppDBContext appDBContext) : IStatementRepository
+public class StatementRepository(AppDBContext db) : IStatementRepository
 {
     public int Insert(int seminarWordId, string original, string translated, int userId)
     {
@@ -15,15 +15,15 @@ public class StatementRepository(AppDBContext appDBContext) : IStatementReposito
         var statement = new Statement
         {
             SeminarWordId = seminarWordId,
-            OriginalStatement = original,
-            TranslatedStatement = translated,  
+            Original = original,
+            Translated = translated,  
             IsActive = true,
             CreatedById = userId,
             CreatedDate = DateTime.Now,
         };
 
-        appDBContext.Add(statement);
-        appDBContext.SaveChanges();
+        db.Add(statement);
+        db.SaveChanges();
 
         return statement.Id;
     }
@@ -37,8 +37,8 @@ public class StatementRepository(AppDBContext appDBContext) : IStatementReposito
             var statement = new Statement
             {
                 SeminarWordId = seminarWordId,
-                OriginalStatement = s.OriginalStatement,
-                TranslatedStatement = s.TranslatedStatement,
+                Original = s.OriginalStatement,
+                Translated = s.TranslatedStatement,
                 IsActive = true,
                 CreatedById = userId
             };
@@ -48,8 +48,8 @@ public class StatementRepository(AppDBContext appDBContext) : IStatementReposito
 
         if (statements.Any())
         {
-            appDBContext.AddRange(statements);
-            appDBContext.SaveChanges();
+            db.AddRange(statements);
+            db.SaveChanges();
         }
 
         return statements.Select(s => s.Id).ToList();

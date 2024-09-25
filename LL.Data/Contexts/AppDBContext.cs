@@ -8,13 +8,15 @@ namespace LL.Data.Contexts
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) { }
 
         public AppDBContext() { }
-
-        public DbSet<Person> People { get; set; }
-        public DbSet<PersonLog> PeopleLogs { get; set; }
+        
         public DbSet<User> Users { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<UserTokenLog> UserTokenLogs { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<MessageLog> MessageLogs { get; set; }
+        public DbSet<MessageStatus> MessageStatuses { get; set; }
+        public DbSet<MessageContent> MessageContents { get; set; }
         public DbSet<LoginHistory> LoginHistory { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Word> Words { get; set; }
@@ -29,50 +31,17 @@ namespace LL.Data.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Person>(entity =>
-            {
-                entity.Property(p => p.FirstName).IsRequired();
-                entity.Property(p => p.LastName).IsRequired();
-                entity.Property(p => p.IsActive).IsRequired();
-            });
-
-            modelBuilder.Entity<PersonLog>(entity =>
-            {
-                entity.Property(p => p.FirstName).IsRequired();
-                entity.Property(p => p.LastName).IsRequired();
-                entity.Property(p => p.IsActive).IsRequired();
-                entity.Property(p => p.CreatedById).IsRequired();
-                entity.Property(p => p.CreatedDate).IsRequired();
-                entity.Property(u => u.PersonId).IsRequired();
-
-                entity.HasOne(p => p.Person)
-                    .WithMany()
-                    .HasForeignKey(p => p.PersonId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(p => p.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(p => p.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
+            
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(p => p.Username).IsRequired();
+                entity.Property(p => p.Email).IsRequired();
                 entity.Property(p => p.PasswordHash).IsRequired();
                 entity.Property(u => u.IsActive).IsRequired();
-                entity.Property(u => u.PersonId).IsRequired();
-
-                entity.HasOne(p => p.Person)
-                    .WithMany()
-                    .HasForeignKey(p => p.PersonId)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<UserLog>(entity =>
             {
-                entity.Property(p => p.Username).IsRequired();
+                entity.Property(p => p.Email).IsRequired();
                 entity.Property(p => p.PasswordHash).IsRequired();
                 entity.Property(u => u.IsActive).IsRequired();
                 entity.Property(u => u.PersonId).IsRequired();
@@ -116,6 +85,94 @@ namespace LL.Data.Contexts
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.Property(ut => ut.SenderId).IsRequired();
+                entity.Property(ut => ut.ReceiverId).IsRequired();
+                entity.Property(ut => ut.StatusId).IsRequired();
+                entity.Property(ut => ut.MessageContentId).IsRequired();
+                entity.Property(ut => ut.DateSend).IsRequired();
+
+                entity.HasOne(ut => ut.Sender)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);;
+
+                entity.HasOne(p => p.Receiver)
+                    .WithMany()
+                    .HasForeignKey(p => p.ReceiverId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(p => p.Status)
+                    .WithMany()
+                    .HasForeignKey(p => p.StatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(p => p.MessageContent)
+                    .WithMany()
+                    .HasForeignKey(p => p.MessageContentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
+            modelBuilder.Entity<MessageLog>(entity =>
+            {
+                entity.Property(ut => ut.MessageId).IsRequired();
+                entity.Property(ut => ut.SenderId).IsRequired();
+                entity.Property(ut => ut.ReceiverId).IsRequired();
+                entity.Property(ut => ut.StatusId).IsRequired();
+                entity.Property(ut => ut.MessageContentId).IsRequired();
+                entity.Property(ut => ut.DateSend).IsRequired();
+
+                entity.HasOne(ut => ut.Message)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.MessageId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(ut => ut.Sender)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Receiver)
+                    .WithMany()
+                    .HasForeignKey(p => p.ReceiverId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(p => p.Status)
+                    .WithMany()
+                    .HasForeignKey(p => p.StatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(p => p.MessageContent)
+                    .WithMany()
+                    .HasForeignKey(p => p.MessageContentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
+            modelBuilder.Entity<MessageStatus>(entity =>
+            {
+                entity.Property(ut => ut.Value).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.CreatedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
+            modelBuilder.Entity<MessageContent>(entity =>
+            {
+                entity.Property(ut => ut.Value).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(p => p.CreatedDate).IsRequired();
+
+                entity.HasOne(ut => ut.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(ut => ut.CreatedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            
             modelBuilder.Entity<LoginHistory>(entity => 
             {
                 entity.HasOne(ut => ut.User)
@@ -239,8 +296,8 @@ namespace LL.Data.Contexts
             
             modelBuilder.Entity<Statement>(entity =>
             {
-                entity.Property(ut => ut.OriginalStatement).IsRequired();
-                entity.Property(ut => ut.TranslatedStatement).IsRequired();
+                entity.Property(ut => ut.Original).IsRequired();
+                entity.Property(ut => ut.Translated).IsRequired();
                 entity.Property(ut => ut.SeminarWordId).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();

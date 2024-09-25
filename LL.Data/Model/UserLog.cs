@@ -8,12 +8,12 @@ public class UserLog
     public virtual User? User { get; set; }
 
     public int PersonId { get; set; }
-    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 
     public int CreatedById { get; set; }
-    public virtual Person? CreatedBy { get; set; }
+    public virtual User? CreatedBy { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
 }
 

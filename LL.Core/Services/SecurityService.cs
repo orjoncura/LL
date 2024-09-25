@@ -14,16 +14,15 @@ using Microsoft.IdentityModel.Tokens;
 namespace LL.Core.Services
 {
     public class SecurityService(
-        ISecurityRepository securityRepository,
+        IUserRepository userRepository,
         IOptions<TokenConfigModel> config)
         : ISecurityService
     {
-        private readonly ISecurityRepository _securityRepository = securityRepository;
         private readonly TokenConfigModel _tokenConfig = config.Value;
 
         public TokenViewModel? Authenticate(LoginModel userLogin)
         {
-            var user = _securityRepository.GetLoginByUsername(userLogin.Username);
+            var user = userRepository.GetByEmail(userLogin.Email);
 
             if (user is null)
             {
@@ -65,7 +64,7 @@ namespace LL.Core.Services
             return
             [
                 new Claim("UserId", user.Id.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Username ?? string.Empty)
+                new Claim(ClaimTypes.NameIdentifier, user.Email ?? string.Empty)
             ];
         }
     }

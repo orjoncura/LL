@@ -4,7 +4,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class SeminarWordRepository(AppDBContext appDBContext) : ISeminarWordRepository
+public class SeminarWordRepository(AppDBContext db) : ISeminarWordRepository
 {
     public int Insert(int wordId, int seminarId, int seminarWordRankId, int userId)
     {
@@ -18,8 +18,8 @@ public class SeminarWordRepository(AppDBContext appDBContext) : ISeminarWordRepo
             CreatedDate = DateTime.Now,
         };
 
-        appDBContext.Add(seminarWord);
-        appDBContext.SaveChanges();
+        db.Add(seminarWord);
+        db.SaveChanges();
 
         return seminarWord.Id;
     }
@@ -31,8 +31,8 @@ public class SeminarWordRepository(AppDBContext appDBContext) : ISeminarWordRepo
             & s.SeminarWordRankId > 0
             & s.SeminarId > 0 ).ToList();
         
-        appDBContext.AddRange(seminarWords);
-        appDBContext.SaveChanges();
+        db.AddRange(seminarWords);
+        db.SaveChanges();
 
         return seminarWords.All(s => s.Id > 0);
     }

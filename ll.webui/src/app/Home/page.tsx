@@ -7,23 +7,14 @@ import Constants from '@/scripts/Constants'
 export default function Home() {
   const [text, setText] = useState<string>('');
   const [response, setResponse] = useState<string | null>(null);
-
-    function createListFromText(value: string) {
-        // Remove special symbols using a regular expression
-        const cleanedArticle = value.replace(/[^\w\s.]/g, '');
-
-        const sentences = cleanedArticle.split(' ').map(sentence => sentence.trim()).filter(sentence => sentence.length > 0);
-
-        return sentences;
-    }
-
+  
   const handleSubmit = async () => {
 
     try {
         const data = {
-            "words": createListFromText(text),
-            "languageIdFrom": 1,
-            "langaugeIdTo": 2
+            "text": text,
+            "languageIdFrom": 2,
+            "langaugeIdTo": 1
         };
 
         fetch(Constants().API + '/Seminar/CreateSeminar', { 

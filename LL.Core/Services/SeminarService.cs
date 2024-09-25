@@ -64,13 +64,13 @@ public class SeminarService(
     {
         int wordId = wordRepository.Insert(word, fromId, userId);
 
-        string translatedWord = translationService.TranslateText(word, fromId, toId);
-            
-        int translatedWordId = wordRepository.Insert(translatedWord, fromId, userId);
+        // string translatedWord = translationService.TranslateText(word, fromId, toId);
+        //     
+        // int translatedWordId = wordRepository.Insert(translatedWord, fromId, userId);
+        //
+        // wordLinkRepository.Insert(wordId, translatedWordId, userId);
 
-        wordLinkRepository.Insert(wordId, translatedWordId, userId);
-
-        InsertMeaningsByWordId(wordId, translatedWord, toId, userId);
+        InsertMeaningsByWordId(wordId, word, toId, userId);
 
         return wordId;
     }

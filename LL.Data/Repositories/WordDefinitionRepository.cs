@@ -4,7 +4,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class WordDefinitionRepository(AppDBContext appDBContext) : IWordDefinitionRepository 
+public class WordDefinitionRepository(AppDBContext db) : IWordDefinitionRepository 
 {
     public int Insert(string definition, int wordMeaningId, int userId)
     {
@@ -17,8 +17,8 @@ public class WordDefinitionRepository(AppDBContext appDBContext) : IWordDefiniti
             CreatedDate = DateTime.Now,
         };
 
-        appDBContext.Add(wordDefinition);
-        appDBContext.SaveChanges();
+        db.Add(wordDefinition);
+        db.SaveChanges();
         
         return wordDefinition.Id;
     }

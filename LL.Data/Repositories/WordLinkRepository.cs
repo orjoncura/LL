@@ -4,10 +4,10 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class WordLinkRepository(AppDBContext appDBContext) : IWordLinkRepository
+public class WordLinkRepository(AppDBContext db) : IWordLinkRepository
 {
     private WordLink? Get(int sourceId, int targetId) =>
-        appDBContext.WordLinks.FirstOrDefault(w => w.SourceId == sourceId && w.TargetId == targetId && w.IsActive);
+        db.WordLinks.FirstOrDefault(w => w.SourceId == sourceId && w.TargetId == targetId && w.IsActive);
     
     public int Insert(int wordId, int translatedWordId, int userId)
     {
@@ -24,8 +24,8 @@ public class WordLinkRepository(AppDBContext appDBContext) : IWordLinkRepository
                 CreatedDate = DateTime.Now,
             };
 
-            appDBContext.Add(wordLink);
-            appDBContext.SaveChanges();
+            db.Add(wordLink);
+            db.SaveChanges();
         }
 
         return wordLink.Id;

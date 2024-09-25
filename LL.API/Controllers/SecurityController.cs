@@ -39,7 +39,7 @@ namespace LL.API.Controllers
 
                 if (loginModel != null)
                 {
-                    exceptionData["Username"] = loginModel.Username;
+                    exceptionData["Username"] = loginModel.Email;
                 }
 
                 appMonitoringService.ExportError(ex, exceptionData);

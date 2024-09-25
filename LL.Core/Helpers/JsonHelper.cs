@@ -18,8 +18,8 @@ public static class JsonHelper
     public static T? Extract<T>(string text) where T : class
     {
         // Regex to match JSON enclosed in curly braces or triple backticks
-        var match = Regex.Match(text, @"(?<json>{(?:[^{}]|(?<Nested>{)|(?<-Nested>}))*(?(Nested)(?!))})", RegexOptions.Multiline);
-
+        var match = Regex.Match(text, @"(?<json>\[.*?\]|\{(?:[^{}]|(?<Nested>{)|(?<-Nested>}))*(?(Nested)(?!))\})", RegexOptions.Singleline);
+        
         if (match.Success) 
             return DeserializeObject<T>(match.Value);
             

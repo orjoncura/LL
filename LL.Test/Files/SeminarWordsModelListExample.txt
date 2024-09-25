@@ -1,0 +1,358 @@
+[
+  {
+    "Word": "creo",
+    "Importance": 1
+  },
+  {
+    "Word": "milagros",
+    "Importance": 1
+  },
+  {
+    "Word": "vi",
+    "Importance": 1
+  },
+  {
+    "Word": "noche",
+    "Importance": 1
+  },
+  {
+    "Word": "tequila",
+    "Importance": 1
+  },
+  {
+    "Word": "sexy",
+    "Importance": 1
+  },
+  {
+    "Word": "ojos",
+    "Importance": 1
+  },
+  {
+    "Word": "persiguen",
+    "Importance": 1
+  },
+  {
+    "Word": "ti",
+    "Importance": 1
+  },
+  {
+    "Word": "debe",
+    "Importance": 1
+  },
+  {
+    "Word": "caos",
+    "Importance": 1
+  },
+  {
+    "Word": "brote",
+    "Importance": 1
+  },
+  {
+    "Word": "estrella",
+    "Importance": 1
+  },
+  {
+    "Word": "baila",
+    "Importance": 1
+  },
+  {
+    "Word": "infierno",
+    "Importance": 1
+  },
+  {
+    "Word": "paraíso",
+    "Importance": 1
+  },
+  {
+    "Word": "luna",
+    "Importance": 1
+  },
+  {
+    "Word": "sol",
+    "Importance": 1
+  },
+  {
+    "Word": "brilla",
+    "Importance": 1
+  },
+  {
+    "Word": "baby",
+    "Importance": 1
+  },
+  {
+    "Word": "night",
+    "Importance": 1
+  },
+  {
+    "Word": "fire",
+    "Importance": 1
+  },
+  {
+    "Word": "fuego",
+    "Importance": 1
+  },
+  {
+    "Word": "cielo",
+    "Importance": 1
+  },
+  {
+    "Word": "llamas",
+    "Importance": 1
+  },
+  {
+    "Word": "oscuro",
+    "Importance": 1
+  },
+  {
+    "Word": "baila",
+    "Importance": 1
+  },
+  {
+    "Word": "morena",
+    "Importance": 1
+  },
+  {
+    "Word": "luna",
+    "Importance": 1
+  },
+  {
+    "Word": "llena",
+    "Importance": 1
+  },
+  {
+    "Word": "moonlight",
+    "Importance": 1
+  },
+  {
+    "Word": "ven",
+    "Importance": 1
+  },
+  {
+    "Word": "chica",
+    "Importance": 1
+  },
+  {
+    "Word": "loca",
+    "Importance": 1
+  },
+  {
+    "Word": "boca",
+    "Importance": 1
+  },
+  {
+    "Word": "noche",
+    "Importance": 1
+  },
+  {
+    "Word": "cosa",
+    "Importance": 1
+  },
+  {
+    "Word": "toca",
+    "Importance": 1
+  },
+  {
+    "Word": "corazón",
+    "Importance": 1
+  },
+  {
+    "Word": "oro",
+    "Importance": 1
+  },
+  {
+    "Word": "santo",
+    "Importance": 1
+  },
+  {
+    "Word": "dámelo",
+    "Importance": 1
+  },
+  {
+    "Word": "merezco",
+    "Importance": 1
+  },
+  {
+    "Word": "en",
+    "Importance": 2
+  },
+  {
+    "Word": "desde",
+    "Importance": 2
+  },
+  {
+    "Word": "esta",
+    "Importance": 2
+  },
+  {
+    "Word": "boom",
+    "Importance": 2
+  },
+  {
+    "Word": "eres",
+    "Importance": 2
+  },
+  {
+    "Word": "thing",
+    "Importance": 2
+  },
+  {
+    "Word": "sólo",
+    "Importance": 2
+  },
+  {
+    "Word": "a",
+    "Importance": 2
+  },
+  {
+    "Word": "dentro",
+    "Importance": 2
+  },
+  {
+    "Word": "así",
+    "Importance": 2
+  },
+  {
+    "Word": "que",
+    "Importance": 2
+  },
+  {
+    "Word": "cómo",
+    "Importance": 2
+  },
+  {
+    "Word": "the",
+    "Importance": 2
+  },
+  {
+    "Word": "is",
+    "Importance": 2
+  },
+  {
+    "Word": "seamos",
+    "Importance": 2
+  },
+  {
+    "Word": "el",
+    "Importance": 2
+  },
+  {
+    "Word": "lo",
+    "Importance": 2
+  },
+  {
+    "Word": "tanto",
+    "Importance": 2
+  },
+  {
+    "Word": "los",
+    "Importance": 3
+  },
+  {
+    "Word": "de",
+    "Importance": 3
+  },
+  {
+    "Word": "te",
+    "Importance": 3
+  },
+  {
+    "Word": "de",
+    "Importance": 3
+  },
+  {
+    "Word": "tan",
+    "Importance": 3
+  },
+  {
+    "Word": "mis",
+    "Importance": 3
+  },
+  {
+    "Word": "un",
+    "Importance": 3
+  },
+  {
+    "Word": "para",
+    "Importance": 3
+  },
+  {
+    "Word": "una",
+    "Importance": 3
+  },
+  {
+    "Word": "y",
+    "Importance": 3
+  },
+  {
+    "Word": "de",
+    "Importance": 3
+  },
+  {
+    "Word": "la",
+    "Importance": 3
+  },
+  {
+    "Word": "un",
+    "Importance": 3
+  },
+  {
+    "Word": "mira",
+    "Importance": 3
+  },
+  {
+    "Word": "on",
+    "Importance": 3
+  },
+  {
+    "Word": "en",
+    "Importance": 3
+  },
+  {
+    "Word": "en",
+    "Importance": 3
+  },
+  {
+    "Word": "bajo",
+    "Importance": 3
+  },
+  {
+    "Word": "esta",
+    "Importance": 3
+  },
+  {
+    "Word": "under",
+    "Importance": 3
+  },
+  {
+    "Word": "dame",
+    "Importance": 3
+  },
+  {
+    "Word": "que",
+    "Importance": 3
+  },
+  {
+    "Word": "cualquier",
+    "Importance": 3
+  },
+  {
+    "Word": "te",
+    "Importance": 3
+  },
+  {
+    "Word": "mi",
+    "Importance": 3
+  },
+  {
+    "Word": "es",
+    "Importance": 3
+  },
+  {
+    "Word": "del",
+    "Importance": 3
+  },
+  {
+    "Word": "me",
+    "Importance": 3
+  }
+]

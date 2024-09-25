@@ -4,7 +4,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class SeminarRepository(AppDBContext appDBContext) : ISeminarRepository
+public class SeminarRepository(AppDBContext db) : ISeminarRepository
 {
     public int Insert(string value, int fromId, int toId, int userId)
     {
@@ -18,8 +18,8 @@ public class SeminarRepository(AppDBContext appDBContext) : ISeminarRepository
             CreatedDate = DateTime.Now,
         };
 
-        appDBContext.Add(seminar);
-        appDBContext.SaveChanges();
+        db.Add(seminar);
+        db.SaveChanges();
 
         return seminar.Id;
     }
