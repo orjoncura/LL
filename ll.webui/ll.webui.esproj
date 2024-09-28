@@ -10872,5 +10872,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".next\cache\swc\plugins\v7_linux_x86_64_0.106.15\" />
+    <Folder Include="src\app\Security\" />
   </ItemGroup>
 </Project>

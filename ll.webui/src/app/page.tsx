@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
+import {POST} from '../scripts/Helpers/SecurityHelper'
+import {LoginModel} from "@/scripts/Models/LoginModel";
 
 export default function Login() {
   const router = useRouter()
@@ -12,7 +14,25 @@ export default function Login() {
   const handleSubmit = (event:any) => {
     event.preventDefault();
     console.log('Login attempted with:', { email, password });
-    router.push('/Home', { scroll: false })
+
+    try {
+          if(email.trim() != '' && password.trim() != '') {
+            
+            const data: LoginModel = {
+              "email": email,
+              "password": password
+            };
+            
+            POST('/Security/Authenticate', JSON.stringify(data))
+                .then(data => { router.push('/Home', { scroll: false })})
+                .catch(error => { console.error('Error sending data:', error);});
+      }
+    } catch (error) {
+      console.error('Error making API call:', error);
+      
+      // setResponse('An error occurred');
+    }
+    //
   };
 
   return (

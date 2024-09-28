@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar/Navbar/Navbar';
 import Constants from '@/scripts/Constants'
+import {SeminarRequestModel} from "../../scripts/Models/SeminarRequestModel";
 
 export default function Home() {
   const [text, setText] = useState<string>('');
@@ -11,10 +12,10 @@ export default function Home() {
   const handleSubmit = async () => {
 
     try {
-        const data = {
+        const data: SeminarRequestModel = {
             "text": text,
-            "languageIdFrom": 2,
-            "langaugeIdTo": 1
+            "languageFromId": 2,
+            "languageToId": 1
         };
 
         fetch(Constants().API + '/Seminar/CreateSeminar', { 

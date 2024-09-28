@@ -20,7 +20,7 @@ public class UserRepository(AppDBContext db) : IUserRepository
      
      public int Insert(string email, string password, int personId)
      {
-         var user = Get(email);
+         User? user = Get(email);
          
          if (user != null) 
              return user.Id;
