@@ -1,4 +1,4 @@
-﻿using LL.Core.Enums;
+using LL.Core.Enums;
 
 namespace LL.Core.Models.Arguments;
 

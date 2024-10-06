@@ -14,7 +14,7 @@ namespace LL.API.Configs
         {
             //Core Services
             services.AddScoped<ISeminarService, SeminarService>();
-            services.AddScoped<ISecurityService, SecurityService>();
+            //services.AddScoped<ISecurityService, SecurityService>();
             
             //Repositories
             services.AddScoped<IUserRepository, UserRepository>();
