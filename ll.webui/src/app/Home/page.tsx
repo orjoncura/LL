@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar/Navbar/Navbar';
 import Constants from '@/scripts/Constants'
-import {SeminarRequestModel} from "../../scripts/Models/SeminarRequestModel";
+import {SeminarRequestModel} from '@/generated-client/src';
 
 export default function Home() {
   const [text, setText] = useState<string>('');

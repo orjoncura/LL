@@ -7,11 +7,8 @@ public class MessageLog
     public int MessageId { get; set; }
     public virtual Message? Message { get; set; }
     
-    public int SenderId { get; set; }
-    public virtual User? Sender { get; set; }
-    
-    public int ReceiverId { get; set; }
-    public virtual User? Receiver { get; set; }
+    public int RecipientId { get; set; }
+    public virtual User? Recipient { get; set; }
     
     public int StatusId { get; set; }
     public MessageStatus? Status { get; set; }

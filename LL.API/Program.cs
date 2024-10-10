@@ -1,4 +1,6 @@
 using LL.API.Configs;
+using LL.API.Constants;
+using Microsoft.OpenApi.Models;
 
 internal class Program
 {
@@ -11,13 +13,16 @@ internal class Program
         // Add services to the container.
         builder.Services
             .AddDbContextConfig(builder.Configuration)
-            //.AddJwtConfig(builder.Configuration)
+            .AddJwtConfig(builder.Configuration)
             .AddCorsConfig()
-            .AddDependencyInjectionConfig()
-            .AddSingletonCongig(builder.Configuration)
-            .AddSwaggerGen()
+            .AddDependencyInjectionConfig(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();
+        
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = builder.Configuration.GetSection(AppSettings.Version).Value });
+        });
 
         var app = builder.Build();
 

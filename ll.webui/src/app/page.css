@@ -1,0 +1,10 @@
+.center {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+}
+
+a {
+    text-decoration: none;
+    color: #007bff; /* Link color */
+    font-size: 20px; /* Text size */
+}

@@ -1,4 +1,5 @@
-﻿using LL.Core.Interfaces.Extensions;
+﻿using LL.Core.Constants;
+using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.ViewModel;
@@ -10,11 +11,11 @@ namespace LL.API.Configs
 {
     public static class DependencyInjectionConfig
     {
-        public static IServiceCollection AddDependencyInjectionConfig(this IServiceCollection services)
+        public static IServiceCollection AddDependencyInjectionConfig(this IServiceCollection services, IConfiguration config)
         {
             //Core Services
             services.AddScoped<ISeminarService, SeminarService>();
-            //services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<ISecurityService, SecurityService>();
             
             //Repositories
             services.AddScoped<IUserRepository, UserRepository>();
@@ -27,6 +28,9 @@ namespace LL.API.Configs
             services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
             
             //Extensions
+            services.AddScoped<IAgentService>(p => 
+                new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
+            
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<ITranslationService, TranslationService>();

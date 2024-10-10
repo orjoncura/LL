@@ -5,9 +5,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LL.API.Configs
-{
-        public class ConfigureJwtBearerOptions(IOptions<TokenConfigModel> tokenConfigModel)
-        : IConfigureNamedOptions<JwtBearerOptions>
+{ 
+    public class ConfigureJwtBearerOptions(IOptions<TokenConfigModel> tokenConfigModel): IConfigureNamedOptions<JwtBearerOptions>
     {
         private readonly TokenConfigModel _tokenConfigModel = tokenConfigModel.Value;
 
@@ -20,7 +19,7 @@ namespace LL.API.Configs
             ValidIssuer = _tokenConfigModel.Issuer,
             ValidAudience = _tokenConfigModel.Audience,
             LifetimeValidator = CustomLifetimeValidator,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfigModel.Key)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenConfigModel.Key))
         };
 
         public void Configure(JwtBearerOptions options) => Configure(JwtBearerDefaults.AuthenticationScheme, options);

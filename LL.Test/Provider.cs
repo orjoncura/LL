@@ -22,10 +22,12 @@ public static class Provider
             
         var config = new ConfigurationBuilder().AddUserSecrets<SeminarServiceTest>().Build();
             
-        //Services
+        //Core Services
         services.AddScoped<ISeminarService, SeminarService>();
+        services.AddScoped<ISecurityService, SecurityService>();
             
         //Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISeminarRepository, SeminarRepository>();
         services.AddScoped<IWordRepository, WordRepository>();
         services.AddScoped<IWordLinkRepository, WordLinkRepository>();
@@ -35,13 +37,13 @@ public static class Provider
         services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
             
         //Extensions
+        services.AddScoped<IAgentService>(p => 
+            new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
+            
         services.AddScoped<IAppMonitoringService, AppMonitoringService>();
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<IDictionaryService, DictionaryService>();
-
-        //Singletons
-        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
             
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));

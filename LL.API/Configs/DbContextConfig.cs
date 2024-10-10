@@ -1,4 +1,4 @@
-﻿using LL.API.Constants;
+﻿using LL.Core.Constants;
 using LL.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,9 +6,9 @@ namespace LL.API.Configs
 {
     public static class DbContextConfig
     {
-        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDbContextConfig(this IServiceCollection services, IConfiguration config)
         {
-            string? connectionString = configuration.GetConnectionString(AppSettings.DefaultConnectionString);
+            string? connectionString = config.GetConnectionString(Secrets.DefaultConnectionString);
 
             if (connectionString == null) throw new Exception("Connection String is null");
 

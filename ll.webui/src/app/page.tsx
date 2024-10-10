@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
-import {POST} from '../scripts/Helpers/SecurityHelper'
-import {LoginModel} from "@/scripts/Models/LoginModel";
+import {POST} from '@/scripts/Helpers/SecurityHelper'
+import {LoginModel} from '@/generated-client/src';
+import './page.css'; // Import CSS file
+import Link from 'next/link';
 
 export default function Login() {
   const router = useRouter()
@@ -13,10 +15,11 @@ export default function Login() {
 
   const handleSubmit = (event:any) => {
     event.preventDefault();
-    console.log('Login attempted with:', { email, password });
 
     try {
-          if(email.trim() != '' && password.trim() != '') {
+        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        
+          if(email.trim() != '' && password.trim() != '' && pattern.test(email)) {
             
             const data: LoginModel = {
               "email": email,
@@ -29,43 +32,42 @@ export default function Login() {
       }
     } catch (error) {
       console.error('Error making API call:', error);
-      
-      // setResponse('An error occurred');
     }
-    //
   };
 
   return (
     <Container>
       <Row className="justify-content-md-center mt-5">
-        <Col xs={12} md={6}>
-          <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
+          <Col xs={12} md={6}>
+              <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
 
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
               <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
               />
-            </Form.Group>
+              <br/>
+              <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+              />
 
-            <Button variant="primary" type="submit" className="w-100">
-              Login
-            </Button>
-          </Form>
-        </Col>
+              <br/>
+              <Button variant="primary" type="submit" className="w-100" onSubmit={handleSubmit}> Login </Button>
+
+              <hr/>
+              <div className="center">
+                  <Link href="/Security/ResetPassword">Forgotten password?</Link>
+              </div>
+
+              <br/>
+              <Link href="/Security/CreateNewAccount">
+                  <Button variant="success" type="submit" className="w-100"  href="/Security/CreateNewAccount"> Create new account </Button> 
+              </Link>
+          </Col>
       </Row>
     </Container>
   );

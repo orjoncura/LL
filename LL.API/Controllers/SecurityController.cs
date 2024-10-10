@@ -1,6 +1,8 @@
 ﻿using LL.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using System.Text.RegularExpressions;
+using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
@@ -15,7 +17,7 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SecurityController(ISecurityService securityService, IAppMonitoringService appMonitoringService) : Controller
+    public class SecurityController(IConfiguration config, ISecurityService securityService, IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
         /// Pass username and password and get a security token.
@@ -46,6 +48,40 @@ namespace LL.API.Controllers
             }
 
             return Ok(tokenViewModel);
+        }
+
+        /// <summary>
+        /// Will create a user and a message.
+        /// </summary>
+        /// <param name="email">The email address of the user</param>
+        /// <response code="200">The new seminar</response>
+        [HttpPost("CreateUserRequest")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult CreateUserRequest(string email)
+        {
+            bool isRequestCreated = false;
+            
+            try
+            {
+                //Check if the email is in a valid format.
+                if (Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+                {
+                    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+                    var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
+                
+                    isRequestCreated = securityService.CreateNewUserRequest(email, ipAddress, attemptsLimit);
+                }
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+
+                exceptionData["email"] = email;
+
+                appMonitoringService.ExportError(ex, exceptionData);
+            }
+
+            return Ok(isRequestCreated);
         }
     }
 }

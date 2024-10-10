@@ -1,0 +1,13 @@
+namespace LL.Data.Model;
+
+public class ResetPasswordRequest
+{
+    public int Id { get; set; }
+    
+    public int UserId { get; set; }
+    public virtual User? User { get; set; }
+    
+    public string IP { get; set; }
+    public Guid Token { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }     
+}

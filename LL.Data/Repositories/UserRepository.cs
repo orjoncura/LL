@@ -18,7 +18,7 @@ public class UserRepository(AppDBContext db) : IUserRepository
          db.Users.FirstOrDefault(u => 
              u.Email.ToLower().Trim() == email.ToLower().Trim());
      
-     public int Insert(string email, string password, int personId)
+     public int Insert(string email, string password)
      {
          User? user = Get(email);
          
@@ -40,7 +40,6 @@ public class UserRepository(AppDBContext db) : IUserRepository
              UserId = user.Id,
              Email = email,
              PasswordHash = password,
-             PersonId = personId,
              IsActive = true,
          };
 
