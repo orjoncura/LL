@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 
-namespace LL.Core.Helpers
-{
-    public static class SecurityHelper
+namespace LL.Core.Helpers;
+
+public static class SecurityHelper
     {
         public static bool VerifyHashedPassword(string hashedPassword, string password)
         {
@@ -50,4 +50,4 @@ namespace LL.Core.Helpers
             return flag;
         }
     }
-}
+

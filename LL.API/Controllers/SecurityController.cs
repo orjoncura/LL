@@ -1,7 +1,5 @@
-﻿using LL.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
-using System.Text.RegularExpressions;
 using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
@@ -57,20 +55,17 @@ namespace LL.API.Controllers
         /// <response code="200">The new seminar</response>
         [HttpPost("CreateUserRequest")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public ActionResult CreateUserRequest(string email)
+        public ActionResult CreateUserRequest([FromBody] string email)
         {
             bool isRequestCreated = false;
             
             try
             {
-                //Check if the email is in a valid format.
-                if (Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
-                {
-                    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-                    var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+                var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
+            
+                isRequestCreated = securityService.CreateNewUserRequest(email, ipAddress, attemptsLimit);
                 
-                    isRequestCreated = securityService.CreateNewUserRequest(email, ipAddress, attemptsLimit);
-                }
             }
             catch (Exception ex)
             {

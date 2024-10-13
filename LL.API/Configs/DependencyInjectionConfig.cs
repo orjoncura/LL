@@ -26,10 +26,15 @@ namespace LL.API.Configs
             services.AddScoped<IWordDefinitionRepository, WordDefinitionRepository>();
             services.AddScoped<IStatementRepository, StatementRepository>();
             services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
             
             //Extensions
-            services.AddScoped<IAgentService>(p => 
-                new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
+            services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
+            services.AddScoped<IAgentService, AgentService>();
+            
+            //services.AddScoped<IAgentService>(p => 
+              //  new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
             
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IAgentService, AgentService>();

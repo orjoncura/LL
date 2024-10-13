@@ -1,31 +1,42 @@
 "use client";
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import Constants from "@/scripts/Constants";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
-import {useRouter} from "next/navigation";
+import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
+import ModalView from '../../../components/Modal/ModalView';
 
 export default function CreateNewAccountPage() {
-    
+
+    const modalRef = useRef<any>(null); 
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalBody, setModalBody] = useState('');
     const [email, setEmail] = useState('');
-    const router = useRouter();
     
+    const openModal = (title: string, body:string) => {
+        if (modalRef.current) {
+            setModalTitle(title);
+            setModalBody(body);
+          modalRef.current.openModal(); // Call openModal from the Example component
+        }
+      };
+
     const handleSubmit = (event:any) => {
         event.preventDefault();
 
+        console.log("Creating new account...");
+
         try {
-            const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if(IsValidEmail(email)) {
 
-            if(email.trim() != '' && pattern.test(email)) {
-
-                POST('/Security/CreateUserRequest', JSON.stringify({ "email": email}))
-                    .then(data => { router.push('/', { scroll: false })})
+                POST('/Security/CreateUserRequest', JSON.stringify(email))
+                    .then(data => { })
                     .catch(error => { console.error('Error sending data:', error);});
+            }else {
+                openModal("Invalid Email", "Please pass a valid email"); 
             }
         } catch (error) {
             console.error('Error making API call:', error);
-
-            // setResponse('An error occurred');
         }
     };
     
@@ -43,9 +54,12 @@ export default function CreateNewAccountPage() {
                     />
                     
                     <br/>
-                    <Button variant="success" type="submit" className="w-100" onSubmit={handleSubmit}> Submit </Button>
+                    <Button variant="success" type="submit" className="w-100" onClick={handleSubmit}> Submit </Button>
                 </Col>
             </Row>
+
+            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} />
+
         </Container>
     );
 };

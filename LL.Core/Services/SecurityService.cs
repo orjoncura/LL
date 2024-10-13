@@ -42,17 +42,21 @@ public class SecurityService(
     public bool CreateNewUserRequest(string email, string ip, int attemptsLimit)
     {
         int newUserRequest = 0;
-
-        int userId = userRepository.Insert(email.ToLower(), string.Empty);
         
-        if (newUserRequestRepository.HasReachedLimit(userId, new DateTimeOffset(), attemptsLimit) == false)
+        //Check if the email is in a valid format.
+        if (TextHelper.IsValidEmail(email))
         {
-            Guid token = Guid.NewGuid();
-            
-            newUserRequest = newUserRequestRepository.Insert(userId, ip, token);
-            messageRepository.Insert(userId, SecurityMessagesFactory.CreateSeminarPrompt(token));
+            int userId = userRepository.Insert(email.ToLower(), string.Empty);
+
+            if (newUserRequestRepository.HasReachedLimit(userId, new DateTimeOffset(), attemptsLimit) == false)
+            {
+                Guid token = Guid.NewGuid();
+
+                newUserRequest = newUserRequestRepository.Insert(userId, ip, token);
+                messageRepository.Insert(userId, SecurityMessagesFactory.CreateSeminarPrompt(token));
+            }
         }
-        
+
         return newUserRequest > 0;
     }
 

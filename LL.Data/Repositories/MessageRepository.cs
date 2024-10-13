@@ -1,9 +1,10 @@
+using LL.Core.Interfaces.Repositories;
 using LL.Data.Contexts;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class MessageRepository(AppDBContext db) 
+public class MessageRepository(AppDBContext db)  : IMessageRepository
 {
     public int Insert(int recipientId, string content)
     {

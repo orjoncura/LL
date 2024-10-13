@@ -4,9 +4,12 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
 import {POST} from '@/scripts/Helpers/SecurityHelper'
+import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import {LoginModel} from '@/generated-client/src';
-import './page.css'; // Import CSS file
 import Link from 'next/link';
+
+import './globals.css'; 
+import './page.css'; 
 
 export default function Login() {
   const router = useRouter()
@@ -17,9 +20,9 @@ export default function Login() {
     event.preventDefault();
 
     try {
-        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         
-          if(email.trim() != '' && password.trim() != '' && pattern.test(email)) {
+          if(IsValidEmail(email) && password.trim() != '') {
             
             const data: LoginModel = {
               "email": email,
@@ -29,7 +32,7 @@ export default function Login() {
             POST('/Security/Authenticate', JSON.stringify(data))
                 .then(data => { router.push('/Home', { scroll: false })})
                 .catch(error => { console.error('Error sending data:', error);});
-      }
+          }
     } catch (error) {
       console.error('Error making API call:', error);
     }
@@ -47,6 +50,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
               />
+              
               <br/>
               <Form.Control
                   type="password"
@@ -64,8 +68,8 @@ export default function Login() {
               </div>
 
               <br/>
-              <Link href="/Security/CreateNewAccount">
-                  <Button variant="success" type="submit" className="w-100"  href="/Security/CreateNewAccount"> Create new account </Button> 
+              <Link href="/Security/CreateNewAccount" className="w-100 button-link btn btn-success">
+                  Create new account
               </Link>
           </Col>
       </Row>
