@@ -1,3 +1,4 @@
+using Google.Apis.Requests;
 using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
@@ -7,7 +8,6 @@ using LL.Core.Services;
 using LL.Data.Contexts;
 using LL.Data.Repositories;
 using LL.Extensions;
-using LL.Test.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,12 +16,16 @@ namespace LL.Test;
 
 public static class Provider
 {
-    public static T GetRequiredService<T>()
+    public static IConfiguration GetConfiguration<T>() where T : class =>
+        new ConfigurationBuilder().AddUserSecrets<T>().Build();
+
+    
+    public static T GetRequiredService<T>() where T : class
     {
         var services = new ServiceCollection();
             
-        var config = new ConfigurationBuilder().AddUserSecrets<SeminarServiceTest>().Build();
-            
+        var config = GetConfiguration<T>();
+        
         //Core Services
         services.AddScoped<ISeminarService, SeminarService>();
         services.AddScoped<ISecurityService, SecurityService>();
@@ -35,19 +39,21 @@ public static class Provider
         services.AddScoped<IWordDefinitionRepository, WordDefinitionRepository>();
         services.AddScoped<IStatementRepository, StatementRepository>();
         services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
             
         //Extensions
-        services.AddScoped<IAgentService>(p => 
-            new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
-            
-        services.AddScoped<IAppMonitoringService, AppMonitoringService>();
+        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
         services.AddScoped<IAgentService, AgentService>();
+        services.AddScoped<IAppMonitoringService, AppMonitoringService>();
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<IDictionaryService, DictionaryService>();
-            
+        
+        services.AddSingleton(new TokenConfigModel(config[Secrets.JwtKey], config[Secrets.JwtIssuer], config[Secrets.JwtAudience]));
+        
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));
-            
+
         return services.BuildServiceProvider().GetRequiredService<T>();
     }
 }

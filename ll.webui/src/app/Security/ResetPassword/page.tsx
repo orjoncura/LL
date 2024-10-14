@@ -1,5 +1,6 @@
 "use client";
 import React, {useState, useRef} from 'react';
+import { useRouter } from 'next/navigation'
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import Constants from "@/scripts/Constants";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
@@ -8,15 +9,21 @@ import ModalView from '../../../components/Modal/ModalView';
 
 export default function ResetPassword() {
 
+    const router = useRouter()
     const modalRef = useRef<any>(null); 
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
+    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+
     const [email, setEmail] = useState('');
     
-    const openModal = (title: string, body:string) => {
+    const openModal = (title: string, body:string, onClick?: Function) => {
         if (modalRef.current) {
+
             setModalTitle(title);
             setModalBody(body);
+            setOnModalClick(() => onClick); 
+
           modalRef.current.openModal(); // Call openModal from the Example component
         }
       };
@@ -24,11 +31,24 @@ export default function ResetPassword() {
     const handleSubmit = (event:any) => {
         event.preventDefault();
 
+        console.log("Creating new account...");
+
         try {
             if(IsValidEmail(email)) {
 
                 POST('/Security/ResetPassword', JSON.stringify(email))
-                    .then(data => { })
+                    .then(isSuccessfull => { 
+                            if(isSuccessfull) {
+
+                                let fun = () => {
+                                    router.push('/', { scroll: false }); 
+                                  };
+
+                                openModal("Success", "You will receive an email to confirm your request", fun);
+                                
+                            }else{
+                                openModal("Error", "Something went wrong the request cannot be completed at this time")
+                            }})
                     .catch(error => { console.error('Error sending data:', error);});
             }else {
                 openModal("Invalid Email", "Please pass a valid email"); 
@@ -56,7 +76,7 @@ export default function ResetPassword() {
                 </Col>
             </Row>
 
-            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} />
+            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
 
         </Container>
     );

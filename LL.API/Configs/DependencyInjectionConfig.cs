@@ -30,16 +30,15 @@ namespace LL.API.Configs
             services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
             
             //Extensions
-            services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
             services.AddScoped<IAgentService, AgentService>();
-            
-            //services.AddScoped<IAgentService>(p => 
-              //  new AgentService(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation])));
-            
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<ITranslationService, TranslationService>();
             services.AddScoped<IDictionaryService, DictionaryService>();
+            
+            //Singletons
+            services.AddSingleton(new TokenConfigModel(config[Secrets.JwtKey], config[Secrets.JwtIssuer], config[Secrets.JwtAudience]));
+            services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
             
             return services;
         }
