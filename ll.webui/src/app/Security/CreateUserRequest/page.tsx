@@ -7,7 +7,7 @@ import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '../../../components/Modal/ModalView';
 
-export default function CreateNewAccountPage() {
+export default function CreateUserRequest() {
 
     const router = useRouter()
     const modalRef = useRef<any>(null); 

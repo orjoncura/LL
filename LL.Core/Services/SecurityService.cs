@@ -57,6 +57,11 @@ public class SecurityService(
         return newUserRequest > 0;
     }
 
+    public bool VerifyUser(string token)
+    {
+        return false;
+    }
+    
     private TokenViewModel GenerateToken(UserShort user)
     {
         var expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(token.Expires));

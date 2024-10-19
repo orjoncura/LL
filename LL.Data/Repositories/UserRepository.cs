@@ -8,10 +8,12 @@ namespace LL.Data.Repositories;
 public class UserRepository(AppDBContext db) : IUserRepository
 {
      public UserShort? GetByEmail(string email) =>
-         db.Users.Where(u => 
-             u.Email.ToLower().Trim() == email.ToLower().Trim() 
-             && u.IsActive).Select(u => 
-                 new UserShort(u.Id, u.Email, u.PasswordHash))
+         db.Users.Where(u =>
+                 string.IsNullOrWhiteSpace(u.Email) == false
+                 && u.Email.ToLower().Trim() == email.ToLower().Trim() 
+                 && u.IsVerified
+                 && u.IsActive)
+             .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
              .FirstOrDefault();
 
      private User? Get(string email) =>
@@ -29,6 +31,7 @@ public class UserRepository(AppDBContext db) : IUserRepository
          {
              Email = email,
              PasswordHash = password,
+             IsVerified = false,
              IsActive = true,
          };
 
@@ -40,6 +43,7 @@ public class UserRepository(AppDBContext db) : IUserRepository
              UserId = user.Id,
              Email = email,
              PasswordHash = password,
+             IsVerified = false,
              IsActive = true,
          };
 

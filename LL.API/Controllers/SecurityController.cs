@@ -69,14 +69,43 @@ namespace LL.API.Controllers
             }
             catch (Exception ex)
             {
-                var exceptionData = new Dictionary<string, object>();
-
-                exceptionData["email"] = email;
+                var exceptionData = new Dictionary<string, object>
+                {
+                    ["email"] = email
+                };
 
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
             return Ok(isRequestCreated);
+        }
+        
+        /// <summary>
+        /// Will check if token is valid and will mark the user as 'verified'.
+        /// </summary>
+        /// <param name="token">The token that has been generated in CreateUserRequest method</param>
+        /// <response code="200">The new seminar</response>
+        [HttpPost("VerifyUser")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult VerifyUser([FromBody] string token)
+        {
+            bool isVerified = false;
+            
+            try
+            {
+                isVerified = securityService.VerifyUser(token);
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>
+                {
+                    ["token"] = token
+                };
+
+                appMonitoringService.ExportError(ex, exceptionData);
+            }
+
+            return Ok(isVerified);
         }
     }
 }
