@@ -2,5 +2,5 @@ namespace LL.Core.Interfaces.Repositories;
 
 public interface IMessageRepository
 {
-    int Insert(int recipientId, string contentS);
+    int Insert(string recipientAddress, string content, int? recipientId = null);
 }

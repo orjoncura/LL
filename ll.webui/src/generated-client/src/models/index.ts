@@ -1,5 +1,15 @@
 import * as coreClient from "@azure/core-client";
 
+export interface NewUserModel {
+  email?: string;
+  confirmEmail?: string;
+}
+
+export interface NewPasswordModel {
+  password?: string;
+  confirmPassword?: string;
+}
+
 export interface LoginModel {
   email?: string;
   password?: string;

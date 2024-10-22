@@ -20,9 +20,8 @@ namespace LL.API.Controllers
         /// <summary>
         /// Pass username and password and get a security token.
         /// </summary>
-        /// <param name="Username">The email address of the user</param>
-        /// <param name="Password">The plain password of the user</param>
-        /// <response code="200">The new seminar</response>
+        /// <param name="loginModel">Contains the email address and The plain password of the user</param>
+        /// <response code="200">The new token</response>
         [HttpPost("Authenticate")]
         [ProducesResponseType(typeof(IEnumerable<TokenViewModel>), StatusCodes.Status200OK)]
         public ActionResult Authenticate([FromBody] LoginModel loginModel)
@@ -51,11 +50,11 @@ namespace LL.API.Controllers
         /// <summary>
         /// Will create a user and a message.
         /// </summary>
-        /// <param name="email">The email address of the user</param>
-        /// <response code="200">The new seminar</response>
+        /// <param name="model">Contains the email of the new user and its confirmation</param>
+        /// <response code="200">Success status</response>
         [HttpPost("CreateUserRequest")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public ActionResult CreateUserRequest([FromBody] string email)
+        public ActionResult CreateUserRequest([FromBody] NewUserModel model)
         {
             bool isRequestCreated = false;
             
@@ -64,8 +63,39 @@ namespace LL.API.Controllers
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
                 var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
             
-                isRequestCreated = securityService.CreateNewUserRequest(email, ipAddress, attemptsLimit);
+                isRequestCreated = securityService.CreateNewUserRequest(model, ipAddress, attemptsLimit);
                 
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+                
+                if(model != null)
+                {
+                    exceptionData["email"] = model.Email;
+                    exceptionData["ConfirmEmail"] = model.ConfirmEmail;
+                };
+
+                appMonitoringService.ExportError(ex, exceptionData);
+            }
+
+            return Ok(isRequestCreated);
+        }
+        
+        /// <summary>
+        /// Will send email to the user to create a new password
+        /// </summary>
+        /// <param name="email">The email of the user</param>
+        /// <response code="200">Success status</response>
+        [HttpPost("ResetPassword")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult ResetPassword([FromBody] string email)
+        {
+            bool isVerified = false;
+            
+            try
+            {
+                isVerified = securityService.ResetPassword(email);
             }
             catch (Exception ex)
             {
@@ -77,35 +107,70 @@ namespace LL.API.Controllers
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
-            return Ok(isRequestCreated);
-        }
+            return Ok(isVerified);
+        }        
         
         /// <summary>
         /// Will check if token is valid and will mark the user as 'verified'.
         /// </summary>
-        /// <param name="token">The token that has been generated in CreateUserRequest method</param>
-        /// <response code="200">The new seminar</response>
+        /// <param name="model"> Contains password and the token that has been generated in CreateUserRequest method</param>
+        /// <response code="200">Success status</response>
         [HttpPost("VerifyUser")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public ActionResult VerifyUser([FromBody] string token)
+        public ActionResult VerifyUser([FromBody] VerifyUserModel model)
         {
             bool isVerified = false;
             
             try
             {
-                isVerified = securityService.VerifyUser(token);
+                isVerified = securityService.VerifyUser(model);
             }
             catch (Exception ex)
             {
-                var exceptionData = new Dictionary<string, object>
+                var exceptionData = new Dictionary<string, object>();
+                
+                if(model != null)
                 {
-                    ["token"] = token
+                    exceptionData["IsPasswordEmpty"] = string.IsNullOrWhiteSpace(model.Password);
+                    exceptionData["IsConfirmPasswordEmpty"] = string.IsNullOrWhiteSpace(model.ConfirmPassword);
+                    exceptionData["Token"] = model.Token;
                 };
 
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
             return Ok(isVerified);
+        }        
+        
+        /// <summary>
+        /// Will check if token is valid and will mark the user as 'verified'.
+        /// </summary>
+        /// <param name="model">Contains the new password and its confirmation</param>
+        /// <response code="200">Success status</response>
+        [HttpPost("CompletePasswordReset")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult CompletePasswordReset([FromBody] NewPasswordModel model)
+        {
+            bool hasBeenReset = false;
+            
+            try
+            {
+                hasBeenReset = securityService.CompletePasswordReset(model);
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+                
+                if (model != null)
+                {
+                    exceptionData["IsPasswordEmpty"] = string.IsNullOrWhiteSpace(model.Password);
+                    exceptionData["IsConfirmPasswordEmpty"] = string.IsNullOrWhiteSpace(model.ConfirmPassword);
+                };
+
+                appMonitoringService.ExportError(ex, exceptionData);
+            }
+
+            return Ok(hasBeenReset);
         }
     }
 }

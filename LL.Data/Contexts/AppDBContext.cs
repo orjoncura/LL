@@ -90,7 +90,7 @@ namespace LL.Data.Contexts
             
             modelBuilder.Entity<NewUserRequest>(entity =>
             {
-                entity.Property(ut => ut.UserId).IsRequired();
+                entity.Property(ut => ut.Email).IsRequired();
                 entity.Property(ut => ut.IP).IsRequired();
                 entity.Property(ut => ut.Token).IsRequired();
                 entity.Property(ut => ut.CreatedDate).IsRequired();
@@ -111,7 +111,7 @@ namespace LL.Data.Contexts
             
             modelBuilder.Entity<Message>(entity =>
             {
-                entity.Property(ut => ut.RecipientId).IsRequired();
+                entity.Property(ut => ut.RecipientAddress).IsRequired();
                 entity.Property(ut => ut.StatusId).IsRequired();
                 entity.Property(ut => ut.MessageContentId).IsRequired();
                 entity.Property(ut => ut.DateSend).IsRequired();
@@ -135,10 +135,12 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<MessageLog>(entity =>
             {
                 entity.Property(ut => ut.MessageId).IsRequired();
-                entity.Property(ut => ut.RecipientId).IsRequired();
+                entity.Property(ut => ut.RecipientAddress).IsRequired();
                 entity.Property(ut => ut.StatusId).IsRequired();
                 entity.Property(ut => ut.MessageContentId).IsRequired();
                 entity.Property(ut => ut.DateSend).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
+                entity.Property(ut => ut.CreatedDate).IsRequired();
 
                 entity.HasOne(ut => ut.Message)
                     .WithMany()
@@ -159,6 +161,11 @@ namespace LL.Data.Contexts
                     .WithMany()
                     .HasForeignKey(p => p.MessageContentId)
                     .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasOne(p => p.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(p => p.CreatedById)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<MessageStatus>(entity =>
@@ -176,13 +183,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<MessageContent>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
-
-                entity.HasOne(ut => ut.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<LoginHistory>(entity => 

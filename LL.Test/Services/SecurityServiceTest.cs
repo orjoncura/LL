@@ -1,5 +1,6 @@
 using LL.Core.Constants;
 using LL.Core.Interfaces.Services;
+using LL.Core.Models.Arguments;
 using Microsoft.Extensions.Configuration;
 
 namespace LL.Test.Services;
@@ -16,16 +17,17 @@ public class SecurityServiceTest
     }
         
     [Fact]
-    public async Task CreateSeminar_ShouldCreateSeminar()
+    public async Task CreateSeminar_ShouldCreateNewUserRequest()
     {     
         bool isRequestCreated = false;
-        
-        string email = "test@test.com";
-        var ipAddress = string.Empty;
+
+        var model = new NewUserModel();
+        model.Email = "test@test.com";
+        model.ConfirmEmail = "test@test.com";
         
         var attemptsLimit = Convert.ToInt32(_config[Secrets.AttemptsLimit]);
         
-        isRequestCreated = _securityService.CreateNewUserRequest(email, ipAddress, attemptsLimit);
+        isRequestCreated = _securityService.CreateNewUserRequest(model, string.Empty, attemptsLimit);
         
         // Assert
         Assert.True(isRequestCreated);

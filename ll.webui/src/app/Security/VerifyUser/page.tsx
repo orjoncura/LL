@@ -1,6 +1,5 @@
 "use client";
 import React, {useEffect} from 'react';
-import { useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSmile, faFaceFrown } from '@fortawesome/free-solid-svg-icons';
 import {Container} from "react-bootstrap";

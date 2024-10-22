@@ -9,7 +9,6 @@ import {LoginModel} from '@/generated-client/src';
 import Link from 'next/link';
 
 import './globals.css'; 
-import './page.css'; 
 
 export default function Login() {
   const router = useRouter()
@@ -20,8 +19,6 @@ export default function Login() {
     event.preventDefault();
 
     try {
-          const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        
           if(IsValidEmail(email) && password.trim() != '') {
             
             const data: LoginModel = {
@@ -64,11 +61,11 @@ export default function Login() {
 
               <hr/>
               <div className="center">
-                  <Link href="/Security/ResetPassword">Forgotten password?</Link>
+                  <Link href="/Security/ResetPassword" className='hyperLink'>Forgotten password?</Link>
               </div>
 
               <br/>
-              <Link href="/Security/CreateNewAccount" className="w-100 button-link btn btn-success">
+              <Link href="/Security/CreateUserRequest" className="w-100 button-link btn btn-success">
                   Create new account
               </Link>
           </Col>

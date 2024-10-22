@@ -6,12 +6,11 @@ namespace LL.Data.Repositories;
 
 public class MessageRepository(AppDBContext db)  : IMessageRepository
 {
-    public int Insert(int recipientId, string content)
+    public int Insert(string recipientAddress, string content, int? recipientId = null)
     {
         var messageContent = new MessageContent()
         {
             Value = content,
-            CreatedById = recipientId,
             CreatedDate = DateTimeOffset.Now
         };
         
@@ -21,6 +20,7 @@ public class MessageRepository(AppDBContext db)  : IMessageRepository
         var message = new Message()
         {
             RecipientId = recipientId,
+            RecipientAddress = recipientAddress,
             StatusId = 1,
             MessageContentId = messageContent.Id,
             DateSend = DateTimeOffset.Now

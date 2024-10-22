@@ -11,6 +11,8 @@
     <PackageJsonDependenciesAzureCoreAuth Condition="$(PackageJsonDependenciesAzureCoreAuth) == ''">^1.8.0</PackageJsonDependenciesAzureCoreAuth>
     <PackageJsonDependenciesAzureCoreClient Condition="$(PackageJsonDependenciesAzureCoreClient) == ''">^1.9.2</PackageJsonDependenciesAzureCoreClient>
     <PackageJsonDependenciesAzureCoreRestPipeline Condition="$(PackageJsonDependenciesAzureCoreRestPipeline) == ''">^1.17.0</PackageJsonDependenciesAzureCoreRestPipeline>
+    <PackageJsonDependenciesFortawesomeFreeSolidSvgIcons Condition="$(PackageJsonDependenciesFortawesomeFreeSolidSvgIcons) == ''">^6.6.0</PackageJsonDependenciesFortawesomeFreeSolidSvgIcons>
+    <PackageJsonDependenciesFortawesomeReactFontawesome Condition="$(PackageJsonDependenciesFortawesomeReactFontawesome) == ''">^0.2.2</PackageJsonDependenciesFortawesomeReactFontawesome>
     <PackageJsonDependenciesBootstrap Condition="$(PackageJsonDependenciesBootstrap) == ''">^5.3.3</PackageJsonDependenciesBootstrap>
     <PackageJsonDependenciesJquery Condition="$(PackageJsonDependenciesJquery) == ''">^3.7.1</PackageJsonDependenciesJquery>
     <PackageJsonDependenciesNext Condition="$(PackageJsonDependenciesNext) == ''">^14.2.15</PackageJsonDependenciesNext>

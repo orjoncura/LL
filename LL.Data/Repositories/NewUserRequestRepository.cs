@@ -6,18 +6,24 @@ namespace LL.Data.Repositories;
 
 public class NewUserRequestRepository(AppDBContext db) : INewUserRequestRepository
 {
-    public bool HasReachedLimit(int userId, DateTimeOffset date, int attemptsLimit) => 
+    public bool HasReachedLimit(string email, DateTimeOffset date, int attemptsLimit) => 
         db.NewUserRequests.Count(u => 
-            u.UserId == userId 
+            u.Email == email 
             && u.CreatedDate.Date.Year == date.Year
             && u.CreatedDate.Date.Month == date.Month
             && u.CreatedDate.Date.Day == date.Day) > attemptsLimit;
 
-    public int Insert(int userId, string ip, Guid token)
+    public bool IsTokenValid(Guid token) => 
+        db.NewUserRequests.Any(u => u.Token == token) == false;
+    
+    public string GetEmailByToken(string token) =>
+        db.NewUserRequests.SingleOrDefault(u => token.CompareTo(u.Token) == 0).Email;
+    
+    public int Insert(string email, string ip, Guid token)
     {
         var newUserRequest = new NewUserRequest()
         {
-            UserId = userId,
+            Email = email,
             IP = ip,
             Token = token,
             CreatedDate = DateTime.Now,

@@ -36,28 +36,42 @@ public class SecurityService(
         return GenerateToken(user);
     }
 
-    public bool CreateNewUserRequest(string email, string ip, int attemptsLimit)
+    public bool CreateNewUserRequest(NewUserModel model, string ip, int attemptsLimit)
     {
-        int newUserRequest = 0;
+        model.Email = model.Email.ToLower().Trim();
+        model.ConfirmEmail = model.ConfirmEmail.ToLower().Trim();
         
-        //Check if the email is in a valid format.
-        if (TextHelper.IsValidEmail(email))
-        {
-            int userId = userRepository.Insert(email.ToLower(), string.Empty);
+        //Check if the email is in a valid format also check if both emails are the same.
+        if (!TextHelper.IsValidEmail(model.Email) || !TextHelper.IsValidEmail(model.ConfirmEmail) || model.Email != model.ConfirmEmail)
+            return false;
+        
+        if (newUserRequestRepository.HasReachedLimit(model.Email, new DateTimeOffset(), attemptsLimit))
+            return false;
+        
+        var token = GenerateToken();
 
-            if (newUserRequestRepository.HasReachedLimit(userId, new DateTimeOffset(), attemptsLimit) == false)
-            {
-                Guid token = Guid.NewGuid();
-
-                newUserRequest = newUserRequestRepository.Insert(userId, ip, token);
-                messageRepository.Insert(userId, SecurityMessagesFactory.CreateSeminarPrompt(token));
-            }
-        }
-
-        return newUserRequest > 0;
+        if (token == null)
+            return false;
+        
+        return newUserRequestRepository.Insert(model.Email, ip, token.Value) > 0 
+               && messageRepository.Insert(model.Email, SecurityMessagesFactory.CreateSeminarPrompt(token.Value)) > 0;
     }
 
-    public bool VerifyUser(string token)
+    public bool VerifyUser(VerifyUserModel model)
+    {
+        string email = newUserRequestRepository.GetEmailByToken(model.Token);
+        
+        if(string.IsNullOrWhiteSpace(email))
+            return false;
+
+        return userRepository.Insert(email, model.Password) > 0;
+    }
+
+    public bool ResetPassword(string email)
+    {
+        return false;
+    }
+    public bool CompletePasswordReset(NewPasswordModel model)
     {
         return false;
     }
@@ -90,6 +104,21 @@ public class SecurityService(
             new Claim("UserId", user.Id.ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Email ?? string.Empty)
         ];
+    }
+
+    private Guid? GenerateToken()
+    {
+        Guid token = Guid.NewGuid();
+        
+        for (int i = 0; i < 1000; i++)
+        {
+            if(newUserRequestRepository.IsTokenValid(token))
+                return token;
+                    
+            token = Guid.NewGuid();
+        }
+
+        return null;
     }
 }
 

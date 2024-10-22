@@ -4,8 +4,10 @@ public class Message
 {
     public int Id { get; set; }
     
-    public int RecipientId { get; set; }
+    public int? RecipientId { get; set; }
     public virtual User? Recipient { get; set; }
+    
+    public string RecipientAddress { get; set; }
     
     public int StatusId { get; set; }
     public MessageStatus? Status { get; set; }
