@@ -11,7 +11,6 @@ public class UserRepository(AppDBContext db) : IUserRepository
          db.Users.Where(u =>
                  string.IsNullOrWhiteSpace(u.Email) == false
                  && u.Email.ToLower().Trim() == email.ToLower().Trim() 
-                 && u.IsVerified
                  && u.IsActive)
              .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
              .FirstOrDefault();
@@ -20,7 +19,7 @@ public class UserRepository(AppDBContext db) : IUserRepository
          db.Users.FirstOrDefault(u => 
              u.Email.ToLower().Trim() == email.ToLower().Trim());
      
-     public int Insert(string email, string password)
+     public int Insert(string email, string password, int loginId)
      {
          User? user = Get(email);
          
@@ -31,7 +30,6 @@ public class UserRepository(AppDBContext db) : IUserRepository
          {
              Email = email,
              PasswordHash = password,
-             IsVerified = false,
              IsActive = true,
          };
 
@@ -43,13 +41,42 @@ public class UserRepository(AppDBContext db) : IUserRepository
              UserId = user.Id,
              Email = email,
              PasswordHash = password,
-             IsVerified = false,
              IsActive = true,
+             CreatedById = loginId,
+             CreatedDate = new DateTimeOffset()
          };
 
          db.Add(userLog);
          db.SaveChanges();
          
          return user.Id;
+     }
+
+     public bool UpdatePassword(int userId, string password, int loginId)
+     {
+         User? user = db.Users.FirstOrDefault(u => u.Id == userId);         
+         
+         if (user == null) 
+             return false;
+         
+         user.PasswordHash = password;
+         
+         db.Add(user);
+         db.SaveChanges();
+         
+         var userLog = new UserLog()
+         {
+             UserId = user.Id,
+             Email = user.Email,
+             PasswordHash = user.PasswordHash,
+             IsActive = user.IsActive,
+             CreatedById = loginId,
+             CreatedDate = new DateTimeOffset()
+         };
+
+         db.Add(userLog);
+         db.SaveChanges();
+         
+         return user.PasswordHash == password;
      }
 }

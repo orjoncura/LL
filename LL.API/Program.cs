@@ -1,5 +1,6 @@
 using LL.API.Configs;
 using LL.API.Constants;
+using LL.API.Middlewares;
 using Microsoft.OpenApi.Models;
 
 internal class Program
@@ -25,7 +26,9 @@ internal class Program
         });
 
         var app = builder.Build();
-
+        
+        //app.UseMiddleware<AuthenticationMiddleware>();
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

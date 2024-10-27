@@ -1,18 +1,24 @@
 import * as coreClient from "@azure/core-client";
 
+export interface ConfirmationModel {
+  password: string;
+  confirmPassword: string;
+  token: string;
+}
+
 export interface NewUserModel {
-  email?: string;
-  confirmEmail?: string;
+  email: string;
+  confirmEmail: string;
 }
 
 export interface NewPasswordModel {
-  password?: string;
-  confirmPassword?: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export interface LoginModel {
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
 }

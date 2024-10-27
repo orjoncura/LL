@@ -33,6 +33,7 @@ public class MessageRepository(AppDBContext db)  : IMessageRepository
         {
             MessageId = message.Id,
             RecipientId = recipientId,
+            RecipientAddress = recipientAddress,
             StatusId = 1,
             MessageContentId = messageContent.Id,
             DateSend = DateTimeOffset.Now

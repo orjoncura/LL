@@ -86,7 +86,11 @@ namespace LL.Data.Migrations
                     b.Property<int>("MessageContentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RecipientId")
+                    b.Property<string>("RecipientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
@@ -111,9 +115,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -122,8 +123,6 @@ namespace LL.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
 
                     b.ToTable("MessageContents");
                 });
@@ -136,6 +135,12 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("DateSend")
                         .HasColumnType("datetimeoffset");
 
@@ -145,13 +150,19 @@ namespace LL.Data.Migrations
                     b.Property<int>("MessageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RecipientId")
+                    b.Property<string>("RecipientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("MessageContentId");
 
@@ -197,8 +208,15 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IP")
                         .IsRequired()
@@ -207,12 +225,9 @@ namespace LL.Data.Migrations
                     b.Property<Guid>("Token")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("NewUserRequests");
                 });
@@ -399,9 +414,6 @@ namespace LL.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -430,9 +442,6 @@ namespace LL.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
@@ -705,8 +714,7 @@ namespace LL.Data.Migrations
                     b.HasOne("LL.Data.Model.User", "Recipient")
                         .WithMany()
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LL.Data.Model.MessageStatus", "Status")
                         .WithMany()
@@ -721,7 +729,7 @@ namespace LL.Data.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("LL.Data.Model.MessageContent", b =>
+            modelBuilder.Entity("LL.Data.Model.MessageLog", b =>
                 {
                     b.HasOne("LL.Data.Model.User", "CreatedBy")
                         .WithMany()
@@ -729,11 +737,6 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.MessageLog", b =>
-                {
                     b.HasOne("LL.Data.Model.MessageContent", "MessageContent")
                         .WithMany()
                         .HasForeignKey("MessageContentId")
@@ -749,14 +752,15 @@ namespace LL.Data.Migrations
                     b.HasOne("LL.Data.Model.User", "Recipient")
                         .WithMany()
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LL.Data.Model.MessageStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("Message");
 
@@ -780,13 +784,13 @@ namespace LL.Data.Migrations
 
             modelBuilder.Entity("LL.Data.Model.NewUserRequest", b =>
                 {
-                    b.HasOne("LL.Data.Model.User", "User")
+                    b.HasOne("LL.Data.Model.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("LL.Data.Model.ResetPasswordRequest", b =>

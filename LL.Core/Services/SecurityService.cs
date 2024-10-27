@@ -17,6 +17,7 @@ public class SecurityService(
     IUserRepository userRepository, 
     IMessageRepository messageRepository, 
     INewUserRequestRepository newUserRequestRepository, 
+    IResetPasswordRequestRepository resetPasswordRequestRepository,
     TokenConfigModel token) : ISecurityService
 {
     public TokenViewModel? Authenticate(LoginModel userLogin)
@@ -36,7 +37,7 @@ public class SecurityService(
         return GenerateToken(user);
     }
 
-    public bool CreateNewUserRequest(NewUserModel model, string ip, int attemptsLimit)
+    public bool RegisterUser(NewUserModel model, string ip, int attemptsLimit, int loginId)
     {
         model.Email = model.Email.ToLower().Trim();
         model.ConfirmEmail = model.ConfirmEmail.ToLower().Trim();
@@ -48,32 +49,61 @@ public class SecurityService(
         if (newUserRequestRepository.HasReachedLimit(model.Email, new DateTimeOffset(), attemptsLimit))
             return false;
         
-        var token = GenerateToken();
+        var token = GenerateNewUserToken();
 
         if (token == null)
             return false;
         
-        return newUserRequestRepository.Insert(model.Email, ip, token.Value) > 0 
-               && messageRepository.Insert(model.Email, SecurityMessagesFactory.CreateSeminarPrompt(token.Value)) > 0;
+        return newUserRequestRepository.Insert(model.Email, ip, token.Value, loginId) > 0 
+               && messageRepository.Insert(model.Email, SecurityMessagesFactory.CreateNewUser(token.Value)) > 0;
     }
-
-    public bool VerifyUser(VerifyUserModel model)
+    public bool CompleteUserRegistration(ConfirmationModel model, int loginId)
     {
         string email = newUserRequestRepository.GetEmailByToken(model.Token);
         
         if(string.IsNullOrWhiteSpace(email))
             return false;
 
-        return userRepository.Insert(email, model.Password) > 0;
+        if (!TextHelper.IsPasswordValid(model.Password) || model.Password != model.ConfirmPassword)
+            return false;
+        
+        return userRepository.Insert(email, SecurityHelper.HashPassword(model.Password), loginId) > 0;
     }
+    public bool ResetPassword(string email, string ip, int attemptsLimit)
+    {
+        email = email.ToLower().Trim();
+        
+        //Check if the email is in a valid format also check if both emails are the same.
+        if (!TextHelper.IsValidEmail(email))
+            return false;
+        
+        UserShort? user = userRepository.GetByEmail(email);
 
-    public bool ResetPassword(string email)
-    {
-        return false;
+        if (user is null)
+            return false;
+        
+        if (resetPasswordRequestRepository.HasReachedLimit(user.Id, new DateTimeOffset(), attemptsLimit))
+            return false;
+        
+        var token = GenerateResetPasswordToken();
+
+        if (token == null)
+            return false;
+        
+        return resetPasswordRequestRepository.Insert(user.Id, ip, token.Value) > 0 
+               && messageRepository.Insert(email, SecurityMessagesFactory.ResetPassword(token.Value)) > 0;
     }
-    public bool CompletePasswordReset(NewPasswordModel model)
-    {
-        return false;
+    public bool CompletePasswordReset(ConfirmationModel model)
+    {        
+        int userId = resetPasswordRequestRepository.GetUserIdByToken(model.Token);
+        
+        if(userId == 0)
+            return false;
+        
+        if (!TextHelper.IsPasswordValid(model.Password) || model.Password != model.ConfirmPassword)
+            return false;
+        
+        return userRepository.UpdatePassword(userId, SecurityHelper.HashPassword(model.Password), userId);
     }
     
     private TokenViewModel GenerateToken(UserShort user)
@@ -96,17 +126,7 @@ public class SecurityService(
             Expiration = expires.ToString(),
         };
     }
-
-    private static Claim[] GetClaims(UserShort user)
-    {
-        return
-        [
-            new Claim("UserId", user.Id.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Email ?? string.Empty)
-        ];
-    }
-
-    private Guid? GenerateToken()
+    private Guid? GenerateNewUserToken()
     {
         Guid token = Guid.NewGuid();
         
@@ -119,6 +139,28 @@ public class SecurityService(
         }
 
         return null;
+    }    
+    private Guid? GenerateResetPasswordToken()
+    {
+        Guid token = Guid.NewGuid();
+        
+        for (int i = 0; i < 1000; i++)
+        {
+            if(resetPasswordRequestRepository.IsTokenValid(token))
+                return token;
+                    
+            token = Guid.NewGuid();
+        }
+
+        return null;
+    }
+    private static Claim[] GetClaims(UserShort user)
+    {
+        return
+        [
+            new Claim("UserId", user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Email ?? string.Empty)
+        ];
     }
 }
 

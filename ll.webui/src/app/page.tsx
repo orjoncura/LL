@@ -57,7 +57,7 @@ export default function Login() {
               />
 
               <br/>
-              <Button variant="primary" type="submit" className="w-100" onSubmit={handleSubmit}> Login </Button>
+              <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Login </Button>
 
               <hr/>
               <div className="center">
@@ -65,7 +65,7 @@ export default function Login() {
               </div>
 
               <br/>
-              <Link href="/Security/CreateUserRequest" className="w-100 button-link btn btn-success">
+              <Link href="/Security/RegisterUser" className="w-100 button-link btn btn-success">
                   Create new account
               </Link>
           </Col>

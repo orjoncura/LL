@@ -28,6 +28,7 @@ namespace LL.API.Configs
             services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
+            services.AddScoped<IResetPasswordRequestRepository, ResetPasswordRequestRepository>();
             
             //Extensions
             services.AddScoped<IAgentService, AgentService>();

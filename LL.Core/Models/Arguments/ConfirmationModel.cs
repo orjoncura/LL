@@ -1,6 +1,6 @@
 namespace LL.Core.Models.Arguments;
 
-public class VerifyUserModel
+public class ConfirmationModel
 {
     public string Password { get; set; }
     

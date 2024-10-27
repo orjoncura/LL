@@ -38,7 +38,6 @@ namespace LL.Data.Contexts
             {
                 entity.Property(p => p.Email).IsRequired();
                 entity.Property(p => p.PasswordHash).IsRequired();
-                entity.Property(u => u.IsVerified).IsRequired();
                 entity.Property(u => u.IsActive).IsRequired();
             });
 
@@ -46,7 +45,6 @@ namespace LL.Data.Contexts
             {
                 entity.Property(p => p.Email).IsRequired();
                 entity.Property(p => p.PasswordHash).IsRequired();
-                entity.Property(u => u.IsVerified).IsRequired();
                 entity.Property(u => u.IsActive).IsRequired();
 
                 entity.HasOne(p => p.User)

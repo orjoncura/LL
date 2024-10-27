@@ -41,6 +41,7 @@ public static class Provider
         services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
+        services.AddScoped<IResetPasswordRequestRepository, ResetPasswordRequestRepository>();
             
         //Extensions
         services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));

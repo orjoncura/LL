@@ -19,13 +19,14 @@ public class NewUserRequestRepository(AppDBContext db) : INewUserRequestReposito
     public string GetEmailByToken(string token) =>
         db.NewUserRequests.SingleOrDefault(u => token.CompareTo(u.Token) == 0).Email;
     
-    public int Insert(string email, string ip, Guid token)
+    public int Insert(string email, string ip, Guid token, int loginId)
     {
         var newUserRequest = new NewUserRequest()
         {
             Email = email,
             IP = ip,
             Token = token,
+            CreatedById = loginId,
             CreatedDate = DateTime.Now,
         };
 

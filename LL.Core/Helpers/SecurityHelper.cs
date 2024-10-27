@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace LL.Core.Helpers;
 
@@ -27,6 +28,22 @@ public static class SecurityHelper
         }
 
         return ByteArraysEqual(array3, bytes);
+    }
+
+    public static string HashPassword(string password)
+    {
+        // divide by 8 to convert bits to bytes
+        byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); 
+
+        // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            password: password!,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100000,
+            numBytesRequested: 256 / 8));
+
+        return hashed;
     }
 
     private static bool ByteArraysEqual(byte[] a, byte[] b)
