@@ -51,17 +51,17 @@ export default function Login() {
 
               if(isSuccessfull) {
 
-                router.push('/', { scroll: false }); 
+                router.push('/Home', { scroll: false }); 
                   
               }else{
                   openModal("Error", "Something went wrong the request cannot be completed at this time");
               }
               
               setLoading(false);
-            }).catch(error => { 
-                setLoading(false); 
-                openModal("Error", error.message);
-            });
+            }).catch(e => { 
+              setLoading(false); 
+              openModal("Error", "The server was unable to complete your request. Please try again later.");
+          });
           }
     } catch (error) {
       console.error('Error making API call:', error);

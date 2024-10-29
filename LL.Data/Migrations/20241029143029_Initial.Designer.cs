@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LL.Data.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240929203834_YourMigrationName")]
-    partial class YourMigrationName
+    [Migration("20241029143029_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,22 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Languages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "English"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Spanish"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.LoginHistory", b =>
@@ -64,14 +80,13 @@ namespace LL.Data.Migrations
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("IP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("LoginHistory");
                 });
@@ -84,28 +99,31 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset>("DateSend")
+                    b.Property<DateTimeOffset?>("DateSend")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("MessageContentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("int");
+                    b.Property<string>("RecipientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SenderId")
+                    b.Property<int?>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MessageContentId");
 
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
+                    b.HasIndex("RecipientId");
 
                     b.HasIndex("StatusId");
 
@@ -120,9 +138,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -131,8 +146,6 @@ namespace LL.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
 
                     b.ToTable("MessageContents");
                 });
@@ -145,7 +158,13 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset>("DateSend")
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateSend")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("MessageContentId")
@@ -154,24 +173,29 @@ namespace LL.Data.Migrations
                     b.Property<int>("MessageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("int");
+                    b.Property<string>("RecipientAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SenderId")
+                    b.Property<int?>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("MessageContentId");
 
                     b.HasIndex("MessageId");
 
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
+                    b.HasIndex("RecipientId");
 
                     b.HasIndex("StatusId");
 
@@ -201,6 +225,91 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("MessageStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Queued"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Sent"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Failed"
+                        });
+                });
+
+            modelBuilder.Entity("LL.Data.Model.NewUserRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("NewUserRequests");
+                });
+
+            modelBuilder.Entity("LL.Data.Model.ResetPasswordRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("IP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ResetPasswordRequests");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Seminar", b =>
@@ -303,6 +412,29 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("SeminarWordRank");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "High"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Medium"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Low"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.Statement", b =>
@@ -361,9 +493,23 @@ namespace LL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            Email = "",
+                            IsActive = true,
+                            PasswordHash = "",
+                            Salt = ""
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.UserLog", b =>
@@ -390,9 +536,6 @@ namespace LL.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -625,6 +768,43 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("WordTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Nouns"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Verbs"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Adjectives"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Adverbs"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Interjections"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.Language", b =>
@@ -646,15 +826,7 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LL.Data.Model.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Message", b =>
@@ -665,17 +837,10 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LL.Data.Model.User", "Receiver")
+                    b.HasOne("LL.Data.Model.User", "Recipient")
                         .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LL.Data.Model.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LL.Data.Model.MessageStatus", "Status")
                         .WithMany()
@@ -685,14 +850,12 @@ namespace LL.Data.Migrations
 
                     b.Navigation("MessageContent");
 
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
+                    b.Navigation("Recipient");
 
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("LL.Data.Model.MessageContent", b =>
+            modelBuilder.Entity("LL.Data.Model.MessageLog", b =>
                 {
                     b.HasOne("LL.Data.Model.User", "CreatedBy")
                         .WithMany()
@@ -700,11 +863,6 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.MessageLog", b =>
-                {
                     b.HasOne("LL.Data.Model.MessageContent", "MessageContent")
                         .WithMany()
                         .HasForeignKey("MessageContentId")
@@ -717,17 +875,10 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LL.Data.Model.User", "Receiver")
+                    b.HasOne("LL.Data.Model.User", "Recipient")
                         .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LL.Data.Model.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LL.Data.Model.MessageStatus", "Status")
                         .WithMany()
@@ -735,13 +886,13 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("Message");
 
                     b.Navigation("MessageContent");
 
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
+                    b.Navigation("Recipient");
 
                     b.Navigation("Status");
                 });
@@ -755,6 +906,28 @@ namespace LL.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("LL.Data.Model.NewUserRequest", b =>
+                {
+                    b.HasOne("LL.Data.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("LL.Data.Model.ResetPasswordRequest", b =>
+                {
+                    b.HasOne("LL.Data.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Seminar", b =>

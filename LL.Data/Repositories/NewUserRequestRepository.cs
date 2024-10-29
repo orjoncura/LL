@@ -1,10 +1,11 @@
+using LL.Core.Interfaces.Extensions;
 using LL.Data.Contexts;
 using LL.Core.Interfaces.Repositories;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class NewUserRequestRepository(AppDBContext db) : INewUserRequestRepository
+public class NewUserRequestRepository(AppDBContext db, IEncryptionService encryptionService) : INewUserRequestRepository
 {
     public bool HasReachedLimit(string email, DateTimeOffset date, int attemptsLimit) => 
         db.NewUserRequests.Count(u => 
@@ -12,23 +13,20 @@ public class NewUserRequestRepository(AppDBContext db) : INewUserRequestReposito
             && u.CreatedDate.Date.Year == date.Year
             && u.CreatedDate.Date.Month == date.Month
             && u.CreatedDate.Date.Day == date.Day) > attemptsLimit;
-
-    public bool IsTokenValid(string token) => 
-        db.NewUserRequests.Any(u => u.Token == token) == false;
     
     public string? GetEmailByToken(string token) =>
         db.NewUserRequests.FirstOrDefault(u => u.Token == token)?.Email;
     
-    public int Insert(string email, string ip, string token, int loginId)
+    public string Insert(string email, string ip, int loginId)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return 0;
+            return string.Empty;
         
         var newUserRequest = new NewUserRequest()
         {
             Email = email.Trim().ToLower(),
             IP = ip,
-            Token = token,
+            Token = encryptionService.GenerateSecureToken(),
             CreatedById = loginId,
             CreatedDate = DateTimeOffset.Now,
         };
@@ -36,6 +34,6 @@ public class NewUserRequestRepository(AppDBContext db) : INewUserRequestReposito
         db.Add(newUserRequest);
         db.SaveChanges();
 
-        return newUserRequest.Id;
+        return newUserRequest.Id > 0 ? newUserRequest.Token : string.Empty;
     }
 }

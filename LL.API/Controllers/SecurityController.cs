@@ -3,8 +3,10 @@ using System.Net.Mime;
 using LL.API.Constants;
 using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
+using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModel;
 using LL.Core.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
@@ -16,7 +18,12 @@ namespace LL.API.Controllers
     [Route("[controller]")]
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SecurityController(IConfiguration config, ISecurityService securityService, IAppMonitoringService appMonitoringService) : Controller
+    public class SecurityController(
+        IConfiguration config,
+        ISecurityService securityService, 
+        IUserRepository userRepository, 
+        IAppMonitoringService appMonitoringService,
+        TokenConfigModel tokenConfigModel) : Controller
     {
         /// <summary>
         /// Pass username and password and get a security token.
@@ -31,7 +38,7 @@ namespace LL.API.Controllers
 
             try
             {
-                tokenViewModel = securityService.Authenticate(loginModel);
+                tokenViewModel = userRepository.GetAuthenticationToken(loginModel, tokenConfigModel);
             }
             catch (Exception ex)
             {

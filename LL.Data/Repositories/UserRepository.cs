@@ -1,11 +1,15 @@
+using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
+using LL.Core.Models.ViewModel;
+using LL.Core.Models.ViewModels;
 using LL.Data.Contexts;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class UserRepository(AppDBContext db) : IUserRepository
+public class UserRepository(AppDBContext db, IEncryptionService encryptionService) : IUserRepository
 {
     public UserShort? GetById(int id) =>
         db.Users
@@ -14,16 +18,31 @@ public class UserRepository(AppDBContext db) : IUserRepository
             .FirstOrDefault();
     
      public UserShort? GetByEmail(string email) =>
-         db.Users.Where(u =>
-                 string.IsNullOrWhiteSpace(u.Email) == false
-                 && u.Email.ToLower().Trim() == email.ToLower().Trim() 
-                 && u.IsActive)
-             .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
-             .FirstOrDefault();
+         Get(email) is var u && u != null 
+             ? new UserShort(u.Id, u.Email, u.PasswordHash)
+             : null;
 
+     public TokenViewModel? GetAuthenticationToken(LoginModel loginModel, TokenConfigModel token)
+     {
+         if(loginModel.IsValid == false)
+             return null;
+         
+         var user = Get(loginModel.Email);
+         
+         if(user == null)
+             return null;
+        
+         if(encryptionService.VerifyPassword(loginModel.Password, user.PasswordHash, user.Salt) == false)
+             return null;
+
+         return encryptionService.GenerateAuthenticationToken(user.Id, user.Email, token);
+     }
+     
      private User? Get(string email) =>
-         db.Users.FirstOrDefault(u => 
-             u.Email.ToLower().Trim() == email.ToLower().Trim());
+         db.Users.FirstOrDefault(u =>
+             string.IsNullOrWhiteSpace(u.Email) == false
+             && u.Email.ToLower().Trim() == email.ToLower().Trim() 
+             && u.IsActive);
      
      public int Insert(string email, string password, int loginId)
      {

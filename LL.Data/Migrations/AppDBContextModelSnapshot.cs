@@ -45,6 +45,22 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Languages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "English"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Spanish"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.LoginHistory", b =>
@@ -206,6 +222,29 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("MessageStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Queued"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Sent"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Failed"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.NewUserRequest", b =>
@@ -370,6 +409,29 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("SeminarWordRank");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "High"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Medium"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Low"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.Statement", b =>
@@ -428,9 +490,23 @@ namespace LL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            Email = "",
+                            IsActive = true,
+                            PasswordHash = "",
+                            Salt = ""
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.UserLog", b =>
@@ -689,6 +765,43 @@ namespace LL.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("WordTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Nouns"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Verbs"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Adjectives"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Adverbs"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedById = 0,
+                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "Interjections"
+                        });
                 });
 
             modelBuilder.Entity("LL.Data.Model.Language", b =>

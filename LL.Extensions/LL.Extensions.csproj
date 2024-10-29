@@ -10,6 +10,7 @@
     <PackageReference Include="Google.Cloud.Translation.V2" Version="3.4.0" />
     <PackageReference Include="LLamaSharp" Version="0.16.0" />
     <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.16.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="9.0.0-rc.2.24474.3" />
   </ItemGroup>
 
   <ItemGroup>

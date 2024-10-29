@@ -1,16 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using LL.Core.Helpers;
-using System.Security.Claims;
-using System.Text;
+﻿using LL.Core.Helpers;
 using LL.Core.Constants;
 using LL.Core.Factories;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
-using LL.Core.Models.ViewModel;
-using LL.Core.Models.ViewModels;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LL.Core.Services;
 
@@ -18,26 +12,8 @@ public class SecurityService(
     IUserRepository userRepository, 
     IMessageRepository messageRepository, 
     INewUserRequestRepository newUserRequestRepository, 
-    IResetPasswordRequestRepository resetPasswordRequestRepository,
-    TokenConfigModel token) : ISecurityService
+    IResetPasswordRequestRepository resetPasswordRequestRepository) : ISecurityService
 {
-    public TokenViewModel? Authenticate(LoginModel userLogin)
-    {
-        var user = userRepository.GetByEmail(userLogin.Email);
-
-        if (user is null)
-        {
-            return null;
-        }
-
-        if (!SecurityHelper.VerifyHashedPassword(user.PasswordHash, userLogin.Password))
-        {
-            return null;
-        }
-
-        return GenerateToken(user);
-    }
-
     public bool RegisterUser(NewUserModel model, string ip, string url)
     {
         model.Email = model.Email.ToLower().Trim();
@@ -52,11 +28,13 @@ public class SecurityService(
         
         if (newUserRequestRepository.HasReachedLimit(model.Email, new DateTimeOffset(), Settings.AttemptsLimit))
             return false;
+
+        string token = newUserRequestRepository.Insert(model.Email, ip, Settings.LoginId);
+
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
         
-        string token = SecurityHelper.GenerateSecureToken();
-        
-        return newUserRequestRepository.Insert(model.Email, ip, token, Settings.LoginId) > 0 
-               && messageRepository.Insert(
+        return messageRepository.Insert(
                    model.Email, 
                    "Confirm Your Email Address",
                    SecurityMessagesFactory.CreateNewUser(url, token, model.Email), 
@@ -78,7 +56,7 @@ public class SecurityService(
         if(!TextHelper.IsValidEmail(model.Email) || model.Email != email)
             return false;
             
-        return userRepository.Insert(email, SecurityHelper.HashPassword(model.Password), Settings.LoginId) > 0;
+        return userRepository.Insert(email, model.Password, Settings.LoginId) > 0;
     }
     public bool ResetPassword(string email, string ip, string url)
     {
@@ -96,10 +74,12 @@ public class SecurityService(
         if (resetPasswordRequestRepository.HasReachedLimit(user.Id, new DateTimeOffset(), Settings.AttemptsLimit))
             return false;
         
-        string token = SecurityHelper.GenerateSecureToken();
+        string token = resetPasswordRequestRepository.Insert(user.Id, ip);
 
-        return resetPasswordRequestRepository.Insert(user.Id, ip, token) > 0 
-               && messageRepository.Insert(
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
+        
+        return messageRepository.Insert(
                    email, 
                    "Reset Your Password",
                    SecurityMessagesFactory.ResetPassword(url, token, user.Email),
@@ -118,36 +98,7 @@ public class SecurityService(
         if(!TextHelper.IsValidEmail(model.Email) || model.Email != userRepository.GetById(userId)?.Email)
             return false;
         
-        return userRepository.UpdatePassword(userId, SecurityHelper.HashPassword(model.Password), userId);
-    }
-    
-    private TokenViewModel GenerateToken(UserShort user)
-    {
-        var expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(token.Expires));
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token.Key ?? string.Empty));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        var claims = GetClaims(user);
-
-        var securityToken = new JwtSecurityToken(
-            token.Issuer,
-            token.Audience,
-            claims,
-            expires: expires,
-            signingCredentials: credentials);
-
-        return new TokenViewModel()
-        {
-            Token = new JwtSecurityTokenHandler().WriteToken(securityToken),
-            Expiration = expires.ToString(),
-        };
-    }
-    private static Claim[] GetClaims(UserShort user)
-    {
-        return
-        [
-            new Claim("UserId", user.Id.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Email ?? string.Empty)
-        ];
+        return userRepository.UpdatePassword(userId, model.Password, userId);
     }
 }
 

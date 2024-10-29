@@ -9,10 +9,10 @@ import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
 import {ConfirmationModel} from '@/generated-client/src';
 import Link from 'next/link';
 
-export default function CompleteResetPassword() {
+export default function CompleteUserRegistration() {
 
     const router = useRouter()
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const modalRef = useRef<any>(null); 
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
@@ -47,16 +47,16 @@ export default function CompleteResetPassword() {
                   return;
               }
             
-              const searchParams = new URLSearchParams(window.location.search);
+              const searchParams = new URLSearchParams(window.location.search.toLowerCase());
               let token:string = searchParams.get('token') || '';
               let email:string = searchParams.get('email') || '';
 
-              if(token.length > 1) {
+              if(token.length < 1) {
 
                 openModal("Invalid Token", "The token provided is invalid or has expired. Please request a new one.");
                 return;
               }
-              
+
               if(IsValidEmail(email) == false) {
 
                 openModal("Invalid Link", "This link is invalid or has expired. Please request a new one.");
@@ -71,20 +71,22 @@ export default function CompleteResetPassword() {
               };
               
               setLoading(true);
-              POST('/Security/CompletePasswordReset', JSON.stringify(data))
+              POST('/Security/CompleteUserRegistration', JSON.stringify(data))
                 .then(isSuccessfull => { 
+
                   if(isSuccessfull) {
 
                       let fun = () => {
                           router.push('/', { scroll: false }); 
                         };
 
-                      openModal("Success", "Your password has been reset successfully", fun);
+                      openModal("Success", "Your new account has been created successfully", fun);
                       
-                  }else{
-                      openModal("Error", "Something went wrong the request cannot be completed at this time")
+                  }else{                      
+                      openModal("Error", "Something went wrong the request cannot be completed at this time. "
+                        + "If you already created an account please reset your password");
                   }
-                
+
                   setLoading(false);
                 }).catch(e => { 
                   setLoading(false); 
@@ -98,37 +100,37 @@ export default function CompleteResetPassword() {
 
     return (
         <Container>
-          <Row className="justify-content-md-center mt-5">
-              <Col xs={12} md={6}>
-                  <h2 className="text-center mb-4">Reset Password</h2>
-    
-                  <Form.Control
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                  />
-                  
-                  <br/>
-                  <Form.Control
-                      type="password"
-                      placeholder="Confirm Password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirPassword(e.target.value)}
-                  />
-    
-                  <br/>
-                  <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Confirm </Button>
+            <Row className="justify-content-md-center mt-5">
+                <Col xs={12} md={6}>
+                    <h2 className="text-center mb-4">User Registration</h2>
 
-                  <hr/>
-                  <div className="center">
-                      <Link href="/" className='hyperLink'>Sign in</Link>
-                  </div>
-              </Col>
-          </Row>
+                    <Form.Control
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    
+                    <br/>
+                    <Form.Control
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirPassword(e.target.value)}
+                    />
 
-          {loading && <SpinnerOverlay />}
-          <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick}/>
-      </Container>
+                    <br/>
+                    <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Confirm </Button>
+
+                    <hr/>
+                    <div className="center">
+                        <Link href="/" className='hyperLink'>Sign in</Link>
+                    </div>
+                </Col>
+            </Row>
+
+            {loading && <SpinnerOverlay />}
+            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick}/>
+        </Container>
     );
 };

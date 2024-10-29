@@ -55,9 +55,9 @@ export default function ResetPassword() {
                         }
                         
                         setLoading(false);
-                    }).catch(error => { 
+                    }).catch(e => { 
                         setLoading(false); 
-                        openModal("Error", error.message);
+                        openModal("Error", "The server was unable to complete your request. Please try again later.");
                     });
             }else {
                 openModal("Invalid Email", "Please pass a valid email"); 

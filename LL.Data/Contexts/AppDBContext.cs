@@ -1,4 +1,5 @@
-﻿using LL.Data.Model;
+﻿using LL.Core.Enums;
+using LL.Data.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Contexts
@@ -38,8 +39,22 @@ namespace LL.Data.Contexts
             {
                 entity.Property(p => p.Email).IsRequired();
                 entity.Property(p => p.PasswordHash).IsRequired();
+                entity.Property(p => p.Salt).IsRequired();
                 entity.Property(u => u.IsActive).IsRequired();
             });
+            
+            modelBuilder.Entity<User>().HasData(
+                Enum.GetValues(typeof(UserEnum))
+                    .Cast<UserEnum>()
+                    .Select(e => new User()
+                    {
+                        Id = (int)e,
+                        Email = string.Empty,
+                        PasswordHash = string.Empty,
+                        Salt = string.Empty,
+                        IsActive = true
+                    })
+            );
 
             modelBuilder.Entity<UserLog>(entity =>
             {
@@ -179,6 +194,16 @@ namespace LL.Data.Contexts
                     .OnDelete(DeleteBehavior.Restrict);
             });
             
+            modelBuilder.Entity<MessageStatus>().HasData(
+                Enum.GetValues(typeof(MessageStatusEnum))
+                    .Cast<MessageStatusEnum>()
+                    .Select(e => new MessageStatus
+                    {
+                        Id = (int)e,
+                        Value = e.ToString()
+                    })
+            );
+            
             modelBuilder.Entity<MessageContent>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
@@ -207,6 +232,16 @@ namespace LL.Data.Contexts
                     .HasForeignKey(ut => ut.CreatedById)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+            
+            modelBuilder.Entity<Language>().HasData(
+                Enum.GetValues(typeof(LanguageEnum))
+                    .Cast<LanguageEnum>()
+                    .Select(e => new Language
+                    {
+                        Id = (int)e,
+                        Value = e.ToString()
+                    })
+            );
             
             modelBuilder.Entity<Word>(entity =>
             {
@@ -278,6 +313,16 @@ namespace LL.Data.Contexts
                     .HasForeignKey(ut => ut.CreatedById)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+            
+            modelBuilder.Entity<WordType>().HasData(
+                Enum.GetValues(typeof(WordTypeEnum))
+                    .Cast<WordTypeEnum>()
+                    .Select(e => new WordType
+                    {
+                        Id = (int)e,
+                        Value = e.ToString()
+                    })
+            );
             
             modelBuilder.Entity<WordLink>(entity =>
             {
@@ -359,6 +404,16 @@ namespace LL.Data.Contexts
                     .HasForeignKey(ut => ut.CreatedById)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+            
+            modelBuilder.Entity<SeminarWordRank>().HasData(
+                Enum.GetValues(typeof(SeminarWordRankEnum))
+                    .Cast<SeminarWordRankEnum>()
+                    .Select(e => new SeminarWordRank
+                    {
+                        Id = (int)e,
+                        Value = e.ToString()
+                    })
+            );
             
             modelBuilder.Entity<SeminarWord>(entity =>
             {

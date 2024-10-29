@@ -1,6 +1,6 @@
 namespace LL.Core.Enums;
 
-public enum SeminarWordRank
+public enum SeminarWordRankEnum
 {
     High = 1,
     Medium = 2,
