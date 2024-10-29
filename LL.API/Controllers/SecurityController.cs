@@ -62,11 +62,10 @@ namespace LL.API.Controllers
             try
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-                var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
-                var loginId = Convert.ToInt32(config[AppSettings.LoginId]);
-            
-                isRequestCreated = securityService.RegisterUser(model, ipAddress, attemptsLimit, loginId);
-                
+                var url = config[AppSettings.BaseUrl] ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(url) == false)
+                    isRequestCreated = securityService.RegisterUser(model, ipAddress, url);
             }
             catch (Exception ex)
             {
@@ -93,12 +92,11 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult CompleteUserRegistration([FromBody] ConfirmationModel model)
         {
-            bool isVerified = false;
+            bool isCompleted = false;
             
             try
             {
-                var loginId = Convert.ToInt32(config[AppSettings.LoginId]);
-                isVerified = securityService.CompleteUserRegistration(model, loginId);
+                isCompleted = securityService.CompleteUserRegistration(model);
             }
             catch (Exception ex)
             {
@@ -114,7 +112,7 @@ namespace LL.API.Controllers
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
-            return Ok(isVerified);
+            return Ok(isCompleted);
         }      
         
         /// <summary>
@@ -126,14 +124,15 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult ResetPassword([FromBody] string email)
         {
-            bool isVerified = false;
+            bool isRequestCreated = false;
             
             try
             {    
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-                var attemptsLimit = Convert.ToInt32(config[Secrets.AttemptsLimit]);
-                
-                isVerified = securityService.ResetPassword(email, ipAddress, attemptsLimit);
+                var url = config[AppSettings.BaseUrl] ?? string.Empty;
+
+                if (string.IsNullOrWhiteSpace(url) == false)
+                    isRequestCreated = securityService.ResetPassword(email, ipAddress,  url);
             }
             catch (Exception ex)
             {
@@ -145,7 +144,7 @@ namespace LL.API.Controllers
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
-            return Ok(isVerified);
+            return Ok(isRequestCreated);
         }        
         
         /// <summary>
@@ -157,11 +156,11 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult CompletePasswordReset([FromBody] ConfirmationModel model)
         {
-            bool hasBeenReset = false;
+            bool isCompleted = false;
             
             try
             {
-                hasBeenReset = securityService.CompletePasswordReset(model);
+                isCompleted = securityService.CompletePasswordReset(model);
             }
             catch (Exception ex)
             {
@@ -176,7 +175,7 @@ namespace LL.API.Controllers
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
-            return Ok(hasBeenReset);
+            return Ok(isCompleted);
         }
     }
 }

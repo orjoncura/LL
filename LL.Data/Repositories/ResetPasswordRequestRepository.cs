@@ -11,13 +11,13 @@ public class ResetPasswordRequestRepository(AppDBContext db) : IResetPasswordReq
             && u.CreatedDate.Date.Month == date.Month
             && u.CreatedDate.Date.Day == date.Day) > attemptsLimit;
 
-    public bool IsTokenValid(Guid token) => 
+    public bool IsTokenValid(string token) => 
         db.ResetPasswordRequests.Any(u => u.Token == token) == false;
     
     public int GetUserIdByToken(string token) =>
-        db.ResetPasswordRequests.SingleOrDefault(u => token.CompareTo(u.Token) == 0).UserId;
+        db.ResetPasswordRequests.SingleOrDefault(u => u.Token == token).UserId;
     
-    public int Insert(int userId,string ip, Guid token)
+    public int Insert(int userId,string ip, string token)
     {
         var resetPasswordRequests = new ResetPasswordRequest()
         {

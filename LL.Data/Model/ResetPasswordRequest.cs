@@ -8,6 +8,6 @@ public class ResetPasswordRequest
     public virtual User? User { get; set; }
     
     public string IP { get; set; }
-    public Guid Token { get; set; }
+    public string Token { get; set; }
     public DateTimeOffset CreatedDate { get; set; }     
 }

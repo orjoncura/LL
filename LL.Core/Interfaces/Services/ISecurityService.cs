@@ -6,9 +6,9 @@ namespace LL.Core.Interfaces.Services;
 public interface ISecurityService
 {
     TokenViewModel? Authenticate(LoginModel loginModel);
-    bool RegisterUser(NewUserModel model, string ip, int attemptsLimit, int loginId);
-    bool CompleteUserRegistration(ConfirmationModel model, int loginId);
-    bool ResetPassword(string email, string ip, int attemptsLimit);
+    bool RegisterUser(NewUserModel model, string ip, string url);   
+    bool CompleteUserRegistration(ConfirmationModel model);
+    bool ResetPassword(string email, string ip, string url);
     bool CompletePasswordReset(ConfirmationModel model);
 }
 

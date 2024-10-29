@@ -29,7 +29,6 @@ public static class SecurityHelper
 
         return ByteArraysEqual(array3, bytes);
     }
-
     public static string HashPassword(string password)
     {
         // divide by 8 to convert bits to bytes
@@ -45,7 +44,19 @@ public static class SecurityHelper
 
         return hashed;
     }
-
+    public static string GenerateSecureToken(int length = 64)
+    {
+        var randomNumber = new byte[length];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomNumber);
+        }
+        
+        return Convert.ToBase64String(randomNumber)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
+    }
     private static bool ByteArraysEqual(byte[] a, byte[] b)
     {
         if (ReferenceEquals(a, b))

@@ -3,7 +3,7 @@
     public static class AppSettings
     {
         public const string Version = "Version";
-    
-        public const string LoginId = "DefaultLoginId";
+        
+        public const string BaseUrl = "BaseURL";
     }
 }

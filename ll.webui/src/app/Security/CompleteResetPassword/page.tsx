@@ -3,25 +3,29 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import {POST} from "@/scripts/Helpers/SecurityHelper";
-import {IsValidPassword} from "@/scripts/Helpers/TextHelper";
+import {IsValidPassword, IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '../../../components/Modal/ModalView';
+import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
 import {ConfirmationModel} from '@/generated-client/src';
 import Link from 'next/link';
 
 export default function CompleteResetPassword() {
 
     const router = useRouter()
+    const [loading, setLoading] = useState(false);
     const modalRef = useRef<any>(null); 
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirPassword] = useState('');
+    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
 
     const openModal = (title: string, body:string, onClick?: Function) => {
         if (modalRef.current) {
 
             setModalTitle(title);
             setModalBody(body);
+            setOnModalClick(() => onClick); 
 
           modalRef.current.openModal(); // Call openModal from the Example component
         }
@@ -45,19 +49,28 @@ export default function CompleteResetPassword() {
             
               const searchParams = new URLSearchParams(window.location.search);
               let token:string = searchParams.get('token') || '';
+              let email:string = searchParams.get('email') || '';
 
               if(token.length > 1) {
 
                 openModal("Invalid Token", "The token provided is invalid or has expired. Please request a new one.");
                 return;
               }
+              
+              if(IsValidEmail(email) == false) {
+
+                openModal("Invalid Link", "This link is invalid or has expired. Please request a new one.");
+                return;
+              }
 
               const data: ConfirmationModel = {
                 "password": password,
                 "confirmPassword": confirmPassword,
-                "token": token
+                "token": token,
+                "email": email
               };
               
+              setLoading(true);
               POST('/Security/CompletePasswordReset', JSON.stringify(data))
                 .then(isSuccessfull => { 
                   if(isSuccessfull) {
@@ -70,8 +83,13 @@ export default function CompleteResetPassword() {
                       
                   }else{
                       openModal("Error", "Something went wrong the request cannot be completed at this time")
-                  }})
-                  .catch(error => { console.error('Error sending data:', error);});
+                  }
+                
+                  setLoading(false);
+                }).catch(error => { 
+                    setLoading(false); 
+                    openModal("Error", error.message);
+                });
 
         } catch (error) {
           console.error('Error making API call:', error);
@@ -109,7 +127,8 @@ export default function CompleteResetPassword() {
               </Col>
           </Row>
 
-          <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} />
+          {loading && <SpinnerOverlay />}
+          <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick}/>
       </Container>
     );
 };

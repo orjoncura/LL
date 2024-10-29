@@ -9,11 +9,12 @@ public class Message
     
     public string RecipientAddress { get; set; }
     
+    public string Subject { get; set; }
     public int StatusId { get; set; }
     public MessageStatus? Status { get; set; }
     
     public int MessageContentId { get; set; }
     public virtual MessageContent? MessageContent { get; set; }
     
-    public DateTimeOffset DateSend { get; set; }
+    public DateTimeOffset? DateSend { get; set; }
 }

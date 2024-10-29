@@ -52,9 +52,9 @@ public class SecurityServiceTest
         model.ConfirmEmail = "test@test.com";
         
         string ip = "123.123.123.123";
-        int attemptsLimit = 3;
+        string url = "http://localhost:3000";
         
-        isRequestCreated = _securityService.RegisterUser(model, ip, attemptsLimit, 1);
+        isRequestCreated = _securityService.RegisterUser(model, ip, url);
         
         // Assert
         Assert.True(isRequestCreated);
@@ -69,7 +69,7 @@ public class SecurityServiceTest
         model.ConfirmPassword = "Password";
         model.Token = Token;
         
-        isRequestCompleted = _securityService.CompleteUserRegistration(model, 1);
+        isRequestCompleted = _securityService.CompleteUserRegistration(model);
         
         // Assert
         Assert.True(isRequestCompleted);
@@ -80,9 +80,11 @@ public class SecurityServiceTest
         bool isRequestCreated = false;
         string email = "test@test.com";
         string ip = "123.123.123.123";
-        int attemptsLimit = 3;
         
-        isRequestCreated = _securityService.ResetPassword(email, ip, attemptsLimit);
+        int attemptsLimit = 3;
+        string url = "http://localhost:3000";
+        
+        isRequestCreated = _securityService.ResetPassword(email, ip, url);
         
         // Assert
         Assert.True(isRequestCreated);

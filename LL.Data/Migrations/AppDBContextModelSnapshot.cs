@@ -80,7 +80,7 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTimeOffset>("DateSend")
+                    b.Property<DateTimeOffset?>("DateSend")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("MessageContentId")
@@ -95,6 +95,10 @@ namespace LL.Data.Migrations
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -141,7 +145,7 @@ namespace LL.Data.Migrations
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset>("DateSend")
+                    b.Property<DateTimeOffset?>("DateSend")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("MessageContentId")
@@ -159,6 +163,10 @@ namespace LL.Data.Migrations
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -222,8 +230,9 @@ namespace LL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -247,8 +256,9 @@ namespace LL.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

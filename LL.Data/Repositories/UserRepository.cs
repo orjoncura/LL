@@ -7,6 +7,12 @@ namespace LL.Data.Repositories;
 
 public class UserRepository(AppDBContext db) : IUserRepository
 {
+    public UserShort? GetById(int id) =>
+        db.Users
+            .Where(u => u.Id == id && u.IsActive)
+            .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
+            .FirstOrDefault();
+    
      public UserShort? GetByEmail(string email) =>
          db.Users.Where(u =>
                  string.IsNullOrWhiteSpace(u.Email) == false

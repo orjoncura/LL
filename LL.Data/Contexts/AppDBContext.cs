@@ -91,6 +91,7 @@ namespace LL.Data.Contexts
                 entity.Property(ut => ut.Email).IsRequired();
                 entity.Property(ut => ut.IP).IsRequired();
                 entity.Property(ut => ut.Token).IsRequired();
+                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(ut => ut.CreatedDate).IsRequired();
             });
 
@@ -110,9 +111,9 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Message>(entity =>
             {
                 entity.Property(ut => ut.RecipientAddress).IsRequired();
+                entity.Property(ut => ut.Subject).IsRequired();
                 entity.Property(ut => ut.StatusId).IsRequired();
                 entity.Property(ut => ut.MessageContentId).IsRequired();
-                entity.Property(ut => ut.DateSend).IsRequired();
 
                 entity.HasOne(p => p.Recipient)
                     .WithMany()
@@ -134,9 +135,9 @@ namespace LL.Data.Contexts
             {
                 entity.Property(ut => ut.MessageId).IsRequired();
                 entity.Property(ut => ut.RecipientAddress).IsRequired();
+                entity.Property(ut => ut.Subject).IsRequired();
                 entity.Property(ut => ut.StatusId).IsRequired();
                 entity.Property(ut => ut.MessageContentId).IsRequired();
-                entity.Property(ut => ut.DateSend).IsRequired();
                 entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(ut => ut.CreatedDate).IsRequired();
 

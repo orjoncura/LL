@@ -13,21 +13,24 @@ public class NewUserRequestRepository(AppDBContext db) : INewUserRequestReposito
             && u.CreatedDate.Date.Month == date.Month
             && u.CreatedDate.Date.Day == date.Day) > attemptsLimit;
 
-    public bool IsTokenValid(Guid token) => 
+    public bool IsTokenValid(string token) => 
         db.NewUserRequests.Any(u => u.Token == token) == false;
     
-    public string GetEmailByToken(string token) =>
-        db.NewUserRequests.SingleOrDefault(u => token.CompareTo(u.Token) == 0).Email;
+    public string? GetEmailByToken(string token) =>
+        db.NewUserRequests.FirstOrDefault(u => u.Token == token)?.Email;
     
-    public int Insert(string email, string ip, Guid token, int loginId)
+    public int Insert(string email, string ip, string token, int loginId)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            return 0;
+        
         var newUserRequest = new NewUserRequest()
         {
-            Email = email,
+            Email = email.Trim().ToLower(),
             IP = ip,
             Token = token,
             CreatedById = loginId,
-            CreatedDate = DateTime.Now,
+            CreatedDate = DateTimeOffset.Now,
         };
 
         db.Add(newUserRequest);

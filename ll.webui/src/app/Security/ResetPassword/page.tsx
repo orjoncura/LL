@@ -6,10 +6,12 @@ import Constants from "@/scripts/Constants";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '../../../components/Modal/ModalView';
+import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
 
 export default function ResetPassword() {
 
     const router = useRouter()
+    const [loading, setLoading] = useState(false);
     const modalRef = useRef<any>(null); 
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
@@ -36,20 +38,27 @@ export default function ResetPassword() {
         try {
             if(IsValidEmail(email)) {
 
+                setLoading(true);
                 POST('/Security/ResetPassword', JSON.stringify(email))
                     .then(isSuccessfull => { 
-                            if(isSuccessfull) {
 
-                                let fun = () => {
-                                    router.push('/', { scroll: false }); 
-                                  };
+                        if(isSuccessfull) {
 
-                                openModal("Success", "You will receive an email to confirm your request", fun);
-                                
-                            }else{
-                                openModal("Error", "Something went wrong the request cannot be completed at this time")
-                            }})
-                    .catch(error => { console.error('Error sending data:', error);});
+                            let fun = () => {
+                                router.push('/', { scroll: false }); 
+                                };
+
+                            openModal("Success", "You will receive an email to confirm your request", fun);
+                            
+                        }else{
+                            openModal("Error", "Something went wrong the request cannot be completed at this time");
+                        }
+                        
+                        setLoading(false);
+                    }).catch(error => { 
+                        setLoading(false); 
+                        openModal("Error", error.message);
+                    });
             }else {
                 openModal("Invalid Email", "Please pass a valid email"); 
             }
@@ -76,6 +85,7 @@ export default function ResetPassword() {
                 </Col>
             </Row>
 
+            {loading && <SpinnerOverlay />}
             <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
 
         </Container>

@@ -4,6 +4,7 @@ export interface ConfirmationModel {
   password: string;
   confirmPassword: string;
   token: string;
+  email: string;
 }
 
 export interface NewUserModel {

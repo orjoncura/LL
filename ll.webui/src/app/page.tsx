@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, {useState, useRef} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
@@ -7,13 +7,32 @@ import {POST} from '@/scripts/Helpers/SecurityHelper'
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import {LoginModel} from '@/generated-client/src';
 import Link from 'next/link';
+import ModalView from '../components/Modal/ModalView';
+import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
 
 import './globals.css'; 
 
 export default function Login() {
+
   const router = useRouter()
+  const [loading, setLoading] = useState(false);
+  const modalRef = useRef<any>(null); 
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalBody, setModalBody] = useState('');
+  const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const openModal = (title: string, body:string, onClick?: Function) => {
+    if (modalRef.current) {
+
+        setModalTitle(title);
+        setModalBody(body);
+        setOnModalClick(() => onClick); 
+
+      modalRef.current.openModal(); // Call openModal from the Example component
+    }
+  };
 
   const handleSubmit = (event:any) => {
     event.preventDefault();
@@ -26,9 +45,23 @@ export default function Login() {
               "password": password
             };
             
+                setLoading(true);
             POST('/Security/Authenticate', JSON.stringify(data))
-                .then(data => { router.push('/Home', { scroll: false })})
-                .catch(error => { console.error('Error sending data:', error);});
+            .then(isSuccessfull => { 
+
+              if(isSuccessfull) {
+
+                router.push('/', { scroll: false }); 
+                  
+              }else{
+                  openModal("Error", "Something went wrong the request cannot be completed at this time");
+              }
+              
+              setLoading(false);
+            }).catch(error => { 
+                setLoading(false); 
+                openModal("Error", error.message);
+            });
           }
     } catch (error) {
       console.error('Error making API call:', error);
@@ -70,6 +103,9 @@ export default function Login() {
               </Link>
           </Col>
       </Row>
+
+      {loading && <SpinnerOverlay />}
+      <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
     </Container>
   );
 }
