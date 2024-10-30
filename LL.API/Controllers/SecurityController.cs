@@ -6,7 +6,7 @@ using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
-using LL.Core.Models.ViewModel;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 

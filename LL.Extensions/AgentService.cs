@@ -2,9 +2,9 @@
 using System.Text;
 using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
-using LL.Core.Models.ViewModel;
 using LLama;
 using LL.Extensions.Models;
+using LL.Core.Model.DataTransferObjects;
 
 namespace LL.Extensions;
 

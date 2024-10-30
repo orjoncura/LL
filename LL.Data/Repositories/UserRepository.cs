@@ -1,11 +1,11 @@
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
-using LL.Core.Models.ViewModel;
 using LL.Core.Models.ViewModels;
-using LL.Data.Contexts;
 using LL.Data.Model;
+using LL.Data.Contexts;
 
 namespace LL.Data.Repositories;
 
@@ -65,11 +65,14 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
          
          if (user != null) 
              return user.Id;
-         
+
+        HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
+
          user = new User()
          {
              Email = email,
-             PasswordHash = password,
+             PasswordHash = hashPasswordModel.Password,
+             Salt = hashPasswordModel.Salt,
              IsActive = true,
          };
 
@@ -80,10 +83,11 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
          {
              UserId = user.Id,
              Email = email,
-             PasswordHash = password,
+             PasswordHash = hashPasswordModel.Password,
+             Salt = hashPasswordModel.Salt,
              IsActive = true,
              CreatedById = loginId,
-             CreatedDate = new DateTimeOffset()
+             CreatedDate = DateTimeOffset.Now
          };
 
          db.Add(userLog);
@@ -111,7 +115,7 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
              PasswordHash = user.PasswordHash,
              IsActive = user.IsActive,
              CreatedById = loginId,
-             CreatedDate = new DateTimeOffset()
+             CreatedDate = DateTimeOffset.Now
          };
 
          db.Add(userLog);

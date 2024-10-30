@@ -1,11 +1,11 @@
-using LL.Core.Models.ViewModel;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.ViewModels;
 
 namespace LL.Core.Interfaces.Extensions;
 
 public interface IEncryptionService
 {
-    Dictionary<string, string> HashPassword(string password);
+    HashPasswordModel HashPassword(string password);
 
     bool VerifyPassword(string password, string hashedPassword, string salt);
 

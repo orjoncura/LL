@@ -27,7 +27,7 @@ public class SecurityService(
         if(userRepository.GetByEmail(model.Email) != null)            
             return false;
         
-        if (newUserRequestRepository.HasReachedLimit(model.Email, new DateTimeOffset(), Settings.AttemptsLimit))
+        if (newUserRequestRepository.HasReachedLimit(model.Email, DateTimeOffset.Now, Settings.AttemptsLimit))
             return false;
 
         string token = newUserRequestRepository.Insert(model.Email, ip, (int)UserEnum.Admin);
@@ -72,7 +72,7 @@ public class SecurityService(
         if (user is null)
             return false;
         
-        if (resetPasswordRequestRepository.HasReachedLimit(user.Id, new DateTimeOffset(), Settings.AttemptsLimit))
+        if (resetPasswordRequestRepository.HasReachedLimit(user.Id, DateTimeOffset.Now, Settings.AttemptsLimit))
             return false;
         
         string token = resetPasswordRequestRepository.Insert(user.Id, ip);

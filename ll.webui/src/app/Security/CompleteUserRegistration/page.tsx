@@ -12,7 +12,7 @@ import Link from 'next/link';
 export default function CompleteUserRegistration() {
 
     const router = useRouter()
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const modalRef = useRef<any>(null); 
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
@@ -37,7 +37,7 @@ export default function CompleteUserRegistration() {
         try {
               if(IsValidPassword(password) == false || IsValidPassword(confirmPassword) == false) {
 
-                openModal("Invalid Password", "Please make sure both passwords are valid."); 
+                openModal("Invalid Password", "Please make sure that the password contains a capital letter and a symbol."); 
                 return;
               }
 

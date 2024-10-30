@@ -1,4 +1,4 @@
-﻿using LL.Core.Models.ViewModel;
+﻿using LL.Core.Model.DataTransferObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 

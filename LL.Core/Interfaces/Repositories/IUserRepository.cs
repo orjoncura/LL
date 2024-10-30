@@ -1,6 +1,6 @@
-﻿using LL.Core.Models.Arguments;
+﻿using LL.Core.Model.DataTransferObjects;
+using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
-using LL.Core.Models.ViewModel;
 using LL.Core.Models.ViewModels;
 
 namespace LL.Core.Interfaces.Repositories;

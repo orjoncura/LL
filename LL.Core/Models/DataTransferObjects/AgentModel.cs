@@ -1,4 +1,4 @@
-namespace LL.Core.Models.ViewModel;
+namespace LL.Core.Model.DataTransferObjects;
 
 public class AgentModel
 {

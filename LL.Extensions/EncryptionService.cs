@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using LL.Core.Interfaces.Extensions;
-using LL.Core.Models.ViewModel;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.ViewModels;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
@@ -12,38 +12,25 @@ namespace LL.Extensions;
 
 public class EncryptionService : IEncryptionService
 {
-    public Dictionary<string, string> HashPassword(string password)
-    {
-        // divide by 8 to convert bits to bytes
-        byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); 
-        
-        // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+    // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+    private string Hash(string password, byte[] salt) =>
+        Convert.ToBase64String(KeyDerivation.Pbkdf2(
             password: password!,
             salt: salt,
             prf: KeyDerivationPrf.HMACSHA256,
             iterationCount: 100000,
             numBytesRequested: 256 / 8));
 
-        var passwordAndSalt = new Dictionary<string, string>();
-        passwordAndSalt.Add(hashed, Convert.ToBase64String(salt));
+    public HashPasswordModel HashPassword(string password)
+    {
+        // divide by 8 to convert bits to bytes
+        byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); 
         
-        return passwordAndSalt;
+        return new HashPasswordModel(Hash(password, salt), Convert.ToBase64String(salt));
     }
 
-    public bool VerifyPassword(string password, string hashedPassword, string salt)
-    {        
-        byte[] saltBytes = Convert.FromBase64String(salt);
-        
-        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            password: password!,
-            salt: saltBytes,
-            prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 100000,
-            numBytesRequested: 256 / 8));
-        
-        return hashed == hashedPassword;
-    }
+    public bool VerifyPassword(string password, string hashedPassword, string salt) =>
+        Hash(password, Convert.FromBase64String(salt)) == hashedPassword;
     
     public string GenerateSecureToken(int length = 64)
     {
@@ -80,7 +67,6 @@ public class EncryptionService : IEncryptionService
             Expiration = expires.ToString(),
         };
     }
-    
     
     private Claim[] GetClaims(int id, string email)
     {

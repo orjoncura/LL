@@ -2,7 +2,7 @@
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
-using LL.Core.Models.ViewModel;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Services;
 using LL.Data.Repositories;
 using LL.Extensions;
