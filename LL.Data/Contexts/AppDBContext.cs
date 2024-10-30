@@ -1,6 +1,7 @@
 ﻿using LL.Core.Enums;
 using LL.Data.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LL.Data.Contexts
 {
@@ -13,7 +14,6 @@ namespace LL.Data.Contexts
         public DbSet<User> Users { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
-        public DbSet<UserTokenLog> UserTokenLogs { get; set; }
         public DbSet<NewUserRequest> NewUserRequests { get; set; }
         public DbSet<ResetPasswordRequest> ResetPasswordRequests { get; set; }
         public DbSet<Message> Messages { get; set; }
@@ -52,7 +52,7 @@ namespace LL.Data.Contexts
                         Email = string.Empty,
                         PasswordHash = string.Empty,
                         Salt = string.Empty,
-                        IsActive = true
+                        IsActive = false
                     })
             );
 
@@ -77,30 +77,12 @@ namespace LL.Data.Contexts
             {
                 entity.Property(ut => ut.Token).IsRequired();
                 entity.Property(ut => ut.Expiration).IsRequired();
-                entity.Property(ut => ut.IsActive).IsRequired();
 
                 entity.HasOne(ut => ut.User)
                     .WithMany()
                     .HasForeignKey(ut => ut.UserId);
             });
 
-            modelBuilder.Entity<UserTokenLog>(entity =>
-            {
-                entity.Property(ut => ut.Token).IsRequired();
-                entity.Property(ut => ut.Expiration).IsRequired();
-                entity.Property(ut => ut.IsActive).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
-
-                entity.HasOne(ut => ut.UserToken)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.UserTokenId);
-
-                entity.HasOne(p => p.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(p => p.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-            
             modelBuilder.Entity<NewUserRequest>(entity =>
             {
                 entity.Property(ut => ut.Email).IsRequired();
@@ -185,13 +167,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<MessageStatus>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
-
-                entity.HasOne(ut => ut.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<MessageStatus>().HasData(
@@ -200,7 +176,8 @@ namespace LL.Data.Contexts
                     .Select(e => new MessageStatus
                     {
                         Id = (int)e,
-                        Value = e.ToString()
+                        Value = e.ToString(),
+                        CreatedDate = DateTimeOffset.Now
                     })
             );
             
@@ -224,13 +201,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Language>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
-
-                entity.HasOne(ut => ut.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<Language>().HasData(
@@ -239,7 +210,8 @@ namespace LL.Data.Contexts
                     .Select(e => new Language
                     {
                         Id = (int)e,
-                        Value = e.ToString()
+                        Value = e.ToString(),
+                        CreatedDate = DateTimeOffset.Now
                     })
             );
             
@@ -305,13 +277,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<WordType>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
-
-                entity.HasOne(ut => ut.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<WordType>().HasData(
@@ -320,7 +286,8 @@ namespace LL.Data.Contexts
                     .Select(e => new WordType
                     {
                         Id = (int)e,
-                        Value = e.ToString()
+                        Value = e.ToString(),
+                        CreatedDate = DateTimeOffset.Now
                     })
             );
             
@@ -396,13 +363,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<SeminarWordRank>(entity =>
             {
                 entity.Property(ut => ut.Value).IsRequired();
-                entity.Property(ut => ut.CreatedById).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
-                
-                entity.HasOne(ut => ut.CreatedBy)
-                    .WithMany()
-                    .HasForeignKey(ut => ut.CreatedById)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<SeminarWordRank>().HasData(
@@ -411,7 +372,8 @@ namespace LL.Data.Contexts
                     .Select(e => new SeminarWordRank
                     {
                         Id = (int)e,
-                        Value = e.ToString()
+                        Value = e.ToString(),
+                        CreatedDate = DateTimeOffset.Now
                     })
             );
             

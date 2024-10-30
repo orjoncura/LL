@@ -8,11 +8,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LL.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Languages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Languages", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "MessageContents",
                 columns: table => new
@@ -25,6 +39,34 @@ namespace LL.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MessageContents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageStatuses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SeminarWordRank",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SeminarWordRank", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,24 +86,17 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Languages",
+                name: "WordTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Languages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Languages_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_WordTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,21 +121,36 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MessageStatuses",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    RecipientId = table.Column<int>(type: "int", nullable: true),
+                    RecipientAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    MessageContentId = table.Column<int>(type: "int", nullable: false),
+                    DateSend = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MessageStatuses", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MessageStatuses_Users_CreatedById",
-                        column: x => x.CreatedById,
+                        name: "FK_Messages_MessageContents_MessageContentId",
+                        column: x => x.MessageContentId,
+                        principalTable: "MessageContents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_MessageStatuses_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "MessageStatuses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_RecipientId",
+                        column: x => x.RecipientId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -152,20 +202,35 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SeminarWordRank",
+                name: "Seminar",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LanguageFromId = table.Column<int>(type: "int", nullable: false),
+                    LanguageToId = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SeminarWordRank", x => x.Id);
+                    table.PrimaryKey("PK_Seminar", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SeminarWordRank_Users_CreatedById",
+                        name: "FK_Seminar_Languages_LanguageFromId",
+                        column: x => x.LanguageFromId,
+                        principalTable: "Languages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Seminar_Languages_LanguageToId",
+                        column: x => x.LanguageToId,
+                        principalTable: "Languages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Seminar_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -225,63 +290,6 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WordTypes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WordTypes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WordTypes_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Seminar",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LanguageFromId = table.Column<int>(type: "int", nullable: false),
-                    LanguageToId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Seminar", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Seminar_Languages_LanguageFromId",
-                        column: x => x.LanguageFromId,
-                        principalTable: "Languages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Seminar_Languages_LanguageToId",
-                        column: x => x.LanguageToId,
-                        principalTable: "Languages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Seminar_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Words",
                 columns: table => new
                 {
@@ -311,35 +319,50 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "MessageLogs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    MessageId = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: true),
                     RecipientAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     MessageContentId = table.Column<int>(type: "int", nullable: false),
-                    DateSend = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateSend = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedById = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_MessageLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_MessageContents_MessageContentId",
+                        name: "FK_MessageLogs_MessageContents_MessageContentId",
                         column: x => x.MessageContentId,
                         principalTable: "MessageContents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Messages_MessageStatuses_StatusId",
+                        name: "FK_MessageLogs_MessageStatuses_StatusId",
                         column: x => x.StatusId,
                         principalTable: "MessageStatuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Messages_Users_RecipientId",
+                        name: "FK_MessageLogs_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MessageLogs_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MessageLogs_Users_RecipientId",
                         column: x => x.RecipientId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -489,57 +512,6 @@ namespace LL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MessageLogs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MessageId = table.Column<int>(type: "int", nullable: false),
-                    RecipientId = table.Column<int>(type: "int", nullable: true),
-                    RecipientAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    MessageContentId = table.Column<int>(type: "int", nullable: false),
-                    DateSend = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedById = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MessageLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MessageLogs_MessageContents_MessageContentId",
-                        column: x => x.MessageContentId,
-                        principalTable: "MessageContents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MessageLogs_MessageStatuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "MessageStatuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MessageLogs_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MessageLogs_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MessageLogs_Users_RecipientId",
-                        column: x => x.RecipientId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Statements",
                 columns: table => new
                 {
@@ -600,31 +572,31 @@ namespace LL.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "Languages",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "Value" },
+                columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "English" },
-                    { 2, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(6906), new TimeSpan(0, 0, 0, 0, 0)), "English" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(6916), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
                 });
 
             migrationBuilder.InsertData(
                 table: "MessageStatuses",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "Value" },
+                columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
-                    { 2, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
-                    { 3, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5882), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5968), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5970), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
                 });
 
             migrationBuilder.InsertData(
                 table: "SeminarWordRank",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "Value" },
+                columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "High" },
-                    { 2, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
-                    { 3, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5430), new TimeSpan(0, 0, 0, 0, 0)), "High" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5455), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5458), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
                 });
 
             migrationBuilder.InsertData(
@@ -634,20 +606,15 @@ namespace LL.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "WordTypes",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "Value" },
+                columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Nouns" },
-                    { 2, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Verbs" },
-                    { 3, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Adjectives" },
-                    { 4, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Adverbs" },
-                    { 5, 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Interjections" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(506), new TimeSpan(0, 0, 0, 0, 0)), "Nouns" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(524), new TimeSpan(0, 0, 0, 0, 0)), "Verbs" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(526), new TimeSpan(0, 0, 0, 0, 0)), "Adjectives" },
+                    { 4, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(528), new TimeSpan(0, 0, 0, 0, 0)), "Adverbs" },
+                    { 5, new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(530), new TimeSpan(0, 0, 0, 0, 0)), "Interjections" }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Languages_CreatedById",
-                table: "Languages",
-                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LoginHistory_CreatedById",
@@ -695,11 +662,6 @@ namespace LL.Data.Migrations
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MessageStatuses_CreatedById",
-                table: "MessageStatuses",
-                column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_NewUserRequests_CreatedById",
                 table: "NewUserRequests",
                 column: "CreatedById");
@@ -723,11 +685,6 @@ namespace LL.Data.Migrations
                 name: "IX_Seminar_LanguageToId",
                 table: "Seminar",
                 column: "LanguageToId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SeminarWordRank_CreatedById",
-                table: "SeminarWordRank",
-                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SeminarWords_CreatedById",
@@ -833,11 +790,6 @@ namespace LL.Data.Migrations
                 name: "IX_Words_LanguageId",
                 table: "Words",
                 column: "LanguageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WordTypes_CreatedById",
-                table: "WordTypes",
-                column: "CreatedById");
         }
 
         /// <inheritdoc />

@@ -15,6 +15,5 @@ Package Mangager Console
 Command Line
 	Linux: export DOTNET_ROOT=/user/bit/dotnet
            export PATH="$PATH:/home/orjoncura/.dotnet/tools"
-
-	dotnet ef migrations add YourMigrationName --project LL.Data  --startup-project LL.API
-	dotnet ef database update --project LL.Data  --startup-project LL.API
+	Windows: dotnet ef migrations add Intial --project LL.Data  --startup-project LL.API
+			 dotnet ef database update --project LL.Data  --startup-project LL.API

@@ -4,6 +4,7 @@ using LL.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LL.Data.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241030135833_Intial")]
+    partial class Intial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,13 +48,13 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(8788), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(6906), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "English"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(8808), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(6916), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Spanish"
                         });
                 });
@@ -215,19 +218,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7579), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5882), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Queued"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7725), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5968), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Sent"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7728), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 427, DateTimeKind.Unspecified).AddTicks(5970), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Failed"
                         });
                 });
@@ -394,19 +397,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7766), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5430), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "High"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7780), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5455), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Medium"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7782), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(5458), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Low"
                         });
                 });
@@ -534,9 +537,11 @@ namespace LL.Data.Migrations
                     b.Property<DateTimeOffset>("Expiration")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -546,6 +551,41 @@ namespace LL.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserTokens");
+                });
+
+            modelBuilder.Entity("LL.Data.Model.UserTokenLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("Expiration")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserTokenId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UserTokenId");
+
+                    b.ToTable("UserTokenLogs");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Word", b =>
@@ -705,31 +745,31 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2798), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(506), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Nouns"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2811), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(524), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Verbs"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2814), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(526), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adjectives"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2816), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(528), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adverbs"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2818), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 13, 58, 33, 428, DateTimeKind.Unspecified).AddTicks(530), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Interjections"
                         });
                 });
@@ -944,6 +984,25 @@ namespace LL.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LL.Data.Model.UserTokenLog", b =>
+                {
+                    b.HasOne("LL.Data.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LL.Data.Model.UserToken", "UserToken")
+                        .WithMany()
+                        .HasForeignKey("UserTokenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UserToken");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Word", b =>

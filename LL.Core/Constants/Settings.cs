@@ -2,8 +2,6 @@ namespace LL.Core.Constants;
 
 public static class Settings
 {
-    public const int LoginId = 1;
-    
     public const int AttemptsLimit = 3;
     
     public static string CompleteUserRegistrationUrl(string token, string email) =>

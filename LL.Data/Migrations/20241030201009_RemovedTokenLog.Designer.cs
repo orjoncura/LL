@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LL.Data.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20241029143029_Initial")]
-    partial class Initial
+    [Migration("20241030201009_RemovedTokenLog")]
+    partial class RemovedTokenLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0-rc.1.24451.1")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -33,9 +33,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -45,23 +42,19 @@ namespace LL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
                     b.ToTable("Languages");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(8788), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "English"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(8808), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Spanish"
                         });
                 });
@@ -210,9 +203,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -222,30 +212,25 @@ namespace LL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
                     b.ToTable("MessageStatuses");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7579), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Queued"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7725), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Sent"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 580, DateTimeKind.Unspecified).AddTicks(7728), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Failed"
                         });
                 });
@@ -397,9 +382,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -409,30 +391,25 @@ namespace LL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
                     b.ToTable("SeminarWordRank");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7766), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "High"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7780), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Medium"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(7782), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Low"
                         });
                 });
@@ -560,11 +537,9 @@ namespace LL.Data.Migrations
                     b.Property<DateTimeOffset>("Expiration")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -574,41 +549,6 @@ namespace LL.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserTokens");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.UserTokenLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("Expiration")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("UserTokenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("UserTokenId");
-
-                    b.ToTable("UserTokenLogs");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Word", b =>
@@ -753,9 +693,6 @@ namespace LL.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset");
 
@@ -765,57 +702,39 @@ namespace LL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
                     b.ToTable("WordTypes");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2798), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Nouns"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2811), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Verbs"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2814), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adjectives"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2816), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adverbs"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedById = 0,
-                            CreatedDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2024, 10, 30, 20, 10, 9, 581, DateTimeKind.Unspecified).AddTicks(2818), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Interjections"
                         });
-                });
-
-            modelBuilder.Entity("LL.Data.Model.Language", b =>
-                {
-                    b.HasOne("LL.Data.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("LL.Data.Model.LoginHistory", b =>
@@ -895,17 +814,6 @@ namespace LL.Data.Migrations
                     b.Navigation("Recipient");
 
                     b.Navigation("Status");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.MessageStatus", b =>
-                {
-                    b.HasOne("LL.Data.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("LL.Data.Model.NewUserRequest", b =>
@@ -992,17 +900,6 @@ namespace LL.Data.Migrations
                     b.Navigation("Word");
                 });
 
-            modelBuilder.Entity("LL.Data.Model.SeminarWordRank", b =>
-                {
-                    b.HasOne("LL.Data.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-                });
-
             modelBuilder.Entity("LL.Data.Model.Statement", b =>
                 {
                     b.HasOne("LL.Data.Model.User", "CreatedBy")
@@ -1050,25 +947,6 @@ namespace LL.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.UserTokenLog", b =>
-                {
-                    b.HasOne("LL.Data.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LL.Data.Model.UserToken", "UserToken")
-                        .WithMany()
-                        .HasForeignKey("UserTokenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("UserToken");
                 });
 
             modelBuilder.Entity("LL.Data.Model.Word", b =>
@@ -1161,17 +1039,6 @@ namespace LL.Data.Migrations
                     b.Navigation("Type");
 
                     b.Navigation("Word");
-                });
-
-            modelBuilder.Entity("LL.Data.Model.WordType", b =>
-                {
-                    b.HasOne("LL.Data.Model.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
                 });
 #pragma warning restore 612, 618
         }

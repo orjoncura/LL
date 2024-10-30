@@ -5,6 +5,7 @@ using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
+using LL.Core.Enums;
 
 namespace LL.Core.Services;
 
@@ -29,7 +30,7 @@ public class SecurityService(
         if (newUserRequestRepository.HasReachedLimit(model.Email, new DateTimeOffset(), Settings.AttemptsLimit))
             return false;
 
-        string token = newUserRequestRepository.Insert(model.Email, ip, Settings.LoginId);
+        string token = newUserRequestRepository.Insert(model.Email, ip, (int)UserEnum.Admin);
 
         if (string.IsNullOrWhiteSpace(token))
             return false;
@@ -37,8 +38,8 @@ public class SecurityService(
         return messageRepository.Insert(
                    model.Email, 
                    "Confirm Your Email Address",
-                   SecurityMessagesFactory.CreateNewUser(url, token, model.Email), 
-                   Settings.LoginId) > 0;
+                   SecurityMessagesFactory.CreateNewUser(url, token, model.Email),
+                   (int)UserEnum.Admin) > 0;
     }
     public bool CompleteUserRegistration(ConfirmationModel model)
     {
@@ -56,7 +57,7 @@ public class SecurityService(
         if(!TextHelper.IsValidEmail(model.Email) || model.Email != email)
             return false;
             
-        return userRepository.Insert(email, model.Password, Settings.LoginId) > 0;
+        return userRepository.Insert(email, model.Password, (int)UserEnum.Admin) > 0;
     }
     public bool ResetPassword(string email, string ip, string url)
     {
