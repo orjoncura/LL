@@ -50,12 +50,13 @@ export default function Login() {
 
                         console.log("tokenModel:", tokenModel);
 
-                        if (tokenModel != null) {
+                        if (tokenModel.token != null && tokenModel.token.length > 1) {
   
                             router.push('/Home', { scroll: false });
   
                         } else {
-                            openModal("Error", "Something went wrong the request cannot be completed at this time");
+                            openModal("Error", "It looks like the username or password you entered doesn't match our records." 
+                            + " Please double - check and try again.");
                         }
   
                         setLoading(false);

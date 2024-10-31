@@ -31,10 +31,10 @@ namespace LL.API.Controllers
         /// <param name="loginModel">Contains the email address and The plain password of the user</param>
         /// <response code="200">The new token</response>
         [HttpPost("Authenticate")]
-        [ProducesResponseType(typeof(IEnumerable<TokenViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TokenViewModel), StatusCodes.Status200OK)]
         public ActionResult Authenticate([FromBody] LoginModel loginModel)
         {
-            TokenViewModel? tokenViewModel = new TokenViewModel();
+            TokenViewModel tokenViewModel = new TokenViewModel();
 
             try
             {

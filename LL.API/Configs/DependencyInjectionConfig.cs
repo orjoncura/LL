@@ -37,9 +37,15 @@ namespace LL.API.Configs
             services.AddScoped<ITranslationService, TranslationService>();
             services.AddScoped<IDictionaryService, DictionaryService>();
             services.AddScoped<IEncryptionService, EncryptionService>();
-            
+
             //Singletons
-            services.AddSingleton(new TokenConfigModel(config[Secrets.JwtKey], config[Secrets.JwtIssuer], config[Secrets.JwtAudience]));
+            services.AddSingleton(
+                new TokenConfigModel(
+                    config[Secrets.JwtKey],
+                config[Secrets.JwtIssuer],
+                config[Secrets.JwtAudience],
+                config[Secrets.JwtExpiryMinutes]));
+
             services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
             
             return services;

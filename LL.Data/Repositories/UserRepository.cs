@@ -22,23 +22,25 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
              ? new UserShort(u.Id, u.Email, u.PasswordHash)
              : null;
 
-     public TokenViewModel? GetAuthenticationToken(LoginModel loginModel, TokenConfigModel tokenConfigModel)
+     public TokenViewModel GetAuthenticationToken(LoginModel loginModel, TokenConfigModel tokenConfigModel)
      {
-        if(loginModel.IsValid == false)
-            return null;
+        TokenViewModel tokenViewModel = new TokenViewModel();
+
+        if (loginModel.IsValid == false)
+            return tokenViewModel;
          
         var user = Get(loginModel.Email);
          
         if(user == null)
-            return null;
-        
-        if(encryptionService.VerifyPassword(loginModel.Password, user.PasswordHash, user.Salt) == false)
-            return null;
+            return tokenViewModel;
 
-        var tokenViewModel = encryptionService.GenerateAuthenticationToken(user.Id, user.Email, tokenConfigModel);
+        if (encryptionService.VerifyPassword(loginModel.Password, user.PasswordHash, user.Salt) == false)
+            return tokenViewModel;
 
-        if(tokenViewModel == null || string.IsNullOrWhiteSpace(tokenViewModel.Token))
-            return null;
+        tokenViewModel = encryptionService.GenerateAuthenticationToken(user.Id, user.Email, tokenConfigModel);
+
+        if(string.IsNullOrWhiteSpace(tokenViewModel.Token))
+            return tokenViewModel;
 
         var userToken = new UserToken()
         {

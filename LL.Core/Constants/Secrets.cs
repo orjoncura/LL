@@ -13,4 +13,6 @@ public class Secrets
     public const string JwtIssuer = "Jwt:Issuer";
     
     public const string JwtAudience = "Jwt:Audience";
+
+    public const string JwtExpiryMinutes = "Jwt:ExpiryMinutes";
 }

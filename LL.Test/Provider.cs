@@ -50,7 +50,12 @@ public static class Provider
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<IDictionaryService, DictionaryService>();
         
-        services.AddSingleton(new TokenConfigModel(config[Secrets.JwtKey], config[Secrets.JwtIssuer], config[Secrets.JwtAudience]));
+        services.AddSingleton(
+            new TokenConfigModel(
+                config[Secrets.JwtKey], 
+            config[Secrets.JwtIssuer],
+            config[Secrets.JwtAudience],
+            config[Secrets.JwtExpiryMinutes]));
         
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));

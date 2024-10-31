@@ -9,7 +9,7 @@ public interface IUserRepository
 {
     UserShort? GetById(int id);
     UserShort? GetByEmail(string email);
-    TokenViewModel? GetAuthenticationToken(LoginModel loginModel, TokenConfigModel token);
+    TokenViewModel GetAuthenticationToken(LoginModel loginModel, TokenConfigModel token);
     int Insert(string email, string password,  int loginId);
     bool UpdatePassword(int userId, string password, int loginId);
 }
