@@ -1,10 +1,11 @@
 
 import Constants from '../Constants'
 
-export async function POST(url: string, data:string) {
+export async function POST(url: string, data: string) {
     return fetch(Constants().API + url, {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${GetToken()}`,
             'Content-Type': 'application/json',
         },
         body: data,
@@ -23,3 +24,17 @@ export async function POST(url: string, data:string) {
         throw error;  // Re-throw the error so it can be caught by the caller
     });
 }
+
+export function StoreToken(token: string) {
+
+    localStorage.setItem(Constants().TokenStorageName, token);
+}
+
+export function GetToken(): string | null {
+    return localStorage.getItem(Constants().TokenStorageName);
+}
+
+export function RemoveToken() {
+    localStorage.removeItem(Constants().TokenStorageName);
+}
+

@@ -1,5 +1,5 @@
 
-import Navbar from '@/components/Navbar/Navbar/Navbar';
+import Navbar from '@/components/Navbar/Navbar';
 
 export default function Page({ params }: { params: { id: string } }) {
   return (

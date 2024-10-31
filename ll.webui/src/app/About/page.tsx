@@ -1,7 +1,7 @@
 // pages/about.js
 import React from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar/Navbar/Navbar';
+import Navbar from '@/components/Navbar/Navbar';
 
 export default function About() {
   return (      

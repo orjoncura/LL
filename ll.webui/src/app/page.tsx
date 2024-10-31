@@ -3,8 +3,8 @@ import React, {useState, useRef} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
-import {POST} from '@/scripts/Helpers/SecurityHelper'
-import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
+import { POST, StoreToken } from '@/scripts/Helpers/SecurityHelper'
+import { IsValidEmail, IsValidPassword } from "@/scripts/Helpers/TextHelper";
 import {LoginModel, TokenViewModel} from '@/generated-client/src';
 import Link from 'next/link';
 import ModalView from '../components/Modal/ModalView';
@@ -37,34 +37,43 @@ export default function Login() {
         event.preventDefault();
   
         try {
-            if (IsValidEmail(email) && password.trim() != '') {
-  
-                const data: LoginModel = {
-                    "email": email,
-                    "password": password
-                };
-  
-                setLoading(true);
-                POST('/Security/Authenticate', JSON.stringify(data))
-                    .then((tokenModel: TokenViewModel) => {
+            if (IsValidEmail(email) == false) {
 
-                        console.log("tokenModel:", tokenModel);
-
-                        if (tokenModel.token != null && tokenModel.token.length > 1) {
-  
-                            router.push('/Home', { scroll: false });
-  
-                        } else {
-                            openModal("Error", "It looks like the username or password you entered doesn't match our records." 
-                            + " Please double - check and try again.");
-                        }
-  
-                        setLoading(false);
-                    }).catch(e => {
-                        setLoading(false);
-                        openModal("Error", "The server was unable to complete your request. Please try again later.");
-                    });
+                openModal("Error", "Invalid email address format.");
+                return;
             }
+
+            if (IsValidPassword(password) == false) {
+
+                openModal("Error", "Invalid password format.");
+                return;
+            }
+  
+            const data: LoginModel = {
+                "email": email,
+                "password": password
+            };
+  
+            setLoading(true);
+            POST('/Security/Authenticate', JSON.stringify(data))
+                .then((tokenModel: TokenViewModel) => {
+
+                    if (tokenModel.token != null && tokenModel.token.length > 1) {
+
+                        StoreToken(tokenModel.token);
+                        router.push('/Home', { scroll: false });
+  
+                    } else {
+                        openModal("Error", "It looks like the username or password you entered doesn't match our records." 
+                        + " Please double - check and try again.");
+                    }
+  
+                    setLoading(false);
+                }).catch(e => {
+                    setLoading(false);
+                    openModal("Error", "The server was unable to complete your request. Please try again later.");
+                });
+            
   
         } catch (error) {
             console.error('Error making API call:', error);

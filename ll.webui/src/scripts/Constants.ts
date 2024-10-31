@@ -5,5 +5,6 @@ export default function Constants() {
         Version: "1.0.0.0",
         API: "http://localhost:5197",
         SwaggerUrl: "http://localhost:5197/swagger/v1/swagger.json",
+        TokenStorageName: 'JWT'
     };
 }

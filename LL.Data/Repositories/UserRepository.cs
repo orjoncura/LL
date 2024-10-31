@@ -17,13 +17,13 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
             .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
             .FirstOrDefault();
     
-     public UserShort? GetByEmail(string email) =>
-         Get(email) is var u && u != null 
-             ? new UserShort(u.Id, u.Email, u.PasswordHash)
-             : null;
+    public UserShort? GetByEmail(string email) =>
+        Get(email) is var u && u != null 
+            ? new UserShort(u.Id, u.Email, u.PasswordHash)
+            : null;
 
-     public TokenViewModel GetAuthenticationToken(LoginModel loginModel, TokenConfigModel tokenConfigModel)
-     {
+    public TokenViewModel GetAuthenticationToken(LoginModel loginModel, TokenConfigModel tokenConfigModel)
+    {
         TokenViewModel tokenViewModel = new TokenViewModel();
 
         if (loginModel.IsValid == false)
@@ -53,76 +53,76 @@ public class UserRepository(AppDBContext db, IEncryptionService encryptionServic
         db.SaveChanges();
 
         return tokenViewModel;
-     }
+    }
      
-     private User? Get(string email) =>
-         db.Users.FirstOrDefault(u =>
-             string.IsNullOrWhiteSpace(u.Email) == false
-             && u.Email.ToLower().Trim() == email.ToLower().Trim() 
-             && u.IsActive);
+    private User? Get(string email) =>
+        db.Users.FirstOrDefault(u =>
+            string.IsNullOrWhiteSpace(u.Email) == false
+            && u.Email.ToLower().Trim() == email.ToLower().Trim() 
+            && u.IsActive);
      
-     public int Insert(string email, string password, int loginId)
-     {
-         User? user = Get(email);
+    public int Insert(string email, string password, int loginId)
+    {
+        User? user = Get(email);
          
-         if (user != null) 
-             return user.Id;
+        if (user != null) 
+            return user.Id;
 
-        HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
+    HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
 
-         user = new User()
-         {
-             Email = email,
-             PasswordHash = hashPasswordModel.Password,
-             Salt = hashPasswordModel.Salt,
-             IsActive = true,
-         };
+        user = new User()
+        {
+            Email = email,
+            PasswordHash = hashPasswordModel.Password,
+            Salt = hashPasswordModel.Salt,
+            IsActive = true,
+        };
 
-         db.Add(user);
-         db.SaveChanges();
+        db.Add(user);
+        db.SaveChanges();
 
-         var userLog = new UserLog()
-         {
-             UserId = user.Id,
-             Email = email,
-             PasswordHash = hashPasswordModel.Password,
-             Salt = hashPasswordModel.Salt,
-             IsActive = true,
-             CreatedById = loginId,
-             CreatedDate = DateTimeOffset.Now
-         };
+        var userLog = new UserLog()
+        {
+            UserId = user.Id,
+            Email = email,
+            PasswordHash = hashPasswordModel.Password,
+            Salt = hashPasswordModel.Salt,
+            IsActive = true,
+            CreatedById = loginId,
+            CreatedDate = DateTimeOffset.Now
+        };
 
-         db.Add(userLog);
-         db.SaveChanges();
+        db.Add(userLog);
+        db.SaveChanges();
          
-         return user.Id;
-     }
+        return user.Id;
+    }
 
-     public bool UpdatePassword(int userId, string password, int loginId)
-     {
-         User? user = db.Users.FirstOrDefault(u => u.Id == userId);         
+    public bool UpdatePassword(int userId, string password, int loginId)
+    {
+        User? user = db.Users.FirstOrDefault(u => u.Id == userId);         
          
-         if (user == null) 
-             return false;
+        if (user == null) 
+            return false;
          
-         user.PasswordHash = password;
+        user.PasswordHash = password;
          
-         db.Add(user);
-         db.SaveChanges();
+        db.Add(user);
+        db.SaveChanges();
          
-         var userLog = new UserLog()
-         {
-             UserId = user.Id,
-             Email = user.Email,
-             PasswordHash = user.PasswordHash,
-             IsActive = user.IsActive,
-             CreatedById = loginId,
-             CreatedDate = DateTimeOffset.Now
-         };
+        var userLog = new UserLog()
+        {
+            UserId = user.Id,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            IsActive = user.IsActive,
+            CreatedById = loginId,
+            CreatedDate = DateTimeOffset.Now
+        };
 
-         db.Add(userLog);
-         db.SaveChanges();
+        db.Add(userLog);
+        db.SaveChanges();
          
-         return user.PasswordHash == password;
-     }
+        return user.PasswordHash == password;
+    }
 }

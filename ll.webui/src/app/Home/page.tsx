@@ -1,43 +1,41 @@
 "use client";
 import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar/Navbar/Navbar';
+import Navbar from '@/components/Navbar/Navbar';
+import { POST } from '@/scripts/Helpers/SecurityHelper'
 import Constants from '@/scripts/Constants'
 import {SeminarRequestModel} from '@/generated-client/src';
 
 export default function Home() {
-  const [text, setText] = useState<string>('');
-  const [response, setResponse] = useState<string | null>(null);
+
+    const [loading, setLoading] = useState(false);
+    const [text, setText] = useState<string>('');
+    const [response, setResponse] = useState<string | null>(null);
   
-  const handleSubmit = async () => {
+    const handleSubmit = async () => {
 
-    try {
-        const data: SeminarRequestModel = {
-            "text": text,
-            "languageFromId": 2,
-            "languageToId": 1
-        };
+        try {
 
-        fetch(Constants().API + '/Seminar/CreateSeminar', { 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Data sent successfully:', data);
-        })
-        .catch(error => {
-            console.error('Error sending data:', error);
-        });
+            const data: SeminarRequestModel = {
+                "text": text,
+                "languageFromId": 2,
+                "languageToId": 1
+            };
 
-    } catch (error) {
-      console.error('Error making API call:', error);
-      setResponse('An error occurred');
-    }
-  };
+            setLoading(true);
+            POST('/Seminar/CreateSeminar', JSON.stringify(data))
+                .then((results) => {
+
+                    setLoading(false);
+                }).catch(e => {
+                    setLoading(false);
+                });
+
+        } catch (error) {
+            console.error('Error making API call:', error);
+            setResponse('An error occurred');
+        }
+    };
 
     return (
       <div style={{ background: 'inherit' }} >

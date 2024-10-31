@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 using LL.API.Constants;
-using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -183,6 +182,19 @@ namespace LL.API.Controllers
             }
 
             return Ok(isCompleted);
+        }
+
+
+        /// <summary>
+        /// Will delete the token of the Authorization header.
+        /// </summary>
+        /// <response code="200">Success message</response>
+        [HttpPost("Logout")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public IActionResult Logout()
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return Ok(true);
         }
     }
 }

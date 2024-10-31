@@ -8,18 +8,37 @@ namespace LL.API.Configs
 { 
     public class ConfigureJwtBearerOptions(TokenConfigModel token): IConfigureNamedOptions<JwtBearerOptions>
     {
-        public void Configure(string? name, JwtBearerOptions options) => options.TokenValidationParameters = new TokenValidationParameters
+        public void Configure(string? name, JwtBearerOptions options)
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = token.Issuer,
-            ValidAudience = token.Audience,
-            LifetimeValidator = CustomLifetimeValidator,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token.Key))
-        };
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = token.Issuer,
+                ValidAudience = token.Audience,
+                LifetimeValidator = CustomLifetimeValidator,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token.Key))
+            };
 
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    var token = context.Request.Headers["Authorization"];
+                    Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                    Console.WriteLine($"Token: {token}");
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Console.WriteLine("Token validated: " + context.SecurityToken);
+                    return Task.CompletedTask;
+                }
+            };
+        }
+            
         public void Configure(JwtBearerOptions options) => Configure(JwtBearerDefaults.AuthenticationScheme, options);
 
         private static bool CustomLifetimeValidator(DateTime? notBefore, DateTime? expires, SecurityToken tokenToValidate, TokenValidationParameters @param)
