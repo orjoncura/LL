@@ -50,7 +50,7 @@ export interface SeminarRequestModel {
 export interface SeminarViewModel {
   targetWord?: string;
   sentences?: StatementShort[];
-  importance?: number;
+  importance: number;
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
 }

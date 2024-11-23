@@ -1,8 +1,7 @@
 // components/Navbar.tsx
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
-import { Button } from 'react-bootstrap';
 import styles from './Navbar.module.css';
 import { POST, RemoveToken } from '@/scripts/Helpers/SecurityHelper'
 
@@ -10,28 +9,10 @@ import { POST, RemoveToken } from '@/scripts/Helpers/SecurityHelper'
 const Navbar: React.FC = () => {
 
     const router = useRouter()
-    const [loading, setLoading] = useState(false);
-    const modalRef = useRef<any>(null);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
-
-    const openModal = (title: string, body: string, onClick?: Function) => {
-        if (modalRef.current) {
-
-            setModalTitle(title);
-            setModalBody(body);
-            setOnModalClick(() => onClick);
-
-            modalRef.current.openModal();
-        }
-    };
-
     const logout = (event: any) => {
         event.preventDefault();
 
         try {
-            setLoading(true);
             POST('/Security/Logout', "")
                 .then(isSuccessfull => {
 
@@ -41,13 +22,9 @@ const Navbar: React.FC = () => {
                         router.push('/', { scroll: false });
                     }
 
-                    setLoading(false);
                 }).catch(e => {
-                    setLoading(false);
-                    openModal("Error", "The server was unable to complete your request. Please try again later.");
+                    console.log("The server was unable to complete your request. Please try again later.");
                 });
-
-
         } catch (error) {
             console.error('Error making API call:', error);
         };
@@ -61,7 +38,7 @@ const Navbar: React.FC = () => {
       </div>
       <ul className={styles.links}>
         <li>
-          <Link href="/Home">Home</Link>
+          <Link href="/Seminar/CreateSeminar">Home</Link>
         </li>
         <li>
           <Link href="/About">About</Link>
@@ -70,7 +47,7 @@ const Navbar: React.FC = () => {
           <Link href="/Blog/1">Blog</Link>
         </li>
         <li>
-          <Button variant="primary" type="submit" onClick={logout}> Logout </Button>
+          <button type="button" onClick={logout} className={styles.linkButton}>Logout</button>
         </li>
       </ul>
     </nav>

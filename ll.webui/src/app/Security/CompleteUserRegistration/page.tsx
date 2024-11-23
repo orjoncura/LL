@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidPassword, IsValidEmail} from "@/scripts/Helpers/TextHelper";
-import ModalView from '../../../components/Modal/ModalView';
-import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
+import ModalView from '@/components/Modal/ModalView';
+import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import {ConfirmationModel} from '@/generated-client/src';
 import Link from 'next/link';
 

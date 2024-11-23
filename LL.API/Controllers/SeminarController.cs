@@ -3,6 +3,7 @@ using System.Net.Mime;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
+using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 
 namespace LL.API.Controllers
@@ -17,18 +18,44 @@ namespace LL.API.Controllers
     public class SeminarController(ISeminarService seminarService, IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
-        /// Pass a list of words and get a seminat in the selcted language
+        /// Pass a list of words and get a seminar in the selected language
         /// </summary>
-        /// <param name="Words">List of selected words.</param>
-        /// <param name="LanguageIdFrom">Input language.</param>
-        /// <param name="LangaugeIdTo">the laguage the words will be translated to.</param>
+        /// <param name="seminarRequest">Contains text, LanguageIdFrom (Input language) and LangaugeIdTo (the laguage the words will be translated to)</param>
         /// <response code="200">The new seminar</response>
-        [HttpPost("CreateSeminar")]
+        [HttpPost("Create")]
         [ProducesResponseType(typeof(IEnumerable<SeminarViewModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> CreateSeminar([FromBody] SeminarRequestModel seminarRequest)
+        public async Task<ActionResult> Create([FromBody] SeminarRequestModel seminarRequest)
         {
+            return Ok(new List<SeminarViewModel>()
+            {
+                new SeminarViewModel(
+                    "Test",
+                    new List<StatementShort>()
+                    {
+                        new StatementShort()
+                        {
+                            OriginalStatement = "OriginalStatement",
+                            TranslatedStatement = "TranslatedStatement"
+                        }
+                    },
+                    2),
+                
+                new SeminarViewModel(
+                    "Test 2",
+                    new List<StatementShort>()
+                    {
+                        new StatementShort()
+                        {
+                            OriginalStatement = "OriginalStatement 2",
+                            TranslatedStatement = "TranslatedStatement 2"
+                        }
+                    },
+                    1),
+                
+            });
+            
             List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
-
+            
             try
             {
                 seminarViewModels = await seminarService.CreateSeminar(seminarRequest, 1);

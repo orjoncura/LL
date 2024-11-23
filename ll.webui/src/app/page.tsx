@@ -61,7 +61,7 @@ export default function Login() {
                     if (tokenModel.token != null && tokenModel.token.length > 1) {
 
                         StoreToken(tokenModel.token);
-                        router.push('/Home', { scroll: false });
+                        router.push('/Seminar/Create', { scroll: false });
   
                     } else {
                         openModal("Error", "It looks like the username or password you entered doesn't match our records." 

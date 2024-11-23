@@ -183,17 +183,16 @@ namespace LL.API.Controllers
 
             return Ok(isCompleted);
         }
-
-
+        
         /// <summary>
         /// Will delete the token of the Authorization header.
         /// </summary>
         /// <response code="200">Success message</response>
         [HttpPost("Logout")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public IActionResult Logout()
+        public ActionResult Logout()
         {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             return Ok(true);
         }
     }
