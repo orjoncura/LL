@@ -5,10 +5,10 @@ import Link from 'next/link';
 import styles from './Navbar.module.css';
 import { POST, RemoveToken } from '@/scripts/Helpers/SecurityHelper'
 
-
 const Navbar: React.FC = () => {
 
-    const router = useRouter()
+    const router = useRouter();
+
     const logout = (event: any) => {
         event.preventDefault();
 
@@ -32,19 +32,16 @@ const Navbar: React.FC = () => {
 
 
   return (
-    <nav className={styles.navbar}>
+    <nav className={styles.navbar} style={{ background: '#3c0a5d', color: '#fff0f6' }}>
       <div className={styles.logo}>
         <h2>Fluente</h2>
       </div>
       <ul className={styles.links}>
         <li>
-          <Link href="/Seminar/CreateSeminar">Home</Link>
+          <Link href="/Seminar/Create">Home</Link>
         </li>
         <li>
           <Link href="/About">About</Link>
-        </li>
-        <li>
-          <Link href="/Blog/1">Blog</Link>
         </li>
         <li>
           <button type="button" onClick={logout} className={styles.linkButton}>Logout</button>

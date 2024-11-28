@@ -34,6 +34,7 @@ export default function Login() {
     };
 
     const handleSubmit = (event: any) => {
+        console.log("Test");
         event.preventDefault();
   
         try {
@@ -81,7 +82,12 @@ export default function Login() {
     }
 
   return (
-    <Container>
+    <Container onKeyDown={(e) => {
+        if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
+          handleSubmit(e);
+        }
+      }}>
+
       <Row className="justify-content-md-center mt-5">
           <Col xs={12} md={6}>
               <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
@@ -102,7 +108,7 @@ export default function Login() {
               />
 
               <br/>
-              <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Login </Button>
+              <Button style={{ background: '#d63384', color: '#fff0f6', borderColor:"#f06595"   }} type="submit" className="w-100" onClick={handleSubmit}> Login </Button>
 
               <hr/>
               <div className="center">

@@ -29,28 +29,40 @@ namespace LL.API.Controllers
             return Ok(new List<SeminarViewModel>()
             {
                 new SeminarViewModel(
-                    "Test",
+                    "Vamos",
                     new List<StatementShort>()
                     {
                         new StatementShort()
                         {
-                            OriginalStatement = "OriginalStatement",
-                            TranslatedStatement = "TranslatedStatement"
+                            OriginalStatement = "¿Vamos por un café",
+                            TranslatedStatement = "Shall we go for a coffee?"
                         }
                     },
                     2),
                 
                 new SeminarViewModel(
-                    "Test 2",
+                    "Gusta",
                     new List<StatementShort>()
                     {
                         new StatementShort()
                         {
-                            OriginalStatement = "OriginalStatement 2",
-                            TranslatedStatement = "TranslatedStatement 2"
+                            OriginalStatement = "¿Que te gusta hacer en tu tiempo libre?",
+                            TranslatedStatement = "What do you like to do in your free time?"
                         }
                     },
                     1),
+                
+                new SeminarViewModel(
+                    "Que",
+                    new List<StatementShort>()
+                    {
+                        new StatementShort()
+                        {
+                            OriginalStatement = "¿Que me recomiendas hacer?",
+                            TranslatedStatement = "What do you recommend I do?"
+                        }
+                    },
+                    3),
                 
             });
             

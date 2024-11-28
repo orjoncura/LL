@@ -1,23 +1,22 @@
 "use client";
 import Button from 'react-bootstrap/Button';
-import Alert from "react-bootstrap/Alert";
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { POST } from '@/scripts/Helpers/SecurityHelper'
-import {SeminarRequestModel, SeminarViewModel} from '@/generated-client/src';
+import {SeminarRequestModel, SeminarViewModel, StatementShort} from '@/generated-client/src';
+import './page.css'; 
 
 export default function CreateSeminar() {
   
     const modalRef = useRef<any>(null); 
 
-    const [totalCourses, setTotalCourses] = useState<number>(0);
     const [sentenceIndex, setSentenceIndex] = useState<number>(0);
-    const [sentences, setSentences] = useState<string[]>([]);
+    const [sentences, setSentences] = useState<StatementShort[]>([]);
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [options, setOptions] = useState<string[]>([]);
-    const [alertVariant, setAlertVariant] = useState("info");
+    const [showFeedback, setShowFeedback] = useState(false);
     const [feedback, setFeedback] = useState("");
     const [loading, setLoading] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
@@ -26,6 +25,11 @@ export default function CreateSeminar() {
     const [showSeminar, setShowSeminar] = useState(false);
     const [selectedWords, setSelectedWords] = useState<string[]>([]);
     const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+
+    const [feedbackStyle, setFeedbackStyle] = useState<CSSProperties>({
+      color: "#d63384",
+      backgroundColor: "#fff0f6"
+    });
 
     const openModal = (title: string, body:string, onClick?: Function) => {
       if (modalRef.current) {
@@ -37,6 +41,15 @@ export default function CreateSeminar() {
           modalRef.current.openModal(); // Call openModal from the Example component
       }
   };
+
+  function shuffle<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
 
     const handleSubmit = async () => {
 
@@ -59,21 +72,17 @@ export default function CreateSeminar() {
             .then((SeminarViewModels: SeminarViewModel[]) => {
 
                     SeminarViewModels
-                    .sort((a, b) => (a.importance > b.importance ? -1 : 1))
+                    .sort((a, b) => (a.importance > b.importance ? 1 : -1))
                     .forEach(m => { 
 
                       if(m != null && m.sentences != null){
                         m.sentences.forEach(s => { 
-                          if(s.originalStatement != null)
-                            sentences.push(s.originalStatement);
+                            sentences.push(s);
                         });
                       }
                     });
 
-                    setCorrectOrder(sentences[sentenceIndex].split(" "));
-                    setOptions(sentences[sentenceIndex].split(" "));
-                    setTotalCourses(sentences.length);
-                    setShowSeminar(true);
+                    nextStep(0);
                     setLoading(false);
                     
                 }).catch(e => {
@@ -114,107 +123,152 @@ export default function CreateSeminar() {
     // Check if the user's sentence is correct
     const checkAnswer = () => {
 
+      if(showSeminar == false)
+        return handleSubmit();
+
       if(selectedWords == correctOrder){
 
-        setFeedback("Failed");
-        setAlertVariant("success");
-      }else{
+        setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
+        setFeedback("That's Correct");
 
-        setFeedback("Success");
-        setAlertVariant("danger");
+      }else{
+        
+        setFeedbackStyle({color: "#d63384",backgroundColor: "#fff0f6"});
+        setFeedback("That's incorrect");
       }
 
-      setSentenceIndex(sentenceIndex + 1);
-      setCorrectOrder(sentences[sentenceIndex].split(" "));
-      setOptions(sentences[sentenceIndex].split(" "));
-      setSelectedWords([]);
+      setShowFeedback(true);
     };
 
-    function Content() {
-      return <div>
-            <br />
-              <textarea
-                value={text}
-                onChange={e => setText(e.target.value)}
-                placeholder="Enter your text here..."
-                rows={10}
-                cols={50}
-                style={{ marginBottom: '10px', width: '100%' }}
-              />
-              <br />
-              <Button variant="success" onClick={handleSubmit}>Submit</Button>
-          </div>
+    const nextStep = (newSentenceIndex: number) => {
+
+      let statements: string[] = [];
+
+      setShowSeminar(sentences[newSentenceIndex] != null 
+        && sentences[newSentenceIndex].originalStatement != null 
+        && sentences[newSentenceIndex].translatedStatement != null)
+
+      setSentenceIndex(newSentenceIndex < sentences.length ? newSentenceIndex : 0);
+
+      if(sentences[newSentenceIndex] != null && sentences[newSentenceIndex].translatedStatement != null)
+        statements = sentences[newSentenceIndex].translatedStatement.split(" ");
+        
+      if(sentences[newSentenceIndex] == null)
+        setSentences([])
+      
+      setCorrectOrder(statements);
+      setOptions(shuffle(statements));    
+      setSelectedWords([]);
+      setShowFeedback(false);
     }
 
-    function SeminarContent() {
-      return <div className="container mt-4">
-        <div className="mb-4">
-          <div className="d-flex">
-            {Array.from({ length: totalCourses }).map((_, index) => (
-              <div
-                key={index}
-                className={`flex-fill me-1 progress-bar ${
-                  index < sentenceIndex ? "bg-success" : "bg-secondary"
-                }`}
-                style={{
-                  height: "20px",
-                  marginRight: index < totalCourses - 1 ? "2px" : "0",
-                }}
-              ></div>
-            ))}
-          </div>
-        </div>
-  
-        <div className="text-center mb-4">
-          <div className="p-4 bg-light border rounded shadow-sm">
-              <blockquote className="quote">
-                <p className="text-black">
-                {sentences[sentenceIndex]}
-                </p>
-              </blockquote>
-  
-              <div>
-                <div style={{ display: "flex", flexWrap: "wrap" }}>
-                  {selectedWords.map((word, index) => (
-                    <Button key={index} variant="success" className="me-3" onClick={() => removeSelectedWord(word)}>
-                    {word}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-          </div>
-        </div>
-  
-        <div>
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {options.map((word, index) => (
-              <Button key={index} variant="success" className="me-3" onClick={() => addWord(word)}>
-              {word}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <br/>
-        <div className="d-flex justify-content-between align-items-center p-3 bg-light border rounded shadow-sm">
-          <Alert variant={alertVariant} className="mb-0 flex-grow-1 me-3">
-            {feedback}
-          </Alert>
-          <Button variant="success" onClick={checkAnswer}>
-            Confirm
-          </Button>
-        </div>
-      </div>
-    };
-
-    
     return (
       <div style={{ background: 'inherit' }} >
         <Navbar /> 
 
-        <div className="container">
-          {showSeminar == false && Content()}
-          {showSeminar && SeminarContent()}
+        <div className="container-flex"                
+          onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
+                          e.preventDefault();
+                          checkAnswer();
+                        }
+                      }}>
+
+          <div className="container mt-4">
+            <div className="mb-4">
+              <div className="d-flex">
+                {Array.from({ length: sentences.length }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`flex-fill me-1 progress-bar ${
+                      index < sentenceIndex ? "bg-success" : "bg-secondary"
+                    }`}
+                    style={{
+                      height: "20px",
+                      marginRight: index < sentences.length - 1 ? "2px" : "0",
+                    }}
+                  ></div>
+                ))}
+              </div>
+            </div>
+      
+            {showSeminar == false && ( 
+              <textarea
+                      value={text}
+                      onChange={e => setText(e.target.value)}
+                      placeholder="Please enter the text you would like to translate..."
+                      rows={10}
+                      cols={50}
+                      style={{ marginBottom: '10px', width: '100%' }}
+                    />
+            )}
+
+            {showSeminar && (     
+            <div>  
+              <div className="text-center mb-4">
+                <div className="p-4 bg-light border rounded shadow-sm">
+                    <blockquote className="quote">
+                      <p className="text-black">
+                      {sentences[sentenceIndex].originalStatement}
+                      </p>
+                    </blockquote>
+        
+                    <div>
+                      <div>
+
+                        {selectedWords.map((word) => (
+                          <Button onClick={() => removeSelectedWord(word)} className="custom-button"  >
+                            {word}
+                          </Button>
+                        ))}
+
+                      </div>
+                    </div>
+                </div>
+              </div>
+        
+              <div>
+                <div style={{ display: "flex", flexWrap: "wrap" }}>
+
+                  {options.map((word) => (
+                      <Button onClick={() => addWord(word)} className="custom-button"  >
+                        {word}
+                      </Button>
+                   ))}
+
+                </div>
+              </div>
+            </div>
+            )}
+
+            <br/>
+          </div>
+
+          <div className="feedback-container fixed-bottom" style={feedbackStyle}>
+
+            {showFeedback &&  (
+              <div className="feedback-text">
+                <div className="feedback-details">
+                  <h3 className="feedback-title">{feedback}</h3>
+                  <h4 className="feedback-detail">Answer: {sentences[sentenceIndex].translatedStatement}</h4>
+                </div>
+              </div>
+            )}
+
+            {showFeedback == false && (
+              <button className="feedback-button" onClick={checkAnswer}>
+                <span className="chevron">›</span>
+                Confirm
+              </button>
+            )}
+
+            {showFeedback && (
+              <button className="feedback-button" onClick={() => nextStep(sentenceIndex + 1)}>
+                <span className="chevron">›</span>
+                  Next
+              </button>
+            )}
+          </div>
         </div>
         
         {loading && <SpinnerOverlay />}
