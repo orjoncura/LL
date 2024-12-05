@@ -23,7 +23,8 @@ export default function CreateSeminar() {
     const [modalBody, setModalBody] = useState('');
     const [text, setText] = useState<string>('');
     const [showSeminar, setShowSeminar] = useState(false);
-    const [selectedWords, setSelectedWords] = useState<string[]>([]);
+    const [selectedWords, setSelectedWords] = useState<string[]>([]);  
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
 
     const [feedbackStyle, setFeedbackStyle] = useState<CSSProperties>({
@@ -40,16 +41,32 @@ export default function CreateSeminar() {
 
           modalRef.current.openModal(); // Call openModal from the Example component
       }
-  };
+    };
 
-  function shuffle<T>(array: T[]): T[] {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    function shuffle<T>(array: string[]): string[] {
+  
+      const shuffled = [...array];
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      return shuffled;
     }
-    return shuffled;
-  }
+    
+    function areArraysEqual(arr1: string[], arr2: string[]): boolean {
+      
+      if (arr1.length !== arr2.length) return false;
+  
+      for (let i = 0; i < arr1.length; i++) {
+          if (arr1[i] !== arr2[i]) {
+              return false;
+          }
+      }
+  
+      return true;
+    }
 
     const handleSubmit = async () => {
 
@@ -94,29 +111,50 @@ export default function CreateSeminar() {
         }
     };
 
-    const removeSelectedWord = (word: string) => {
+    const onDragStart = (index: number) => {
+      setDraggedIndex(index);
+    };
+  
+    const onDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
+      event.preventDefault(); // Necessary to allow dropping
+    };
+  
+    const onDrop = (index: number) => {
+      if (draggedIndex === null) return;
+  
+      const newItems = [...selectedWords];
+      const [draggedItem] = newItems.splice(draggedIndex, 1); // Remove dragged item
+      newItems.splice(index, 0, draggedItem); // Insert at drop position
+  
+      setSelectedWords(newItems);
+      setDraggedIndex(null); // Reset dragged index
+      }
 
-      // Avoid adding if already added
-      if (options.includes(word)) return;
+    const removeWord = (word: string) => {
+
       setOptions([...options, word]);
 
-      const updatedSelectedWords= selectedWords.filter(
-        (selectedWord) => selectedWord !== word
-      );
-
+      const updatedSelectedWords = [...selectedWords];
+      const index = selectedWords.indexOf(word);
+      if (index > -1) {
+        updatedSelectedWords.splice(index, 1);
+      }
+    
       setSelectedWords(updatedSelectedWords);
     };
 
     // Handle when the user clicks on a word
     const addWord = (word: string) => {
-      // Avoid adding if already added
-      if (selectedWords.includes(word)) return;
+
       setSelectedWords([...selectedWords, word]);
 
-      const updatedOptions = options.filter(
-        (option) => option !== word
-      );
+      const updatedOptions = [...options];
 
+      const index = updatedOptions.indexOf(word);
+      if (index > -1) {
+        updatedOptions.splice(index, 1);
+      }
+    
       setOptions(updatedOptions);
     };
   
@@ -126,7 +164,7 @@ export default function CreateSeminar() {
       if(showSeminar == false)
         return handleSubmit();
 
-      if(selectedWords == correctOrder){
+      if(areArraysEqual(selectedWords, correctOrder)){
 
         setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
         setFeedback("That's Correct");
@@ -142,7 +180,7 @@ export default function CreateSeminar() {
 
     const nextStep = (newSentenceIndex: number) => {
 
-      let statements: string[] = [];
+      let statement: string[] = [];
 
       setShowSeminar(sentences[newSentenceIndex] != null 
         && sentences[newSentenceIndex].originalStatement != null 
@@ -151,13 +189,13 @@ export default function CreateSeminar() {
       setSentenceIndex(newSentenceIndex < sentences.length ? newSentenceIndex : 0);
 
       if(sentences[newSentenceIndex] != null && sentences[newSentenceIndex].translatedStatement != null)
-        statements = sentences[newSentenceIndex].translatedStatement.split(" ");
+        statement = sentences[newSentenceIndex].translatedStatement.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
         
       if(sentences[newSentenceIndex] == null)
         setSentences([])
       
-      setCorrectOrder(statements);
-      setOptions(shuffle(statements));    
+      setCorrectOrder(statement);
+      setOptions(shuffle(statement));    
       setSelectedWords([]);
       setShowFeedback(false);
     }
@@ -168,11 +206,11 @@ export default function CreateSeminar() {
 
         <div className="container-flex"                
           onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
-                          e.preventDefault();
-                          checkAnswer();
-                        }
-                      }}>
+            if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
+              e.preventDefault();
+              checkAnswer();
+            }
+          }}>
 
           <div className="container mt-4">
             <div className="mb-4">
@@ -216,9 +254,17 @@ export default function CreateSeminar() {
                     <div>
                       <div>
 
-                        {selectedWords.map((word) => (
-                          <Button onClick={() => removeSelectedWord(word)} className="custom-button"  >
-                            {word}
+                        {selectedWords.map((word, index) => (
+                            <Button
+                                 key={index}
+                                 draggable
+                                 onDragStart={() => onDragStart(index)}
+                                 onDragOver={onDragOver}
+                                 onDrop={() => onDrop(index)}
+                                 onClick={() => removeWord(word)}
+                                 className="custom-button" 
+                               >
+                                 {word}
                           </Button>
                         ))}
 
