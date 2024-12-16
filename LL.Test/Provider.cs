@@ -1,4 +1,3 @@
-using Google.Apis.Requests;
 using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
@@ -48,6 +47,7 @@ public static class Provider
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<IAppMonitoringService, AppMonitoringService>();
         services.AddScoped<ITranslationService, TranslationService>();
+        services.AddScoped<ITextToSpeechService, TextToSpeechService>();
         services.AddScoped<IDictionaryService, DictionaryService>();
         
         services.AddSingleton(

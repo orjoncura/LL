@@ -1,20 +1,28 @@
+using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Data.Contexts;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class WordLinkRepository(AppDBContext db) : IWordLinkRepository
+public class WordLinkRepository(AppDBContext db,
+    ITranslationService translationService,
+    IWordRepository wordRepository) : IWordLinkRepository
 {
-    private WordLink? Get(int sourceId, int targetId) =>
-        db.WordLinks.FirstOrDefault(w => w.SourceId == sourceId && w.TargetId == targetId && w.IsActive);
-    
-    public int Insert(int wordId, int translatedWordId, int userId)
+    public int Insert(int wordId, string word, int fromId, int toId, int userId)
     {
-        var wordLink = Get(wordId, translatedWordId);
+        WordLink wordLink = db.WordLinks
+            .FirstOrDefault(w => 
+                w.SourceId == wordId 
+                && w.Target.LanguageId == toId 
+                && w.Target.IsActive
+                && w.IsActive);
 
         if (wordLink == null)
         {
+            string translatedWord = translationService.TranslateText(word, fromId, toId).Result;
+            int translatedWordId = wordRepository.Insert(translatedWord, toId, userId);
+            
             wordLink = new WordLink()
             {
                 SourceId = wordId,
@@ -26,8 +34,10 @@ public class WordLinkRepository(AppDBContext db) : IWordLinkRepository
 
             db.Add(wordLink);
             db.SaveChanges();
+            
+            return wordLink.Id;
         }
-
+        
         return wordLink.Id;
     }
 }

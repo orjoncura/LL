@@ -1,6 +1,6 @@
 "use client";
 import Button from 'react-bootstrap/Button';
-import React, {useState, useRef, CSSProperties} from 'react';
+import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
@@ -13,6 +13,7 @@ export default function CreateSeminar() {
     const modalRef = useRef<any>(null); 
 
     const [sentenceIndex, setSentenceIndex] = useState<number>(0);
+    const [courseLength, setCourseLength] = useState<number>(0);
     const [sentences, setSentences] = useState<StatementShort[]>([]);
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [options, setOptions] = useState<string[]>([]);
@@ -78,33 +79,44 @@ export default function CreateSeminar() {
               return;
             }
 
-            const data: SeminarRequestModel = {
-                "text": text,
+            let words: string[] = text.split(" ");
+
+            setCourseLength(words.length * 3);
+
+            words.forEach(word => {
+
+              setLoading(true);
+
+              const data: SeminarRequestModel = {
+                "text": word.replace(/[^a-zA-Z0-9]/g, ''),
                 "languageFromId": 2,
                 "languageToId": 1
-            };
+              };
 
-            setLoading(true);
-            POST('/Seminar/Create', JSON.stringify(data))
-            .then((SeminarViewModels: SeminarViewModel[]) => {
+              POST('/Seminar/Create', JSON.stringify(data))
+              .then((SeminarViewModels: SeminarViewModel[]) => {
 
-                    SeminarViewModels
-                    .sort((a, b) => (a.importance > b.importance ? 1 : -1))
-                    .forEach(m => { 
+                  SeminarViewModels
+                  .sort((a, b) => (a.importance > b.importance ? 1 : -1))
+                  .forEach(m => { 
+                    if(m != null && m.sentences != null){
 
-                      if(m != null && m.sentences != null){
-                        m.sentences.forEach(s => { 
-                            sentences.push(s);
-                        });
-                      }
-                    });
-
+                      m.sentences.forEach(s => { 
+                          sentences.push(s);
+                      });
+                      
+                    }
+                  });
+                  
+                  if((sentences.length / 3) == 1){
                     nextStep(0);
                     setLoading(false);
-                    
+                  }
+
                 }).catch(e => {
                     setLoading(false);
                 });
+            });
 
         } catch (error) {
             console.error('Error making API call:', error);
@@ -191,9 +203,11 @@ export default function CreateSeminar() {
       if(sentences[newSentenceIndex] != null && sentences[newSentenceIndex].translatedStatement != null)
         statement = sentences[newSentenceIndex].translatedStatement.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
         
-      if(sentences[newSentenceIndex] == null)
-        setSentences([])
-      
+      if(sentences[newSentenceIndex] == null){
+
+        setSentences([]);
+        setCourseLength(0);
+      }
       setCorrectOrder(statement);
       setOptions(shuffle(statement));    
       setSelectedWords([]);
@@ -215,7 +229,7 @@ export default function CreateSeminar() {
           <div className="container mt-4">
             <div className="mb-4">
               <div className="d-flex">
-                {Array.from({ length: sentences.length }).map((_, index) => (
+                {Array.from({ length: courseLength }).map((_, index) => (
                   <div
                     key={index}
                     className={`flex-fill me-1 progress-bar ${
@@ -223,7 +237,7 @@ export default function CreateSeminar() {
                     }`}
                     style={{
                       height: "20px",
-                      marginRight: index < sentences.length - 1 ? "2px" : "0",
+                      marginRight: index < courseLength - 1 ? "2px" : "0",
                     }}
                   ></div>
                 ))}

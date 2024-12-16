@@ -19,7 +19,6 @@ public class SeminarService(
     IStatementRepository statementRepository,
     ISeminarWordRepository seminarWordRepository,
     IAgentService agentService,
-    ITranslationService translationService,
     IDictionaryService dictionaryService) : ISeminarService
 {
     public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
@@ -63,12 +62,8 @@ public class SeminarService(
     private int InsertWord(string word, int fromId, int toId, int userId)
     {
         int wordId = wordRepository.Insert(word, fromId, userId);
-
-        // string translatedWord = translationService.TranslateText(word, fromId, toId);
-        //     
-        // int translatedWordId = wordRepository.Insert(translatedWord, fromId, userId);
-        //
-        // wordLinkRepository.Insert(wordId, translatedWordId, userId);
+        
+        wordLinkRepository.Insert(wordId, word, fromId, toId, userId);
 
         InsertMeaningsByWordId(wordId, word, toId, userId);
 

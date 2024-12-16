@@ -3,7 +3,6 @@ using System.Net.Mime;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
-using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 
 namespace LL.API.Controllers
@@ -26,46 +25,6 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<SeminarViewModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] SeminarRequestModel seminarRequest)
         {
-            return Ok(new List<SeminarViewModel>()
-            {
-                new SeminarViewModel(
-                    "Vamos",
-                    new List<StatementShort>()
-                    {
-                        new StatementShort()
-                        {
-                            OriginalStatement = "¿Vamos por un café",
-                            TranslatedStatement = "Shall we go for a coffee?"
-                        }
-                    },
-                    2),
-                
-                new SeminarViewModel(
-                    "Gusta",
-                    new List<StatementShort>()
-                    {
-                        new StatementShort()
-                        {
-                            OriginalStatement = "¿Que te gusta hacer en tu tiempo libre?",
-                            TranslatedStatement = "What do you like to do in your free time?"
-                        }
-                    },
-                    1),
-                
-                new SeminarViewModel(
-                    "Que",
-                    new List<StatementShort>()
-                    {
-                        new StatementShort()
-                        {
-                            OriginalStatement = "¿Que me recomiendas hacer?",
-                            TranslatedStatement = "What do you recommend I do?"
-                        }
-                    },
-                    3),
-                
-            });
-            
             List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
             
             try
