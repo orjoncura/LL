@@ -1,8 +1,8 @@
-﻿using LL.Core.Models.ViewModels;
+﻿using LL.Core.Models.Short;
 
 namespace LL.Core.Interfaces.Repositories;
 public interface IWordRepository
 {
-    int Insert(string name, int languageId, int userId);
+    WordShort Insert(string name, int languageId, int userId);
 }
 

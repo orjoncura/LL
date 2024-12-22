@@ -21,14 +21,14 @@ public class SeminarService(
     IAgentService agentService,
     IDictionaryService dictionaryService) : ISeminarService
 {
-    public async Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
+    public async Task<SeminarViewModel> CreateSeminar(SeminarRequestModel seminarRequest, int userId)
     {
-        List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
+        SeminarViewModel seminarViewModel = new SeminarViewModel();
 
         if(seminarRequest == null || seminarRequest.IsValid == false) 
-            return seminarViewModels;
+            return seminarViewModel;
         
-        int seminarId = seminarRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        seminarViewModel.SeminarId = seminarRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         string rankingPrompt = PromptFactory.CreateSeminarWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
         
         List<SeminarWordsModel> seminarWords = 
@@ -37,49 +37,55 @@ public class SeminarService(
         
         foreach (var seminarWord in seminarWords)
         {
-            int wordId = InsertWord(seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
-            int seminarWordId = seminarWordRepository.Insert(wordId, seminarId, seminarWord.Importance, userId);
-            
-            string prompt = PromptFactory.CreateSeminarPrompt(
-                seminarWord.Word,
-                seminarRequest.LanguageFromId, 
-                seminarRequest.LanguageToId,
-                seminarRequest.Text);
-            
-            var statements = JsonHelper.Extract<List<StatementShort>>(await agentService.Run(prompt));
+            WordShort wordShort = wordRepository.Insert(seminarWord.Word, seminarRequest.LanguageFromId, userId);
+        
+            wordLinkRepository.Insert(wordShort.Id, seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
 
-            if (statements != null && statements.Any(s => s.IsValid))
+            //if(LanguageEnum.English.Equals(seminarRequest.LanguageToId))
+            
+            var wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
+            
+            if (wordMeaning == null)
             {
-                statementRepository.InsertRange(seminarWordId, statements, userId);
-
-                seminarViewModels.Add(new SeminarViewModel(seminarWord.Word, statements, seminarWord.Importance));
-            }
-        }
-
-        return seminarViewModels;
-    }
-
-    private int InsertWord(string word, int fromId, int toId, int userId)
-    {
-        int wordId = wordRepository.Insert(word, fromId, userId);
-        
-        wordLinkRepository.Insert(wordId, word, fromId, toId, userId);
-
-        InsertMeaningsByWordId(wordId, word, toId, userId);
-
-        return wordId;
-    }
-    private void InsertMeaningsByWordId(int wordId, string word, int languageId, int userId)
-    {
-        if (wordMeaningRepository.Any(wordId) || !LanguageEnum.English.Equals(languageId))
-            return;
-        
-        foreach (var meaning in dictionaryService.GetWordDetails(word).Result)
-        {
-            int wordMeaningId = wordMeaningRepository.Insert(wordId, meaning.TypeId, userId);
+                wordMeaning = dictionaryService.GetWordDetails(seminarWord.Word).Result;
+                
+                foreach (var meaning in wordMeaning)
+                {
+                    int wordMeaningId = wordMeaningRepository
+                        .Insert(wordShort.Id, EnumHelper.GetEnumValue(typeof(WordTypeEnum), meaning.Type), userId);
             
-            meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
+                    meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
+                }
+            }
+            
+            seminarViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance));
         }
+
+        return seminarViewModel;
+    }
+
+    public async Task<List<StatementViewModel>> CreateSentences(SeminarWordsModel seminarWord, SeminarRequestModel seminarRequest, int wordId, int seminarId, int userId)
+    {
+        List<StatementViewModel> statementViewModels = new List<StatementViewModel>();
+        
+        int seminarWordId = seminarWordRepository.Insert(wordId, seminarId, seminarWord.Importance, userId);
+        
+        string prompt = PromptFactory.CreateSeminarPrompt(
+            seminarWord.Word,
+            seminarRequest.LanguageFromId, 
+            seminarRequest.LanguageToId,
+            seminarRequest.Text);
+        
+        var statements = JsonHelper.Extract<List<StatementShort>>(await agentService.Run(prompt));
+        
+        if (statements != null && statements.Any(s => s.IsValid))
+        {
+            statementRepository.InsertRange(seminarWordId, statements, userId);
+        
+            statementViewModels.Add(new StatementViewModel(seminarWord.Word, statements, seminarWord.Importance));
+        }
+        
+        return statementViewModels;
     }
 }
 

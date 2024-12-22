@@ -1,4 +1,5 @@
 using LL.Core.Enums;
+using LL.Core.Models.Short;
 
 namespace LL.Core.Models.ViewModels;
 
@@ -6,19 +7,18 @@ public class WordViewModel
 {
     public int Id {  get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Definition { get; set; } = string.Empty;
-    public int TypeId { get; set; }
-    public int LanguageId { get; set; }
-    public bool IsActive { get; set; }
-    public int CreatedById { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
+    public byte[] Audio { get; set; } = [];
+    public string Language { get; set; }
+    public int Importance { get; set; } 
+    public List<MeaningShort> Meanings { get; set; } 
 
-    public WordViewModel() { }
-
-    public WordViewModel(string name, string definition, int typeId)
+    public WordViewModel(WordShort wordShort, List<MeaningShort> meanings, int importance)
     {
-        Name = name;
-        Definition = definition;
-        TypeId = typeId;
+        Id = wordShort.Id;
+        Name = wordShort.Name;
+        Audio = wordShort.Audio;
+        Language = wordShort.Language;
+        Meanings = meanings;
+        Importance = importance;
     }
 }

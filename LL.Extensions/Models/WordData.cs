@@ -17,7 +17,7 @@ public class WordData
         (from m in meanings
         select new MeaningShort
         {
-            TypeId = EnumHelper.GetEnumValue(typeof(WordTypeEnum), m.partOfSpeech),
+            Type = m.partOfSpeech,
             Definitions = m.definitions.Select(d => d.definition).ToList(),
         }).ToList();
     

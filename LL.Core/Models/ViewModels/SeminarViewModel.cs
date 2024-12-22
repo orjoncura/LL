@@ -5,22 +5,13 @@ namespace LL.Core.Models.ViewModels;
 
 public class SeminarViewModel
 {
-    public string TargetWord { get; set; } 
+    public int SeminarId { get; set; } 
 
-    public List<StatementShort> Sentences { get; set; } 
-    
-    public int Importance { get; set; } 
+    public List<WordViewModel> Words { get; set; } = new List<WordViewModel>();
     
     public bool IsValid => 
-        string.IsNullOrWhiteSpace(TargetWord) == false
-        && Sentences.Any(s => string.IsNullOrWhiteSpace(s.OriginalStatement) == false
-                              && string.IsNullOrWhiteSpace(s.TranslatedStatement) == false);
-
-    public SeminarViewModel(string word, List<StatementShort> sentences, int importance)
-    {
-        TargetWord = word;
-        Sentences = sentences;
-        Importance = importance;
-    }
+        SeminarId > 0
+        && Words.Any(w => string.IsNullOrWhiteSpace(w.Name) == false
+                          && string.IsNullOrWhiteSpace(w.Name) == false);
 }
 

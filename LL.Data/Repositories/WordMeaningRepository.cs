@@ -1,3 +1,5 @@
+using LL.Core.Enums;
+using LL.Core.Helpers;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Models.Short;
 using LL.Data.Contexts;
@@ -7,9 +9,22 @@ namespace LL.Data.Repositories;
 
 public class WordMeaningRepository(AppDBContext db) : IWordMeaningRepository
 {
-    public bool Any(int wordId) =>
-        db.WordMeanings
-            .Any(w => w.WordId == wordId & w.IsActive);
+    public List<MeaningShort>? GetByWordId(int wordId) 
+    {
+        var meanings = db.WordMeanings.Where(w => w.WordId == wordId & w.IsActive).ToList();
+
+        if (meanings.Any())
+        {
+            return meanings.Select(m => new MeaningShort()
+            {
+                Type = m.Type.Value,
+                Definitions = m.WordDefinitions.Select(w => w.Value).ToList()
+            }).ToList();
+        }
+        
+        return null;
+    }
+        
     
     public int Insert(int wordId, int typeId, int userId)
     {

@@ -7,7 +7,7 @@ namespace LL.Extensions;
 
 public class TextToSpeechService : ITextToSpeechService
 {
-    public void CreateAudio(string text, int langId)
+    public byte[] CreateAudio(string text, int langId)
     {
         string scriptPath = string.Empty;
         
@@ -30,7 +30,7 @@ public class TextToSpeechService : ITextToSpeechService
         if (!File.Exists(scriptPath))
         {
             Console.WriteLine($"Script not found: {scriptPath}");
-            return;
+            return [];
         }
         
         string outputPath = text.Trim().Replace(" ", "_") + ".wav";
@@ -46,35 +46,17 @@ public class TextToSpeechService : ITextToSpeechService
 
         // Capture the process output
         process.Start();
-        string output = process.StandardOutput.ReadToEnd();
         string error = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
         if (!string.IsNullOrEmpty(error))
-        {
-            Console.WriteLine("TTS Errors:");
-            Console.WriteLine(error);
-        }
+            return [];
 
         // Verify if the audio file was created
         if (File.Exists(outputPath))
-        {
-            Console.WriteLine($"Audio file successfully generated at: {outputPath}");
-
-            // Read the audio file as bytes (for API or streaming)
-            byte[] audioBytes = File.ReadAllBytes(outputPath);
-            Console.WriteLine($"Audio file read successfully. Size: {audioBytes.Length} bytes.");
-            
-            // Optional: Serve or stream the audio
-            // Example: Copy file to shared location
-            string sharedPath = "/output_es.wav";
-            File.Copy(outputPath, sharedPath, overwrite: true);
-            Console.WriteLine($"Audio file copied to: {sharedPath}");
-        }
-        else
-        {
-            Console.WriteLine("Failed to generate audio file.");
-        }
+            return File.ReadAllBytes(outputPath);
+        
+        return [];
     }
     
     private string GetModelPath(int id)

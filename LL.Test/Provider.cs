@@ -3,6 +3,7 @@ using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Model.DataTransferObjects;
+using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
 using LL.Data.Contexts;
 using LL.Data.Repositories;
@@ -43,19 +44,24 @@ public static class Provider
         services.AddScoped<IResetPasswordRequestRepository, ResetPasswordRequestRepository>();
             
         //Extensions
-        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<IAppMonitoringService, AppMonitoringService>();
+        services.AddScoped<IStorageService, StorageService>();
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<ITextToSpeechService, TextToSpeechService>();
         services.AddScoped<IDictionaryService, DictionaryService>();
-        
+        services.AddScoped<IEncryptionService, EncryptionService>();
+
+        //Singletons
         services.AddSingleton(
             new TokenConfigModel(
-                config[Secrets.JwtKey], 
-            config[Secrets.JwtIssuer],
-            config[Secrets.JwtAudience],
-            config[Secrets.JwtExpiryMinutes]));
+                config[Secrets.JwtKey],
+                config[Secrets.JwtIssuer],
+                config[Secrets.JwtAudience],
+                config[Secrets.JwtExpiryMinutes]));
+
+        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
+        services.AddSingleton(new StorageModel(config[Secrets.StorageAccessKey], config[Secrets.StorageSecretKey], config[Secrets.StorageName]));
         
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));

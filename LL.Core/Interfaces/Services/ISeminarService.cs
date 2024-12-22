@@ -5,6 +5,6 @@ namespace LL.Core.Interfaces.Services
 {
     public interface ISeminarService
     {
-        Task<List<SeminarViewModel>> CreateSeminar(SeminarRequestModel seminarRequest, int userId);
+        Task<SeminarViewModel> CreateSeminar(SeminarRequestModel seminarRequest, int userId);
     }
 }

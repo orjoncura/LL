@@ -13,13 +13,11 @@ namespace LL.Test.Services;
 public class SecurityServiceTest
 {
     private ISecurityService _securityService { get; set; }
-    private IConfiguration _config { get; set; }
     
     private string Token { get; set; }
     public SecurityServiceTest()
     {
         _securityService = Provider.GetRequiredService<ISecurityService>();
-        _config = Provider.GetConfiguration<ISecurityService>();
         
         using (var context = Provider.GetRequiredService<AppDBContext>())
         {
@@ -59,6 +57,7 @@ public class SecurityServiceTest
         // Assert
         Assert.True(isRequestCreated);
     } 
+    
     [Fact]
     public async Task CompleteUserRegistration_ShouldRegisterNewUser()
     {     
@@ -74,6 +73,7 @@ public class SecurityServiceTest
         // Assert
         Assert.True(isRequestCompleted);
     } 
+    
     [Fact]
     public async Task ResetPassword_ShouldCreateNewResetPasswordRequest()
     {     
@@ -89,6 +89,7 @@ public class SecurityServiceTest
         // Assert
         Assert.True(isRequestCreated);
     } 
+    
     [Fact]
     public async Task CompletePasswordReset_ShouldCompletePasswordResetRequest()
     {     

@@ -15,4 +15,10 @@ public class Secrets
     public const string JwtAudience = "Jwt:Audience";
 
     public const string JwtExpiryMinutes = "Jwt:ExpiryMinutes";
+    
+    public const string StorageAccessKey = "Storage:AccessKey";
+    
+    public const string StorageSecretKey = "Storage:SecretKey";
+    
+    public const string StorageName = "Storage:Name";
 }

@@ -4,6 +4,7 @@ public class Word
 {
     public int Id {  get; set; }
     public string Name { get; set; } = string.Empty;
+    public string AudioPath { get; set; } = string.Empty;
     public int LanguageId { get; set; }
     public virtual Language? Language { get; set; }
     

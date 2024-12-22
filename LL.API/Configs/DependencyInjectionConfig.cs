@@ -3,6 +3,7 @@ using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Model.DataTransferObjects;
+using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
 using LL.Data.Repositories;
 using LL.Extensions;
@@ -33,8 +34,9 @@ namespace LL.API.Configs
             //Extensions
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
-            services.AddScoped<IAgentService, AgentService>();
+            services.AddScoped<IStorageService, StorageService>();
             services.AddScoped<ITranslationService, TranslationService>();
+            services.AddScoped<ITextToSpeechService, TextToSpeechService>();
             services.AddScoped<IDictionaryService, DictionaryService>();
             services.AddScoped<IEncryptionService, EncryptionService>();
 
@@ -47,6 +49,7 @@ namespace LL.API.Configs
                 config[Secrets.JwtExpiryMinutes]));
 
             services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
+            services.AddSingleton(new StorageModel(config[Secrets.StorageAccessKey], config[Secrets.StorageSecretKey], config[Secrets.StorageName]));
             
             return services;
         }

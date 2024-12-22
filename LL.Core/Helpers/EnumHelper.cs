@@ -4,12 +4,10 @@ public static class EnumHelper
 {
     public static int GetEnumValue(Type enumType, string value)
     {
+        // Return 0 if not an enum
         if (!enumType.IsEnum)
-        {
-            Console.WriteLine("Provided type is not an enum.");
-            return 0; // Return 0 if not an enum
-        }
-
+            return 0; 
+        
         // Convert the input string to lowercase for case-insensitive comparison
         string lowerValue = value.ToLower();
 
@@ -26,5 +24,16 @@ public static class EnumHelper
 
         // If no match is found, return 0
         return 0;
+    }
+    
+    public static string GetEnumValueById<TEnum>(int id) where TEnum : Enum
+    {
+        // Check if the id exists in the enum
+        if (Enum.IsDefined(typeof(TEnum), id))
+        {
+            return Enum.GetName(typeof(TEnum), id); // Return the name as a string
+        }
+
+        return string.Empty; // Return null or handle invalid ID
     }
 }

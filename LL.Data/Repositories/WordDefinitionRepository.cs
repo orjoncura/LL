@@ -8,17 +8,23 @@ public class WordDefinitionRepository(AppDBContext db) : IWordDefinitionReposito
 {
     public int Insert(string definition, int wordMeaningId, int userId)
     {
-        var wordDefinition = new WordDefinition()
+        WordDefinition? wordDefinition = db.WordDefinitions.FirstOrDefault(wd => wd.WordMeaningId == wordMeaningId);
+        
+        if (wordDefinition == null)
         {
-            Value = definition,
-            WordMeaningId = wordMeaningId,
-            IsActive = true,
-            CreatedById = userId,
-            CreatedDate = DateTime.Now,
-        };
+             wordDefinition = new WordDefinition()
+            {
+                Value = definition,
+                WordMeaningId = wordMeaningId,
+                IsActive = true,
+                CreatedById = userId,
+                CreatedDate = DateTime.Now,
+            };
 
-        db.Add(wordDefinition);
-        db.SaveChanges();
+            db.Add(wordDefinition);
+            db.SaveChanges();
+        }
+
         
         return wordDefinition.Id;
     }

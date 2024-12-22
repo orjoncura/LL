@@ -218,6 +218,7 @@ namespace LL.Data.Contexts
             modelBuilder.Entity<Word>(entity =>
             {
                 entity.Property(ut => ut.Name).IsRequired();
+                entity.Property(ut => ut.AudioPath).IsRequired();
                 entity.Property(ut => ut.IsActive).IsRequired();
                 entity.Property(p => p.CreatedDate).IsRequired();
                 
@@ -252,6 +253,11 @@ namespace LL.Data.Contexts
                     .WithMany()
                     .HasForeignKey(ut => ut.CreatedById)
                     .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasMany(ut => ut.WordDefinitions)
+                    .WithOne(ut => ut.WordMeaning)
+                    .HasForeignKey(ut => ut.WordMeaningId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<WordDefinition>(entity =>
@@ -262,7 +268,7 @@ namespace LL.Data.Contexts
                 entity.Property(p => p.CreatedDate).IsRequired();
 
                 entity.HasOne(ut => ut.WordMeaning)
-                    .WithMany()
+                    .WithMany(ut => ut.WordDefinitions)
                     .HasForeignKey(ut => ut.WordMeaningId)
                     .OnDelete(DeleteBehavior.Restrict);
 

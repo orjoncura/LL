@@ -22,14 +22,14 @@ namespace LL.API.Controllers
         /// <param name="seminarRequest">Contains text, LanguageIdFrom (Input language) and LangaugeIdTo (the laguage the words will be translated to)</param>
         /// <response code="200">The new seminar</response>
         [HttpPost("Create")]
-        [ProducesResponseType(typeof(IEnumerable<SeminarViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SeminarViewModel), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] SeminarRequestModel seminarRequest)
         {
-            List<SeminarViewModel> seminarViewModels = new List<SeminarViewModel>();
+            SeminarViewModel seminar = new SeminarViewModel();
             
             try
             {
-                seminarViewModels = await seminarService.CreateSeminar(seminarRequest, 1);
+                seminar = await seminarService.CreateSeminar(seminarRequest, 1);
             }
             catch (Exception ex)
             {
@@ -45,7 +45,7 @@ namespace LL.API.Controllers
                 appMonitoringService.ExportError(ex, exceptionData);
             }
 
-            return Ok(seminarViewModels);
+            return Ok(seminar);
         }
     }
 }

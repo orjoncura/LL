@@ -16,4 +16,5 @@ public class WordMeaning
     public virtual User? CreatedBy { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
 
+    public virtual List<WordDefinition> WordDefinitions { get; set; }
 }
