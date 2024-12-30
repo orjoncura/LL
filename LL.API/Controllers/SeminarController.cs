@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using LL.API.Constants;
 using LL.Core.Interfaces.Extensions;
+using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.ViewModels;
@@ -14,7 +16,9 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SeminarController(ISeminarService seminarService, IAppMonitoringService appMonitoringService) : Controller
+    public class SeminarController(ISeminarService seminarService, 
+        IWordRepository wordRepository,
+        IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
         /// Pass a list of words and get a seminar in the selected language
@@ -25,11 +29,9 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(SeminarViewModel), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] SeminarRequestModel seminarRequest)
         {
-            SeminarViewModel seminar = new SeminarViewModel();
-            
             try
             {
-                seminar = await seminarService.CreateSeminar(seminarRequest, 1);
+                return Ok(await seminarService.CreateSeminar(seminarRequest, 1));
             }
             catch (Exception ex)
             {
@@ -43,9 +45,29 @@ namespace LL.API.Controllers
                 }
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
+        }
+        
+        [HttpPost("StreamAudio")]
+        [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+        public async Task<ActionResult> StreamAudio(int wordId)
+        {
+            try
+            {
+                return new FileStreamResult(wordRepository.GetFileStreamById(wordId), "audio/wav");
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
 
-            return Ok(seminar);
+                exceptionData["wordId"] = wordId;
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+            }
         }
     }
 }

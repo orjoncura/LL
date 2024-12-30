@@ -34,7 +34,7 @@ export default function Login() {
     };
 
     const handleSubmit = (event: any) => {
-        console.log("Test");
+
         event.preventDefault();
   
         try {

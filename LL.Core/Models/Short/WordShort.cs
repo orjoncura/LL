@@ -6,7 +6,5 @@ public class WordShort
     
     public string Name { get; set; } = string.Empty;
     
-    public byte[] Audio { get; set; } = [];
-    
     public string Language { get; set; }
 }

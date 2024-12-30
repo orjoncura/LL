@@ -33,11 +33,9 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(TokenViewModel), StatusCodes.Status200OK)]
         public ActionResult Authenticate([FromBody] LoginModel loginModel)
         {
-            TokenViewModel tokenViewModel = new TokenViewModel();
-
             try
             {
-                tokenViewModel = userRepository.GetAuthenticationToken(loginModel, tokenConfigModel);
+                return Ok(userRepository.GetAuthenticationToken(loginModel, tokenConfigModel));
             }
             catch (Exception ex)
             {
@@ -49,9 +47,9 @@ namespace LL.API.Controllers
                 }
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
-
-            return Ok(tokenViewModel);
         }
 
         /// <summary>
@@ -63,15 +61,12 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult RegisterUser([FromBody] NewUserModel model)
         {
-            bool isRequestCreated = false;
-            
             try
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
                 var url = config[AppSettings.BaseUrl] ?? string.Empty;
 
-                if (string.IsNullOrWhiteSpace(url) == false)
-                    isRequestCreated = securityService.RegisterUser(model, ipAddress, url);
+                return Ok(securityService.RegisterUser(model, ipAddress, url));
             }
             catch (Exception ex)
             {
@@ -84,9 +79,9 @@ namespace LL.API.Controllers
                 };
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
-
-            return Ok(isRequestCreated);
         }
         
         /// <summary>
@@ -98,11 +93,9 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult CompleteUserRegistration([FromBody] ConfirmationModel model)
         {
-            bool isCompleted = false;
-            
             try
             {
-                isCompleted = securityService.CompleteUserRegistration(model);
+                return Ok(securityService.CompleteUserRegistration(model));
             }
             catch (Exception ex)
             {
@@ -116,9 +109,9 @@ namespace LL.API.Controllers
                 };
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
-
-            return Ok(isCompleted);
         }      
         
         /// <summary>
@@ -130,15 +123,12 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult ResetPassword([FromBody] string email)
         {
-            bool isRequestCreated = false;
-            
             try
             {    
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
                 var url = config[AppSettings.BaseUrl] ?? string.Empty;
 
-                if (string.IsNullOrWhiteSpace(url) == false)
-                    isRequestCreated = securityService.ResetPassword(email, ipAddress,  url);
+                return Ok(securityService.ResetPassword(email, ipAddress, url));
             }
             catch (Exception ex)
             {
@@ -148,9 +138,9 @@ namespace LL.API.Controllers
                 };
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
-
-            return Ok(isRequestCreated);
         }        
         
         /// <summary>
@@ -162,11 +152,9 @@ namespace LL.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult CompletePasswordReset([FromBody] ConfirmationModel model)
         {
-            bool isCompleted = false;
-            
             try
             {
-                isCompleted = securityService.CompletePasswordReset(model);
+                return Ok(securityService.CompletePasswordReset(model));
             }
             catch (Exception ex)
             {
@@ -179,9 +167,9 @@ namespace LL.API.Controllers
                 };
 
                 appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
             }
-
-            return Ok(isCompleted);
         }
         
         /// <summary>

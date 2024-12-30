@@ -39,15 +39,17 @@ public class SeminarService(
         {
             WordShort wordShort = wordRepository.Insert(seminarWord.Word, seminarRequest.LanguageFromId, userId);
         
-            wordLinkRepository.Insert(wordShort.Id, seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
-
-            //if(LanguageEnum.English.Equals(seminarRequest.LanguageToId))
+            WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
             
-            var wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
+            List<MeaningShort> wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
             
             if (wordMeaning == null)
             {
-                wordMeaning = dictionaryService.GetWordDetails(seminarWord.Word).Result;
+                string word = LanguageEnum.English.Equals(seminarRequest.LanguageFromId)
+                    ? seminarWord.Word
+                    : wordLink.Target.Name;
+                
+                wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
                 
                 foreach (var meaning in wordMeaning)
                 {
@@ -58,12 +60,12 @@ public class SeminarService(
                 }
             }
             
-            seminarViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance));
+            seminarViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance, wordLink.Target.Name));
         }
 
         return seminarViewModel;
     }
-
+    
     public async Task<List<StatementViewModel>> CreateSentences(SeminarWordsModel seminarWord, SeminarRequestModel seminarRequest, int wordId, int seminarId, int userId)
     {
         List<StatementViewModel> statementViewModels = new List<StatementViewModel>();

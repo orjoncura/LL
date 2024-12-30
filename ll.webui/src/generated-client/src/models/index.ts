@@ -48,11 +48,25 @@ export interface SeminarRequestModel {
 }
 
 export interface SeminarViewModel {
-  targetWord?: string;
-  sentences?: StatementShort[];
-  importance: number;
+  seminarId?: number;
+  words: WordViewModel[];
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
+}
+
+export interface WordViewModel {
+  id?: number;
+  name?: string;
+  translation?: string;
+  audio: Uint8Array;
+  language?: string;
+  importance: number;
+  meanings?: meaningShort[];
+}
+
+export interface meaningShort {
+  type?: number;
+  definitions?: string[];
 }
 
 export interface StatementShort {

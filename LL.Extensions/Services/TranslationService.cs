@@ -4,7 +4,7 @@ using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Extensions.Models;
 
-namespace LL.Extensions;
+namespace LL.Extensions.Services;
 
 public class TranslationService: ITranslationService
 {

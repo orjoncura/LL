@@ -2,9 +2,9 @@ namespace LL.Core.Enums;
 
 public enum WordTypeEnum
 {
-    Nouns = 1,
-    Verbs = 2,
-    Adjectives = 3,
-    Adverbs = 4,
-    Interjections = 5
+    Noun = 1,
+    Verb = 2,
+    Adjective = 3,
+    Adverb = 4,
+    Interjection = 5
 }

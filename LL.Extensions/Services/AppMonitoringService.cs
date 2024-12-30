@@ -1,6 +1,6 @@
 ﻿using LL.Core.Interfaces.Extensions;
 
-namespace LL.Extensions;
+namespace LL.Extensions.Services;
 
 public class AppMonitoringService : IAppMonitoringService
 {

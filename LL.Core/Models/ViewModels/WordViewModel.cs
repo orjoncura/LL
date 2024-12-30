@@ -7,18 +7,16 @@ public class WordViewModel
 {
     public int Id {  get; set; }
     public string Name { get; set; } = string.Empty;
-    public byte[] Audio { get; set; } = [];
-    public string Language { get; set; }
+    public string Translation { get; set; } = string.Empty;
     public int Importance { get; set; } 
     public List<MeaningShort> Meanings { get; set; } 
 
-    public WordViewModel(WordShort wordShort, List<MeaningShort> meanings, int importance)
+    public WordViewModel(WordShort wordShort, List<MeaningShort> meanings, int importance, string translation)
     {
         Id = wordShort.Id;
         Name = wordShort.Name;
-        Audio = wordShort.Audio;
-        Language = wordShort.Language;
         Meanings = meanings;
         Importance = importance;
+        Translation = translation;
     }
 }

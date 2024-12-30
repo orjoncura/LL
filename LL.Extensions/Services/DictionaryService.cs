@@ -4,7 +4,7 @@ using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 using LL.Extensions.Models;
 
-namespace LL.Extensions;
+namespace LL.Extensions.Services;
 
 public class DictionaryService : IDictionaryService
 {

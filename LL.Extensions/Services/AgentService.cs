@@ -6,7 +6,7 @@ using LLama;
 using LL.Extensions.Models;
 using LL.Core.Model.DataTransferObjects;
 
-namespace LL.Extensions;
+namespace LL.Extensions.Services;
 
 public class AgentService(AgentModel agentModel) : IAgentService
 {

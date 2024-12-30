@@ -6,7 +6,7 @@ using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
 using LL.Data.Repositories;
-using LL.Extensions;
+using LL.Extensions.Services;
 
 namespace LL.API.Configs
 {

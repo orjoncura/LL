@@ -15,7 +15,8 @@ public class TextToSpeechServiceTest
     [Fact]
     public async Task TranslateText_ShouldReturnAStream()
     {
-        _textToSpeechService.CreateAudio("HOLA", (int)LanguageEnum.Spanish);
-        Assert.True(true);
+        byte[] results = _textToSpeechService.CreateAudio("HOLA", LanguageEnum.Spanish);
+        
+        Assert.True(results.Length > 0);
     } 
 }

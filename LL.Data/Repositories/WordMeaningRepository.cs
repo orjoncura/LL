@@ -4,6 +4,7 @@ using LL.Core.Interfaces.Repositories;
 using LL.Core.Models.Short;
 using LL.Data.Contexts;
 using LL.Data.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Repositories;
 
@@ -11,7 +12,10 @@ public class WordMeaningRepository(AppDBContext db) : IWordMeaningRepository
 {
     public List<MeaningShort>? GetByWordId(int wordId) 
     {
-        var meanings = db.WordMeanings.Where(w => w.WordId == wordId & w.IsActive).ToList();
+        var meanings = db.WordMeanings
+            .Include(w => w.Type)
+            .Include(w => w.WordDefinitions)
+            .Where(w => w.WordId == wordId & w.IsActive).ToList();
 
         if (meanings.Any())
         {

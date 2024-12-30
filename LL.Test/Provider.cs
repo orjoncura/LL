@@ -1,4 +1,3 @@
-using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -7,25 +6,20 @@ using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
 using LL.Data.Contexts;
 using LL.Data.Repositories;
-using LL.Extensions;
+using LL.Extensions.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LL.Test;
 
 public static class Provider
 {
-    public static IConfiguration GetConfiguration<T>() where T : class =>
-        new ConfigurationBuilder().AddUserSecrets<T>().Build();
-
-    
-    public static T GetRequiredService<T>() where T : class
+    public static T GetRequiredService<T>() where T : class =>
+        GetRequiredService().BuildServiceProvider().GetRequiredService<T>();
+    public static ServiceCollection GetRequiredService()
     {
         var services = new ServiceCollection();
-            
-        var config = GetConfiguration<T>();
-        
+
         //Core Services
         services.AddScoped<ISeminarService, SeminarService>();
         services.AddScoped<ISecurityService, SecurityService>();
@@ -53,19 +47,13 @@ public static class Provider
         services.AddScoped<IEncryptionService, EncryptionService>();
 
         //Singletons
-        services.AddSingleton(
-            new TokenConfigModel(
-                config[Secrets.JwtKey],
-                config[Secrets.JwtIssuer],
-                config[Secrets.JwtAudience],
-                config[Secrets.JwtExpiryMinutes]));
-
-        services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
-        services.AddSingleton(new StorageModel(config[Secrets.StorageAccessKey], config[Secrets.StorageSecretKey], config[Secrets.StorageName]));
+        services.AddSingleton(new TokenConfigModel(string.Empty,string.Empty,string.Empty,string.Empty));
+        services.AddSingleton(new AgentModel(string.Empty, string.Empty));
+        services.AddSingleton(new StorageModel(string.Empty, string.Empty, string.Empty));
         
         //Database
         services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));
 
-        return services.BuildServiceProvider().GetRequiredService<T>();
+        return services;
     }
 }

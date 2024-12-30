@@ -296,6 +296,7 @@ namespace LL.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AudioPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LanguageId = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
@@ -545,8 +546,8 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 716, DateTimeKind.Unspecified).AddTicks(6734), new TimeSpan(0, 0, 0, 0, 0)), "English" },
-                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 716, DateTimeKind.Unspecified).AddTicks(6745), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 768, DateTimeKind.Unspecified).AddTicks(8322), new TimeSpan(0, 0, 0, 0, 0)), "English" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 768, DateTimeKind.Unspecified).AddTicks(8331), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
                 });
 
             migrationBuilder.InsertData(
@@ -554,9 +555,9 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 716, DateTimeKind.Unspecified).AddTicks(5512), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
-                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 716, DateTimeKind.Unspecified).AddTicks(5665), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
-                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 716, DateTimeKind.Unspecified).AddTicks(5668), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 768, DateTimeKind.Unspecified).AddTicks(7708), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 768, DateTimeKind.Unspecified).AddTicks(7754), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 768, DateTimeKind.Unspecified).AddTicks(7756), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
                 });
 
             migrationBuilder.InsertData(
@@ -564,9 +565,9 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(5701), new TimeSpan(0, 0, 0, 0, 0)), "High" },
-                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(5720), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
-                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(5722), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(3673), new TimeSpan(0, 0, 0, 0, 0)), "High" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(3679), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(3681), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
                 });
 
             migrationBuilder.InsertData(
@@ -579,11 +580,11 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(645), new TimeSpan(0, 0, 0, 0, 0)), "Nouns" },
-                    { 2, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(658), new TimeSpan(0, 0, 0, 0, 0)), "Verbs" },
-                    { 3, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(660), new TimeSpan(0, 0, 0, 0, 0)), "Adjectives" },
-                    { 4, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(661), new TimeSpan(0, 0, 0, 0, 0)), "Adverbs" },
-                    { 5, new DateTimeOffset(new DateTime(2024, 10, 30, 23, 21, 36, 717, DateTimeKind.Unspecified).AddTicks(663), new TimeSpan(0, 0, 0, 0, 0)), "Interjections" }
+                    { 1, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(1050), new TimeSpan(0, 0, 0, 0, 0)), "Noun" },
+                    { 2, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(1057), new TimeSpan(0, 0, 0, 0, 0)), "Verb" },
+                    { 3, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(1058), new TimeSpan(0, 0, 0, 0, 0)), "Adjective" },
+                    { 4, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(1059), new TimeSpan(0, 0, 0, 0, 0)), "Adverb" },
+                    { 5, new DateTimeOffset(new DateTime(2024, 12, 24, 23, 20, 26, 769, DateTimeKind.Unspecified).AddTicks(1061), new TimeSpan(0, 0, 0, 0, 0)), "Interjection" }
                 });
 
             migrationBuilder.CreateIndex(

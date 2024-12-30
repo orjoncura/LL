@@ -8,7 +8,7 @@ using LL.Core.Models.ViewModels;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LL.Extensions;
+namespace LL.Extensions.Services;
 
 public class EncryptionService : IEncryptionService
 {
