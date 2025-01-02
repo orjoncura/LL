@@ -28,11 +28,11 @@ public class StatementRepository(AppDBContext db) : IStatementRepository
         return statement.Id;
     }
 
-    public List<int> InsertRange(int seminarWordId, List<StatementShort> statementShorts, int userId)
+    public List<int> InsertRange(int seminarWordId, List<ExerciseShort> statementShorts, int userId)
     {
         var statements = new List<Statement>();
         
-        foreach (StatementShort s in statementShorts.Where(s => s.IsValid).ToList())
+        foreach (ExerciseShort s in statementShorts.Where(s => s.IsValid).ToList())
         {
             var statement = new Statement
             {

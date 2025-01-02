@@ -4,7 +4,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class SeminarWordRepository(AppDBContext db) : ISeminarWordRepository
+public class CourseWordRepository(AppDBContext db) : ICourseWordRepository
 {
     public int Insert(int wordId, int seminarId, int seminarWordRankId, int userId)
     {
@@ -22,18 +22,5 @@ public class SeminarWordRepository(AppDBContext db) : ISeminarWordRepository
         db.SaveChanges();
 
         return seminarWord.Id;
-    }
-    
-    public bool InsertRange(List<SeminarWord> seminarWords)
-    {
-        seminarWords = seminarWords.Where(s => 
-            s.WordId > 0 
-            & s.SeminarWordRankId > 0
-            & s.SeminarId > 0 ).ToList();
-        
-        db.AddRange(seminarWords);
-        db.SaveChanges();
-
-        return seminarWords.All(s => s.Id > 0);
     }
 }

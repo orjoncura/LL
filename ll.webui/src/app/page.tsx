@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Constants from '../scripts/Constants'
 import { POST, StoreToken } from '@/scripts/Helpers/SecurityHelper'
 import { IsValidEmail, IsValidPassword } from "@/scripts/Helpers/TextHelper";
-import {LoginModel, TokenViewModel} from '@/generated-client/src';
+import {LoginModel, TokenViewModel} from '@/scripts/models';
 import Link from 'next/link';
 import ModalView from '../components/Modal/ModalView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
@@ -62,7 +62,7 @@ export default function Login() {
                     if (tokenModel.token != null && tokenModel.token.length > 1) {
 
                         StoreToken(tokenModel.token);
-                        router.push('/Seminar/Create', { scroll: false });
+                        router.push('/Course/Create', { scroll: false });
   
                     } else {
                         openModal("Error", "It looks like the username or password you entered doesn't match our records." 

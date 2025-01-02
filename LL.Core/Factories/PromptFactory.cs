@@ -4,7 +4,7 @@ namespace LL.Core.Factories
 {
     public static class PromptFactory
     {
-        public static string CreateSeminarPrompt(string word, int languageFromId, int languageToId, string text, int numberOfSentences = 3)
+        public static string CreateCoursePrompt(string word, int languageFromId, int languageToId, string text, int numberOfSentences = 3)
         {
             string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
@@ -36,7 +36,7 @@ namespace LL.Core.Factories
             return prompt;
         }
 
-        public static string CreateSeminarWordsPrompt(string text, int languageToId)
+        public static string CreateCourseWordsPrompt(string text, int languageToId)
         {
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 

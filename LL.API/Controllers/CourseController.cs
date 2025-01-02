@@ -16,32 +16,61 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class SeminarController(ISeminarService seminarService, 
+    public class CourseController(ICourseService seminarService, 
         IWordRepository wordRepository,
         IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
         /// Pass a list of words and get a seminar in the selected language
         /// </summary>
-        /// <param name="seminarRequest">Contains text, LanguageIdFrom (Input language) and LangaugeIdTo (the laguage the words will be translated to)</param>
+        /// <param name="courseRequest">Contains text, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
         /// <response code="200">The new seminar</response>
         [HttpPost("Create")]
-        [ProducesResponseType(typeof(SeminarViewModel), StatusCodes.Status200OK)]
-        public async Task<ActionResult> Create([FromBody] SeminarRequestModel seminarRequest)
+        [ProducesResponseType(typeof(CourseViewModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult> Create([FromBody] CourseRequestModel courseRequest)
         {
             try
             {
-                return Ok(await seminarService.CreateSeminar(seminarRequest, 1));
+                return Ok(await seminarService.CreateCourse(courseRequest, 1));
             }
             catch (Exception ex)
             {
                 var exceptionData = new Dictionary<string, object>();
 
-                if (seminarRequest != null)
+                if (courseRequest != null)
                 {
-                    exceptionData["Text"] = seminarRequest.Text;
-                    exceptionData["LanguageIdFrom"] = seminarRequest.LanguageFromId;
-                    exceptionData["LanguageIdTo"] = seminarRequest.LanguageToId;
+                    exceptionData["Text"] = courseRequest.Text;
+                    exceptionData["LanguageIdFrom"] = courseRequest.LanguageFromId;
+                    exceptionData["LanguageIdTo"] = courseRequest.LanguageToId;
+                }
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+            }
+        }
+        
+        /// <summary>
+        /// Pass a word and the course information to create exercises for the selected word.
+        /// </summary>
+        /// <param name="exerciseRequest">Contains Course & Word information</param>
+        /// <response code="200">The new exercises</response>
+        [HttpPost("CreateExercises")]
+        [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult> CreateExercises([FromBody] ExerciseRequestModel exerciseRequest)
+        {
+            try
+            {
+                return Ok(await seminarService.CreateExercises(exerciseRequest, 1));
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+
+                if (exerciseRequest != null && exerciseRequest.IsValid)
+                {
+                    exceptionData["CourseId"] = exerciseRequest.CourseId;
+                    exceptionData["WordId"] = exerciseRequest.WordId;
                 }
 
                 appMonitoringService.ExportError(ex, exceptionData);
@@ -52,7 +81,7 @@ namespace LL.API.Controllers
         
         [HttpPost("StreamAudio")]
         [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
-        public async Task<ActionResult> StreamAudio(int wordId)
+        public ActionResult StreamAudio(int wordId)
         {
             try
             {

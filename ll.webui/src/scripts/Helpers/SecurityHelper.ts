@@ -26,7 +26,7 @@ export async function POST(url: string, data: string) {
 }
 
 export async function CreateAudio(id: number | undefined) {
-    return fetch(Constants().API + '/Seminar/StreamAudio?wordId=' + id, {
+    return fetch(Constants().API + '/Course/StreamAudio?wordId=' + id, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${GetToken()}`,

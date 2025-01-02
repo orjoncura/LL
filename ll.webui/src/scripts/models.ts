@@ -39,7 +39,7 @@ export interface ProblemDetails {
   instance?: string;
 }
 
-export interface SeminarRequestModel {
+export interface CourseRequestModel {
   text?: string;
   languageFromId?: number;
   languageToId?: number;
@@ -47,16 +47,26 @@ export interface SeminarRequestModel {
   readonly isValid?: boolean;
 }
 
-export interface SeminarViewModel {
-  seminarId?: number;
+export interface ExerciseRequestModel {
+  courseId: number;
+  text?: string;
+  languageFromId?: number;
+  languageToId?: number;  
+  
+  wordId?: number;
+  wordName?: string;
+  rankId?: number;
+}
+export interface CourseViewModel {
+  id: number;
   words: WordViewModel[];
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
 }
 
 export interface WordViewModel {
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
   translation?: string;
   audio: Uint8Array;
   language?: string;
@@ -69,7 +79,7 @@ export interface meaningShort {
   definitions?: string[];
 }
 
-export interface StatementShort {
+export interface ExerciseViewModel {
   originalStatement?: string;
   translatedStatement?: string;
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
@@ -86,11 +96,11 @@ export type ApiSecurityResponse = TokenViewModel[];
 
 /** Optional parameters. */
 export interface ApiSeminarOptionalParams extends coreClient.OperationOptions {
-  body?: SeminarRequestModel;
+  body?: CourseRequestModel;
 }
 
 /** Contains response data for the seminar operation. */
-export type ApiSeminarResponse = SeminarViewModel[];
+export type ApiSeminarResponse = CourseViewModel[];
 
 /** Optional parameters. */
 export interface ApiOptionalParams extends coreClient.ServiceClientOptions {

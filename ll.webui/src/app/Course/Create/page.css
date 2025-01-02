@@ -9,6 +9,15 @@
     gap: 16px; /* Spacing between elements */
   }
   
+  .audio{
+      display: 'inline-block';
+      background: 'none';
+      border: 'none';
+      font-Weight: 'bold';
+      color: 'black';
+      font-size: '22px'
+  }
+  
   @media (min-width: 640px) {
     .feedback-container {
       flex-direction: row; /* Align items side by side on larger screens */

@@ -21,18 +21,18 @@ public static class Provider
         var services = new ServiceCollection();
 
         //Core Services
-        services.AddScoped<ISeminarService, SeminarService>();
+        services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ISecurityService, SecurityService>();
             
         //Repositories
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<ISeminarRepository, SeminarRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IWordRepository, WordRepository>();
         services.AddScoped<IWordLinkRepository, WordLinkRepository>();
         services.AddScoped<IWordMeaningRepository, WordMeaningRepository>();
         services.AddScoped<IWordDefinitionRepository, WordDefinitionRepository>();
         services.AddScoped<IStatementRepository, StatementRepository>();
-        services.AddScoped<ISeminarWordRepository, SeminarWordRepository>();
+        services.AddScoped<ICourseWordRepository, CourseWordRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
         services.AddScoped<IResetPasswordRequestRepository, ResetPasswordRequestRepository>();

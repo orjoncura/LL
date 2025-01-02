@@ -4,7 +4,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class SeminarRepository(AppDBContext db) : ISeminarRepository
+public class CourseRepository(AppDBContext db) : ICourseRepository
 {
     public int Insert(string value, int fromId, int toId, int userId)
     {

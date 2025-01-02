@@ -2,7 +2,7 @@ using LL.Core.Enums;
 
 namespace LL.Core.Models.Arguments;
 
-public class SeminarRequestModel
+public class CourseRequestModel
 {
     public string Text { get; set; } = string.Empty;
     public int LanguageFromId { get; set; }

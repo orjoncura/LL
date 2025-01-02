@@ -1,6 +1,6 @@
 namespace LL.Core.Models.Arguments;
 
-public class SeminarWordsModel
+public class CourseWordsModel
 {
     public string Word { get; set; } = string.Empty;
     

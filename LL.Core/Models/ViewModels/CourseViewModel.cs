@@ -3,14 +3,14 @@ using LL.Core.Models.Short;
 
 namespace LL.Core.Models.ViewModels;
 
-public class SeminarViewModel
+public class CourseViewModel
 {
-    public int SeminarId { get; set; } 
+    public int Id { get; set; } 
 
     public List<WordViewModel> Words { get; set; } = new List<WordViewModel>();
     
     public bool IsValid => 
-        SeminarId > 0
+        Id > 0
         && Words.Any(w => string.IsNullOrWhiteSpace(w.Name) == false
                           && string.IsNullOrWhiteSpace(w.Name) == false);
 }

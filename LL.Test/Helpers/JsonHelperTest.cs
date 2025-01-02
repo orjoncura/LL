@@ -21,7 +21,7 @@ public class JsonHelperTest
     {
         string content = File.ReadAllText(@"../../../Files/SeminarWordsModelListExample.txt");
 
-        List<SeminarWordsModel>? seminarWords = JsonHelper.Extract<List<SeminarWordsModel>>(content);
+        List<CourseWordsModel>? seminarWords = JsonHelper.Extract<List<CourseWordsModel>>(content);
         
         Assert.True(seminarWords != null && seminarWords.Any());
     }
