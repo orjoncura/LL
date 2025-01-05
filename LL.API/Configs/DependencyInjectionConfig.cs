@@ -25,7 +25,7 @@ namespace LL.API.Configs
             services.AddScoped<IWordLinkRepository, WordLinkRepository>();
             services.AddScoped<IWordMeaningRepository, WordMeaningRepository>();
             services.AddScoped<IWordDefinitionRepository, WordDefinitionRepository>();
-            services.AddScoped<IStatementRepository, StatementRepository>();
+            services.AddScoped<IExerciseRepository, ExerciseRepository>();
             services.AddScoped<ICourseWordRepository, CourseWordRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();

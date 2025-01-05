@@ -80,8 +80,9 @@ export interface meaningShort {
 }
 
 export interface ExerciseViewModel {
-  originalStatement?: string;
-  translatedStatement?: string;
+  original?: string;
+  translated?: string;
+  extra?: string;
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
 }

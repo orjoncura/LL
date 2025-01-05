@@ -16,21 +16,27 @@ namespace LL.Core.Factories
                 Please make sure {0} in the new sentences has the same meaning, it has in the text,
                 also try to use only words that are included in the text.
                 The text is {3}
-                The JSON file should have the following format:
+                Also add extra words in the same language as the translated statement, 
+                if the translated statement is 'I want to drive' the extra words can be 'You can train'.
+                The extra words will be used in a multi select exercise to confuse the user
 
+                The JSON file should have the following format:
                 [
-                    {{
-                        ""OriginalStatement"": """",
-                        ""TranslatedStatement"": """",
-                    }},
-                    {{
-                        ""OriginalStatement"": """",
-                        ""TranslatedStatement"": """",
-                    }},
-                    {{
-                        ""OriginalStatement"": """",
-                        ""TranslatedStatement"": """",
-                    }}
+                  {{
+                    ""Original"": """",
+                    ""Translated"": """",
+                    ""Extra"": """"
+                  }},
+                  {{
+                    ""Original"": """",
+                    ""Translated"": """",
+                    ""Extra"": """"
+                  }},
+                  {{
+                    ""Original"": """",
+                    ""Translated"": """",
+                    ""Extra"": """"
+                  }}
                 ]", word, languageFrom, languageTo, text, numberOfSentences);
 
             return prompt;

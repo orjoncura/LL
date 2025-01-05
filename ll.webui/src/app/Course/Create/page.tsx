@@ -105,10 +105,7 @@ export default function CreateSeminar() {
                       if(exerciseViewModels == null || exerciseViewModels == undefined)
                         return;
     
-                      exerciseViewModels.forEach(exercise => {
-                        exercises.push(exercise)
-                        //setExercises((prevExercises) => [...prevExercises, exercise]);
-                      });
+                      exerciseViewModels.forEach(e => exercises.push(e));
 
                       nextStep(wordIndex);
 
@@ -126,31 +123,41 @@ export default function CreateSeminar() {
 
     const nextStep = (newIndex: number) => {
 
-      setShowCourse(wordViewModels[newIndex] != null 
-        && wordViewModels[newIndex].name != null)
+      let wordViewModel: WordViewModel = wordViewModels[wordIndex];
+      let exercise: ExerciseViewModel = exercises[newIndex];
 
-      setWordIndex(newIndex < wordViewModels.length ? newIndex : 0);
-      setExercisesIndex(newIndex < exercises.length ? newIndex : 0);
+      setShowCourse(wordViewModel != null 
+        && wordViewModel.name != null
+        && exercise != null)
 
-      let exercise: string[] = [];
-
-      if(exercises[newIndex] != null && exercises[newIndex].translatedStatement != null)
-        exercise = exercises[newIndex].translatedStatement.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
-        
-      if(exercises[newIndex] == null){
-
-        setExercises([]);
-        setCourseLength(0);
-      }
-      
-      if(wordViewModels[newIndex] == null){
+      if(wordViewModels[wordIndex] == null){
 
         setWordViewModels([]);
         setCourseLength(0);
       }
 
-      setCorrectOrder(exercise);
-      setOptions(shuffle(exercise));    
+      setWordIndex(newIndex < wordViewModels.length ? newIndex : 0);
+      setExercisesIndex(newIndex < exercises.length ? newIndex : 0);
+
+      let exerciseInCorrectOrder: string[] = [];
+      let options: string[] = [];
+
+      if(exercise == null){
+
+        setExercises([]);
+        setCourseLength(0);
+        
+      }else{
+
+        if(exercise.translated != null)
+          exerciseInCorrectOrder = exercise.translated.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
+
+        if(exercise.extra != null)
+          options = exerciseInCorrectOrder.concat(exercise.extra.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, '')));
+      }
+      
+      setCorrectOrder(exerciseInCorrectOrder);
+      setOptions(shuffle(options));    
       setSelectedWords([]);
       setShowFeedback(false);
       setExercises(exercises);
@@ -279,14 +286,23 @@ export default function CreateSeminar() {
             </div>
       
             {showCourse == false && ( 
-              <textarea
-                      value={text}
-                      onChange={e => setText(e.target.value)}
-                      placeholder="Please enter the text you would like to translate..."
-                      rows={10}
-                      cols={50}
-                      style={{ marginBottom: '10px', width: '100%' }}
-                    />
+              <div>
+                <div style={{textAlign: 'center'}}>
+                  <b>Transform your ideas into a unique and impactful learning experience</b>
+                  <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
+                        with your specific goals and needs.</label>
+              </div>
+
+                <br/><br/><br/>
+                <textarea
+                        value={text}
+                        onChange={e => setText(e.target.value)}
+                        placeholder="Please enter the text you would like to translate..."
+                        rows={10}
+                        cols={50}
+                        style={{ marginBottom: '10px', width: '100%' }}
+                      />
+              </div>
             )}
 
             {showCourse && (   
@@ -328,7 +344,7 @@ export default function CreateSeminar() {
                   <div className="p-4 bg-light border rounded shadow-sm">
                       <blockquote className="quote">
                         <p className="text-black">
-                        {exercises[exerciseIndex].originalStatement}
+                        {exercises[exerciseIndex].original}
                         </p>
                       </blockquote>
           
@@ -377,7 +393,7 @@ export default function CreateSeminar() {
             <div className="feedback-text">
               <div className="feedback-details">
                 <h3 className="feedback-title">{feedback}</h3>
-                <h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translatedStatement}</h4>
+                <h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4>
               </div>
             </div>
           )}

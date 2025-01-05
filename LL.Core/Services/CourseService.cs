@@ -16,7 +16,7 @@ public class CourseService(
     IWordMeaningRepository wordMeaningRepository,
     IWordDefinitionRepository wordDefinitionRepository,
     IWordLinkRepository wordLinkRepository,
-    IStatementRepository statementRepository,
+    IExerciseRepository exerciseRepository,
     ICourseWordRepository courseWordRepository,
     IAgentService agentService,
     IDictionaryService dictionaryService) : ICourseService
@@ -29,9 +29,11 @@ public class CourseService(
             return courseViewModel;
         
         courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        
         string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
         
-        List<CourseWordsModel> seminarWords = 
+        List<CourseWordsModel> seminarWords = seminarRequest.Text.Trim().Contains(' ') 
+            ? new List<CourseWordsModel>() :
             JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt)) 
             ?? new List<CourseWordsModel>();
         
@@ -68,31 +70,34 @@ public class CourseService(
     
     public async Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId)
     {
-        List<ExerciseViewModel> exerciseViewModel = new List<ExerciseViewModel>();
+        List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();
         
-        if (exerciseRequest == null || exerciseRequest.IsValid == false || userId == 0)
-            return exerciseViewModel; 
+        if (exerciseRequest.IsValid == false || userId == 0)
+            return exercises; 
         
         int courseWordId = courseWordRepository.Insert(exerciseRequest.WordId, exerciseRequest.CourseId, exerciseRequest.RankId, userId);
-        
-        string prompt = PromptFactory.CreateCoursePrompt(
-            exerciseRequest.WordName,
-            exerciseRequest.LanguageFromId, 
-            exerciseRequest.LanguageToId, 
-            exerciseRequest.Text);
-        
-        var exercises = JsonHelper.Extract<List<ExerciseShort>>(await agentService.Run(prompt));
-        
-        if (exercises != null && exercises.Any(s => s.IsValid))
+
+        exercises = exerciseRepository.GetByCourseWordId(courseWordId);
+
+        if (exercises.Any() == false)
         {
-            statementRepository.InsertRange(courseWordId, exercises, userId);
+            string prompt = PromptFactory.CreateCoursePrompt(
+                exerciseRequest.WordName,
+                exerciseRequest.LanguageFromId, 
+                exerciseRequest.LanguageToId, 
+                exerciseRequest.Text);
         
-            exerciseViewModel = exercises
-                .Where(e => e.IsValid)
-                .Select(e => new ExerciseViewModel(e)).ToList();
+            exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));
+        
+            if (exercises != null && exercises.Any(s => s.IsValid))
+            {       
+                exercises = exercises.Where(e => e.IsValid).ToList();
+            
+                exerciseRepository.InsertRange(courseWordId, exercises, userId);
+            }
         }
         
-        return exerciseViewModel;
+        return exercises ?? [];
     }
 }
 

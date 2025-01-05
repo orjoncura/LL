@@ -8,6 +8,7 @@ public class Statement
     public virtual SeminarWord? SeminarWord { get; set; }
     public string Original { get; set; } = string.Empty;
     public string Translated { get; set; } = string.Empty;
+    public string Extra { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
 

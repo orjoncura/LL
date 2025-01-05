@@ -22,15 +22,16 @@ namespace LL.Data.Contexts
         public DbSet<MessageContent> MessageContents { get; set; }
         public DbSet<LoginHistory> LoginHistory { get; set; }
         public DbSet<Language> Languages { get; set; }
+        public DbSet<Seminar> Courses { get; set; }
+        public DbSet<SeminarWord> CourseWords { get; set; }
+        public DbSet<SeminarWordRank> CourseWordRank { get; set; }
         public DbSet<Word> Words { get; set; }
         public DbSet<WordType> WordTypes { get; set; }
         public DbSet<WordMeaning> WordMeanings { get; set; }
         public DbSet<WordDefinition> WordDefinitions { get; set; }
         public DbSet<WordLink> WordLinks { get; set; }
-        public DbSet<Statement> Statements { get; set; }
-        public DbSet<SeminarWord> SeminarWords { get; set; }
-        public DbSet<SeminarWordRank> SeminarWordRank { get; set; }
-
+        public DbSet<Statement> Exercises { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

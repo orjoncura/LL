@@ -1,5 +1,6 @@
 using LL.Core.Helpers;
 using LL.Core.Models.Arguments;
+using LL.Core.Models.ViewModels;
 using LL.Extensions.Models;
 
 namespace LL.Test.Helpers;
@@ -14,6 +15,19 @@ public class JsonHelperTest
         Candidate? candidate = JsonHelper.Extract<JsonData>(content)?.Candidates?.FirstOrDefault();
         
         Assert.True(candidate != null);
+    }
+    
+    [Fact]
+    public void JsonHelper_ExtractExerciseViewModel()
+    {
+        string content = File.ReadAllText(@"../../../Files/ExerciseViewModelJSON.txt");
+
+        Candidate? candidate = JsonHelper.Extract<JsonData>(content)?.Candidates?.FirstOrDefault();
+        string output = candidate?.Content?.Parts?.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
+
+        List<ExerciseViewModel>? exercises = JsonHelper.Extract<List<ExerciseViewModel>>(output)?.ToList();
+        
+        Assert.True(exercises != null && exercises.Any());
     }
     
     [Fact]

@@ -1,4 +1,6 @@
-﻿namespace LL.Core.Models.Short;
+﻿using LL.Core.Models.ViewModels;
+
+namespace LL.Core.Models.Short;
 
 public class ExerciseShort
 {
@@ -9,10 +11,10 @@ public class ExerciseShort
         string.IsNullOrWhiteSpace(OriginalStatement) == false
         && string.IsNullOrWhiteSpace(TranslatedStatement) == false;
     public ExerciseShort() { }
-    public ExerciseShort(string original, string translated) 
+    public ExerciseShort(ExerciseViewModel exercise) 
     {
-        OriginalStatement = original;
-        TranslatedStatement = translated;
+        OriginalStatement = exercise.Original;
+        TranslatedStatement = exercise.Translated;
     }
 }
 

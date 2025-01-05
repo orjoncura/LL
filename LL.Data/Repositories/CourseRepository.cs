@@ -8,19 +8,24 @@ public class CourseRepository(AppDBContext db) : ICourseRepository
 {
     public int Insert(string value, int fromId, int toId, int userId)
     {
-        var seminar = new Seminar()
+        Seminar? course = db.Courses.FirstOrDefault(c => c.Value == value && c.LanguageFromId == fromId && c.LanguageToId == toId && c.IsActive);
+
+        if (course == null)
         {
-            Value = value,
-            LanguageFromId = fromId,
-            LanguageToId = toId,
-            IsActive = true,
-            CreatedById = userId,
-            CreatedDate = DateTime.Now,
-        };
+            course = new Seminar()
+            {
+                Value = value,
+                LanguageFromId = fromId,
+                LanguageToId = toId,
+                IsActive = true,
+                CreatedById = userId,
+                CreatedDate = DateTime.Now,
+            };
 
-        db.Add(seminar);
-        db.SaveChanges();
-
-        return seminar.Id;
+            db.Add(course);
+            db.SaveChanges();
+        }
+        
+        return course.Id;
     }
 }

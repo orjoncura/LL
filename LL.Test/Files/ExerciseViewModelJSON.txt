@@ -1,0 +1,31 @@
+{
+  "candidates" : [ {
+    "content" : {
+      "parts" : [ {
+        "text" : "[{\"OriginalStatement\": \"Los niños persiguen mariposas en el jardín.\", \"TranslatedStatement\": \"The children chase butterflies in the garden.\", \"ExtraWords\": \"The children chase butterflies in the garden.\"}, {\"OriginalStatement\": \"Los perros persiguen a la pelota.\", \"TranslatedStatement\": \"The dogs chase the ball.\", \"ExtraWords\": \"The children chase butterflies in the garden.\"}, {\"OriginalStatement\": \"Los gatos persiguen un ratón.\", \"TranslatedStatement\": \"The cats chase a mouse.\", \"ExtraWords\": \"The children chase butterflies in the garden.\"}]"
+      } ],
+      "role" : "model"
+    },
+    "finishReason" : "STOP",
+    "safetyRatings" : [ {
+      "category" : "HARM_CATEGORY_HATE_SPEECH",
+      "probability" : "NEGLIGIBLE"
+    }, {
+      "category" : "HARM_CATEGORY_DANGEROUS_CONTENT",
+      "probability" : "NEGLIGIBLE"
+    }, {
+      "category" : "HARM_CATEGORY_HARASSMENT",
+      "probability" : "NEGLIGIBLE"
+    }, {
+      "category" : "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+      "probability" : "NEGLIGIBLE"
+    } ],
+    "avgLogprobs" : -0.013975290078965445
+  } ],
+  "usageMetadata" : {
+    "promptTokenCount" : 316,
+    "candidatesTokenCount" : 126,
+    "totalTokenCount" : 442
+  },
+  "modelVersion" : "gemini-1.5-flash"
+}

@@ -8,19 +8,24 @@ public class CourseWordRepository(AppDBContext db) : ICourseWordRepository
 {
     public int Insert(int wordId, int seminarId, int seminarWordRankId, int userId)
     {
-        var seminarWord = new SeminarWord()
+        SeminarWord? courseWord = db.CourseWords.FirstOrDefault(c => c.WordId == wordId && c.SeminarId == seminarId && c.IsActive);
+
+        if (courseWord == null)
         {
-            WordId = wordId,
-            SeminarId = seminarId,
-            SeminarWordRankId = seminarWordRankId,
-            IsActive = true,
-            CreatedById = userId,
-            CreatedDate = DateTime.Now,
-        };
-
-        db.Add(seminarWord);
-        db.SaveChanges();
-
-        return seminarWord.Id;
+            courseWord = new SeminarWord()
+            {
+                WordId = wordId,
+                SeminarId = seminarId,
+                SeminarWordRankId = seminarWordRankId,
+                IsActive = true,
+                CreatedById = userId,
+                CreatedDate = DateTime.Now,
+            };
+            
+            db.Add(courseWord);
+            db.SaveChanges();
+        }
+        
+        return courseWord.Id;
     }
 }
