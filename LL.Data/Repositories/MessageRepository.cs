@@ -5,7 +5,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class MessageRepository(AppDBContext db)  : IMessageRepository
+public class MessageRepository(AppDbContext db)  : IMessageRepository
 {
     public int Insert(string recipientAddress, string subject, string content, int loginId, int? recipientId = null)
     {

@@ -5,7 +5,7 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class NewUserRequestRepository(AppDBContext db, IEncryptionService encryptionService) : INewUserRequestRepository
+public class NewUserRequestRepository(AppDbContext db, IEncryptionService encryptionService) : INewUserRequestRepository
 {
     public bool HasReachedLimit(string email, DateTimeOffset date, int attemptsLimit) => 
         db.NewUserRequests.Count(u => 

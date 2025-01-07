@@ -16,7 +16,7 @@ public static class DataFactory
             Language = EnumHelper.GetEnumValueById<LanguageEnum>(word.LanguageId)
         };
     
-    public static ExerciseViewModel Convert(Statement exercise) =>
+    public static ExerciseViewModel Convert(Exercise exercise) =>
         new()
         {
             Id = exercise.Id,

@@ -52,7 +52,7 @@ public static class Provider
         services.AddSingleton(new StorageModel(string.Empty, string.Empty, string.Empty));
         
         //Database
-        services.AddDbContext<AppDBContext>(options => options.UseInMemoryDatabase("LL_Local"));
+        services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("LL_Local"));
 
         return services;
     }

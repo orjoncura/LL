@@ -4,19 +4,19 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class CourseWordRepository(AppDBContext db) : ICourseWordRepository
+public class CourseWordRepository(AppDbContext db) : ICourseWordRepository
 {
     public int Insert(int wordId, int seminarId, int seminarWordRankId, int userId)
     {
-        SeminarWord? courseWord = db.CourseWords.FirstOrDefault(c => c.WordId == wordId && c.SeminarId == seminarId && c.IsActive);
+        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.WordId == wordId && c.CourseId == seminarId && c.IsActive);
 
         if (courseWord == null)
         {
-            courseWord = new SeminarWord()
+            courseWord = new CourseWord()
             {
                 WordId = wordId,
-                SeminarId = seminarId,
-                SeminarWordRankId = seminarWordRankId,
+                CourseId = seminarId,
+                CourseWordRankId = seminarWordRankId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

@@ -9,7 +9,7 @@ using LL.Data.Factories;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
-public class WordRepository(AppDBContext db,
+public class WordRepository(AppDbContext db,
     StorageModel storageModel, 
     IStorageService storageService, 
     ITextToSpeechService textToSpeechService) : IWordRepository

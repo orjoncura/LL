@@ -30,12 +30,19 @@ public class CourseService(
         
         courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
-        string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId); 
-        
-        List<CourseWordsModel> seminarWords = seminarRequest.Text.Trim().Contains(' ') 
-            ? new List<CourseWordsModel>() :
-            JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt)) 
-            ?? new List<CourseWordsModel>();
+        string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId);
+
+        List<CourseWordsModel> seminarWords = seminarRequest.Text.Trim().Contains(' ')
+            ? JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt))
+              ?? new List<CourseWordsModel>()
+            : new List<CourseWordsModel>()
+            {
+                new CourseWordsModel()
+                {
+                    Word = seminarRequest.Text,
+                    Importance = 1
+                }
+            };
         
         foreach (var seminarWord in seminarWords)
         {
@@ -62,7 +69,8 @@ public class CourseService(
                 }
             }
             
-            courseViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance, wordLink.Target.Name));
+            if(wordMeaning.Any())
+                courseViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance, wordLink.Target.Name));
         }
 
         return courseViewModel;

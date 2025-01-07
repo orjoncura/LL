@@ -1,7 +1,4 @@
-﻿using LL.Core.Enums;
-using LL.Core.Models.Short;
-
-namespace LL.Core.Models.ViewModels;
+﻿namespace LL.Core.Models.ViewModels;
 
 public class CourseViewModel
 {

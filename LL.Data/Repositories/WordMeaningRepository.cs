@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Repositories;
 
-public class WordMeaningRepository(AppDBContext db) : IWordMeaningRepository
+public class WordMeaningRepository(AppDbContext db) : IWordMeaningRepository
 {
     public List<MeaningShort>? GetByWordId(int wordId) 
     {

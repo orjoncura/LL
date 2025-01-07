@@ -58,63 +58,52 @@ export default function CreateSeminar() {
               return;
             }
 
-            let words: string[] = text.split(" ");
+            setLoading(true);
 
-            setCourseLength(words.length * 3);
+            const courseRequestModel: CourseRequestModel = {
+              "text": text,
+              "languageFromId": 2,
+              "languageToId": 1
+            };
 
-            words.forEach(word => {
+            POST('/Course/Create', JSON.stringify(courseRequestModel))
+            .then((courseViewModel: CourseViewModel) => {
 
-              setLoading(true);
+              if(courseViewModel == null || courseViewModel == undefined)
+                return;
 
-              const courseRequestModel: CourseRequestModel = {
-                "text": word.replace(/[^a-zA-Z0-9]/g, ''),
-                "languageFromId": 2,
-                "languageToId": 1
-              };
+              courseViewModel.words
+                .sort((a, b) => (a.importance > b.importance ? 1 : -1))
+                .forEach(w => {
+                  wordViewModels.push(w)
 
-              POST('/Course/Create', JSON.stringify(courseRequestModel))
-              .then((courseViewModel: CourseViewModel) => {
+                  const exerciseRequestModel: ExerciseRequestModel = {
+                    "courseId": courseViewModel.id,
+                    "text": courseRequestModel.text,
+                    "languageFromId": courseRequestModel.languageFromId,
+                    "languageToId": courseRequestModel.languageToId,
+  
+                    "wordId": w.id,
+                    "wordName": w.name,
+                    "rankId": w.importance,
+                  };
+  
+                  POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel))
+                  .then((exerciseViewModels: ExerciseViewModel[]) => {
+  
+                    if(exerciseViewModels == null || exerciseViewModels == undefined)
+                      return;
+  
+                    exerciseViewModels.forEach(e => exercises.push(e));
 
-                if(courseViewModel == null || courseViewModel == undefined)
-                  return;
-
-                courseViewModel.words
-                  .sort((a, b) => (a.importance > b.importance ? 1 : -1))
-                  .forEach(w => {
-                    wordViewModels.push(w)
-
-                    if(wordViewModels.length == 1){
-                      nextStep(wordIndex);
-                      setLoading(false);
-                    }
-
-                    const exerciseRequestModel: ExerciseRequestModel = {
-                      "courseId": courseViewModel.id,
-                      "text": courseRequestModel.text,
-                      "languageFromId": courseRequestModel.languageFromId,
-                      "languageToId": courseRequestModel.languageToId,
-    
-                      "wordId": w.id,
-                      "wordName": w.name,
-                      "rankId": w.importance,
-                    };
-    
-                    POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel))
-                    .then((exerciseViewModels: ExerciseViewModel[]) => {
-    
-                      if(exerciseViewModels == null || exerciseViewModels == undefined)
-                        return;
-    
-                      exerciseViewModels.forEach(e => exercises.push(e));
-
-                      nextStep(wordIndex);
-
-                    })});
-                  
-                }).catch(e => {
+                    nextStep(wordIndex);
                     setLoading(false);
-                });
-            });
+
+                  })});
+                
+              }).catch(e => {
+                  setLoading(false);
+              });
 
         } catch (error) {
             console.error('Error making API call:', error);
@@ -156,6 +145,7 @@ export default function CreateSeminar() {
           options = exerciseInCorrectOrder.concat(exercise.extra.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, '')));
       }
       
+      setCourseLength(wordViewModels.length * 3);
       setCorrectOrder(exerciseInCorrectOrder);
       setOptions(shuffle(options));    
       setSelectedWords([]);
@@ -267,7 +257,7 @@ export default function CreateSeminar() {
             }
           }}>
 
-          <div className="container mt-4">
+          <div className="container mt-4" style={{ marginBottom: "25%" }}>
             <div className="mb-4">
               <div className="d-flex">
                 {Array.from({ length: courseLength }).map((_, index) => (
@@ -291,7 +281,7 @@ export default function CreateSeminar() {
                   <b>Transform your ideas into a unique and impactful learning experience</b>
                   <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
                         with your specific goals and needs.</label>
-              </div>
+                </div>
 
                 <br/><br/><br/>
                 <textarea
@@ -383,8 +373,6 @@ export default function CreateSeminar() {
               </div>
             </div>
             )}
-
-            <br/>
           </div>
         </div>
         

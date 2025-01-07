@@ -1,16 +1,15 @@
 ﻿using LL.Data.Contexts;
 using LL.Core.Interfaces.Repositories;
-using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 using LL.Data.Factories;
 using LL.Data.Model;
 
 namespace LL.Data.Repositories;
-public class ExerciseRepository(AppDBContext db) : IExerciseRepository
+public class ExerciseRepository(AppDbContext db) : IExerciseRepository
 {
     public List<ExerciseViewModel> GetByCourseWordId(int courseWordId)
     {
-        List<Statement> exercises = db.Exercises.Where(e => e.SeminarWordId == courseWordId && e.IsActive).ToList();
+        List<Exercise> exercises = db.Exercises.Where(e => e.CourseWordId == courseWordId && e.IsActive).ToList();
         List<ExerciseViewModel> exerciseViewModels = exercises.Any() ? exercises.Select(DataFactory.Convert).ToList() : [];
 
         return exerciseViewModels;
@@ -18,13 +17,13 @@ public class ExerciseRepository(AppDBContext db) : IExerciseRepository
     
     public List<int> InsertRange(int seminarWordId, List<ExerciseViewModel> exerciseViewModels, int userId)
     {
-        var exercises = new List<Statement>();
+        var exercises = new List<Exercise>();
         
         foreach (ExerciseViewModel exerciseViewModel in exerciseViewModels.Where(s => s.IsValid).ToList())
         {
-            var ex = new Statement
+            var ex = new Exercise
             {
-                SeminarWordId = seminarWordId,
+                CourseWordId = seminarWordId,
                 Original = exerciseViewModel.Original,
                 Translated = exerciseViewModel.Translated,
                 Extra = exerciseViewModel.Extra,

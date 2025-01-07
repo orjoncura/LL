@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Repositories;
 
-public class WordLinkRepository(AppDBContext db,
+public class WordLinkRepository(AppDbContext db,
     ITranslationService translationService,
     IWordRepository wordRepository) : IWordLinkRepository
 {

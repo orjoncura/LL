@@ -9,7 +9,7 @@ using LL.Data.Contexts;
 
 namespace LL.Data.Repositories;
 
-public class UserRepository(AppDBContext db, IEncryptionService encryptionService) : IUserRepository
+public class UserRepository(AppDbContext db, IEncryptionService encryptionService) : IUserRepository
 {
     public UserShort? GetById(int id) =>
         db.Users

@@ -10,23 +10,30 @@ public class DictionaryService : IDictionaryService
 {
     public async Task<List<MeaningShort>> GetWordDetails(string word)
     {
-        // API endpoint for the Dictionary API
-        string url = $"https://api.dictionaryapi.dev/api/v2/entries/en/{word}";
+        try
+        {
+            // API endpoint for the Dictionary API
+            string url = $"https://api.dictionaryapi.dev/api/v2/entries/en/{word}";
 
-        // Make an asynchronous GET request to the API
-        HttpClient client = new HttpClient();
-        HttpResponseMessage response = await client.GetAsync(url);
+            // Make an asynchronous GET request to the API
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(url);
 
-        // Check if the response is successful (status code 200)
-        response.EnsureSuccessStatusCode();
+            // Check if the response is successful (status code 200)
+            response.EnsureSuccessStatusCode();
 
-        // Read the response content as a string
-        string responseBody = await response.Content.ReadAsStringAsync();
+            // Read the response content as a string
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-        // Deserialize the JSON string into a list of WordData objects (since the API returns an array of results)
-        List<WordData> wordDataList = JsonHelper.DeserializeObject<List<WordData>>(responseBody);
+            // Deserialize the JSON string into a list of WordData objects (since the API returns an array of results)
+            List<WordData> wordDataList = JsonHelper.DeserializeObject<List<WordData>>(responseBody);
 
-        // Return the first entry in the list (assuming you just want the first result)
-        return wordDataList?[0].Meanings() ?? new List<MeaningShort>();
+            // Return the first entry in the list (assuming you just want the first result)
+            return wordDataList?[0].Meanings() ?? new List<MeaningShort>();
+        }
+        catch (Exception e)
+        {
+            return new List<MeaningShort>();
+        }
     }
 }

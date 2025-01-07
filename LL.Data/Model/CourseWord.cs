@@ -1,17 +1,17 @@
 namespace LL.Data.Model;
 
-public class SeminarWord
+public class CourseWord
 {
     public int Id { get; set; }
     
     public int WordId { get; set; }
     public virtual Word? Word { get; set; }
     
-    public int SeminarId { get; set; }
-    public virtual Seminar? Seminar { get; set; }
+    public int CourseId { get; set; }
+    public virtual Course? Course { get; set; }
     
-    public int SeminarWordRankId { get; set; }
-    public virtual SeminarWordRank? SeminarWordRank { get; set; }
+    public int CourseWordRankId { get; set; }
+    public virtual CourseWordRank? CourseWordRank { get; set; }
     
     public bool IsActive { get; set; }
 

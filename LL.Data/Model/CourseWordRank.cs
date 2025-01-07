@@ -1,6 +1,6 @@
 namespace LL.Data.Model;
 
-public class SeminarWordRank
+public class CourseWordRank
 {
     public int Id { get; set; }
     public string Value { get; set; }

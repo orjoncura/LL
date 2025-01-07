@@ -4,15 +4,15 @@ using LL.Data.Model;
 
 namespace LL.Data.Repositories;
 
-public class CourseRepository(AppDBContext db) : ICourseRepository
+public class CourseRepository(AppDbContext db) : ICourseRepository
 {
     public int Insert(string value, int fromId, int toId, int userId)
     {
-        Seminar? course = db.Courses.FirstOrDefault(c => c.Value == value && c.LanguageFromId == fromId && c.LanguageToId == toId && c.IsActive);
+        Course? course = db.Courses.FirstOrDefault(c => c.Value == value && c.LanguageFromId == fromId && c.LanguageToId == toId && c.IsActive);
 
         if (course == null)
         {
-            course = new Seminar()
+            course = new Course()
             {
                 Value = value,
                 LanguageFromId = fromId,

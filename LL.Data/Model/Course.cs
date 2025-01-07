@@ -1,6 +1,6 @@
 namespace LL.Data.Model;
 
-public class Seminar
+public class Course
 {
     public int Id { get; set; }
     public string Value { get; set; }

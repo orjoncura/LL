@@ -19,7 +19,7 @@ public class SecurityServiceTest
     {
         _securityService = Provider.GetRequiredService<ISecurityService>();
         
-        using (var context = Provider.GetRequiredService<AppDBContext>())
+        using (var context = Provider.GetRequiredService<AppDbContext>())
         {
             // Ensure the database is created
             context.Database.EnsureCreated();
