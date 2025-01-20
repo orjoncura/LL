@@ -5,8 +5,10 @@ using LL.Data.Contexts;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Models.DataTransferObjects;
 using LL.Core.Models.Short;
+using LL.Core.Models.ViewModels;
 using LL.Data.Factories;
 using LL.Data.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Repositories;
 public class WordRepository(AppDbContext db,
@@ -14,6 +16,18 @@ public class WordRepository(AppDbContext db,
     IStorageService storageService, 
     ITextToSpeechService textToSpeechService) : IWordRepository
 {
+    public List<WordViewModel> GetMostImportantWords(int languageId)
+    {
+        var words = db.WordLinks
+            .Where(w => w.Source.LanguageId == languageId
+                        && w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.High
+                        && w.IsActive)
+            .Include(wordLink => wordLink.Source)
+            .Include(wordLink => wordLink.Target).ToList()
+            .Select(w => new WordViewModel(DataFactory.Convert(w.Source), w.Target.Name)).ToList();
+        
+        return words;
+    }
     public MemoryStream? GetFileStreamById(int wordId)
     {
         var word = db.Words.FirstOrDefault(w => w.Id == wordId);
@@ -44,6 +58,7 @@ public class WordRepository(AppDbContext db,
                 AudioPath = storageService
                     .SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)).Result,
                 LanguageId = languageId,
+                ImportanceRatingId = (int)ImportanceRatingEnum.Low,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

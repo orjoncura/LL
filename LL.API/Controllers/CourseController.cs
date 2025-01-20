@@ -21,6 +21,31 @@ namespace LL.API.Controllers
         IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
+        /// Pass a word amd get its details: meanings, definitions etc
+        /// </summary>
+        /// <param name="languageId">LanguageIdFrom (Input language)</param>
+        /// <response code="200">The new seminar</response>
+        [HttpGet("GetMostImportantWords")]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetMostImportantWords([FromQuery] int languageId)
+        {
+            try
+            {
+                return Ok(wordRepository.GetMostImportantWords(languageId));
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+                
+                exceptionData["languageId"] = languageId;
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+            }
+        }
+        
+        /// <summary>
         /// Pass a list of words and get a seminar in the selected language
         /// </summary>
         /// <param name="courseRequest">Contains text, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
@@ -32,6 +57,36 @@ namespace LL.API.Controllers
             try
             {
                 return Ok(await seminarService.CreateCourse(courseRequest, 1));
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+
+                if (courseRequest != null)
+                {
+                    exceptionData["Text"] = courseRequest.Text;
+                    exceptionData["LanguageIdFrom"] = courseRequest.LanguageFromId;
+                    exceptionData["LanguageIdTo"] = courseRequest.LanguageToId;
+                }
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+            }
+        }
+        
+        /// <summary>
+        /// Pass a word amd get its details: meanings, definitions etc
+        /// </summary>
+        /// <param name="courseRequest">Contains text, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
+        /// <response code="200">The new seminar</response>
+        [HttpPost("CreateDefinitions")]
+        [ProducesResponseType(typeof(WordViewModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult> CreateDefinitions([FromBody] CourseRequestModel courseRequest)
+        {
+            try
+            {
+                return Ok(await seminarService.CreateDefinitions(courseRequest, 1));
             }
             catch (Exception ex)
             {

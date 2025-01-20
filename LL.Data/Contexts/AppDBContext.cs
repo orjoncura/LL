@@ -23,7 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<Language> Languages { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseWord> CourseWords { get; set; }
-    public DbSet<CourseWordRank> CourseWordRank { get; set; }
+    public DbSet<ImportanceRating> ImportanceRatings { get; set; }
     public DbSet<Word> Words { get; set; }
     public DbSet<WordType> WordTypes { get; set; }
     public DbSet<WordMeaning> WordMeanings { get; set; }
@@ -219,6 +219,9 @@ public class AppDbContext : DbContext
         {
             entity.Property(ut => ut.Name).IsRequired();
             entity.Property(ut => ut.AudioPath).IsRequired();
+            entity.Property(ut => ut.ImportanceRatingId).IsRequired()
+                .HasDefaultValue(ImportanceRatingEnum.Low);
+            
             entity.Property(ut => ut.IsActive).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
             
@@ -366,16 +369,16 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
-        modelBuilder.Entity<CourseWordRank>(entity =>
+        modelBuilder.Entity<ImportanceRating>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
         });
         
-        modelBuilder.Entity<CourseWordRank>().HasData(
-            Enum.GetValues(typeof(SeminarWordRankEnum))
-                .Cast<SeminarWordRankEnum>()
-                .Select(e => new CourseWordRank
+        modelBuilder.Entity<ImportanceRating>().HasData(
+            Enum.GetValues(typeof(ImportanceRatingEnum))
+                .Cast<ImportanceRatingEnum>()
+                .Select(e => new ImportanceRating
                 {
                     Id = (int)e,
                     Value = e.ToString(),
@@ -387,7 +390,7 @@ public class AppDbContext : DbContext
         {
             entity.Property(ut => ut.WordId).IsRequired();
             entity.Property(ut => ut.CourseId).IsRequired();
-            entity.Property(ut => ut.CourseWordRankId).IsRequired();
+            entity.Property(ut => ut.ImportanceRatingId).IsRequired();
             entity.Property(ut => ut.IsActive).IsRequired();
             entity.Property(ut => ut.CreatedById).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
@@ -402,9 +405,9 @@ public class AppDbContext : DbContext
                 .HasForeignKey(ut => ut.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
             
-            entity.HasOne(ut => ut.CourseWordRank)
+            entity.HasOne(ut => ut.ImportanceRating)
                 .WithMany()
-                .HasForeignKey(ut => ut.CourseWordRankId)
+                .HasForeignKey(ut => ut.ImportanceRatingId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.HasOne(ut => ut.CreatedBy)

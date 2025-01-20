@@ -57,11 +57,17 @@ export interface ExerciseRequestModel {
   wordName?: string;
   rankId?: number;
 }
+
 export interface CourseViewModel {
   id: number;
-  words: WordViewModel[];
+  words: CourseWordsModel[];
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
+}
+
+export interface CourseWordsModel {
+  word: string;
+  importance: number;
 }
 
 export interface WordViewModel {
@@ -70,7 +76,6 @@ export interface WordViewModel {
   translation?: string;
   audio: Uint8Array;
   language?: string;
-  importance: number;
   meanings?: meaningShort[];
 }
 

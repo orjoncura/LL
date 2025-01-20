@@ -6,7 +6,7 @@ namespace LL.Data.Repositories;
 
 public class CourseWordRepository(AppDbContext db) : ICourseWordRepository
 {
-    public int Insert(int wordId, int seminarId, int seminarWordRankId, int userId)
+    public int Insert(int wordId, int seminarId, int importanceRatingId, int userId)
     {
         CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.WordId == wordId && c.CourseId == seminarId && c.IsActive);
 
@@ -16,7 +16,7 @@ public class CourseWordRepository(AppDbContext db) : ICourseWordRepository
             {
                 WordId = wordId,
                 CourseId = seminarId,
-                CourseWordRankId = seminarWordRankId,
+                ImportanceRatingId = importanceRatingId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

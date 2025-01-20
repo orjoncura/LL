@@ -32,50 +32,42 @@ public class CourseService(
         
         string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId);
 
-        List<CourseWordsModel> seminarWords = seminarRequest.Text.Trim().Contains(' ')
-            ? JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt))
-              ?? new List<CourseWordsModel>()
-            : new List<CourseWordsModel>()
-            {
-                new CourseWordsModel()
-                {
-                    Word = seminarRequest.Text,
-                    Importance = 1
-                }
-            };
+        courseViewModel.Words = seminarRequest.Text.Trim().Contains(' ')
+            ? JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt)) ?? []
+            : [new CourseWordsModel(seminarRequest.Text, 1)];
         
-        foreach (var seminarWord in seminarWords)
-        {
-            WordShort wordShort = wordRepository.Insert(seminarWord.Word, seminarRequest.LanguageFromId, userId);
-        
-            WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, seminarWord.Word, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
-            
-            List<MeaningShort> wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
-            
-            if (wordMeaning == null)
-            {
-                string word = LanguageEnum.English.Equals(seminarRequest.LanguageFromId)
-                    ? seminarWord.Word
-                    : wordLink.Target.Name;
-                
-                wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
-                
-                foreach (var meaning in wordMeaning)
-                {
-                    int wordMeaningId = wordMeaningRepository
-                        .Insert(wordShort.Id, EnumHelper.GetEnumValue(typeof(WordTypeEnum), meaning.Type), userId);
-            
-                    meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
-                }
-            }
-            
-            if(wordMeaning.Any())
-                courseViewModel.Words.Add(new WordViewModel(wordShort, wordMeaning, seminarWord.Importance, wordLink.Target.Name));
-        }
-
         return courseViewModel;
     }
-    
+    public async Task<WordViewModel> CreateDefinitions(CourseRequestModel seminarRequest, int userId)
+    {
+        WordShort wordShort = wordRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, userId);
+        
+        WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+            
+        List<MeaningShort> wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
+            
+        if (wordMeaning == null)
+        {
+            string word = LanguageEnum.English.Equals(seminarRequest.LanguageFromId)
+                ? seminarRequest.Text
+                : wordLink.Target.Name;
+                
+            wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
+                
+            foreach (var meaning in wordMeaning)
+            {
+                int wordMeaningId = wordMeaningRepository
+                    .Insert(wordShort.Id, EnumHelper.GetEnumValue(typeof(WordTypeEnum), meaning.Type), userId);
+            
+                meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
+            }
+        }
+            
+        if(wordMeaning.Any())
+            return new WordViewModel(wordShort, wordMeaning, wordLink.Target.Name);
+        
+        return null;
+    }
     public async Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId)
     {
         List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();

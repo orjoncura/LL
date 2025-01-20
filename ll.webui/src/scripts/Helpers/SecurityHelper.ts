@@ -25,6 +25,30 @@ export async function POST(url: string, data: string) {
     });
 }
 
+export async function GET(url: string) {
+    return fetch(Constants().API + url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${GetToken()}`,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Handle non-2xx responses (e.g., 4xx, 5xx)
+            console.log(`HTTP error! status: ${response.status}`);
+        }else {
+            console.log('Data sent successfully:');
+        }
+        return response.json();  // Parse the JSON response
+    })
+    .catch(error => {
+        console.error('Error sending data:', error);
+        throw error;  // Re-throw the error so it can be caught by the caller
+    });
+}
+
+
 export async function CreateAudio(id: number | undefined) {
     return fetch(Constants().API + '/Course/StreamAudio?wordId=' + id, {
         method: 'POST',

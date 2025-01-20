@@ -4,11 +4,12 @@ import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import { POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
+import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import {CourseRequestModel, ExerciseRequestModel, CourseViewModel, ExerciseViewModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
+import { Inder } from 'next/font/google';
 
 export default function CreateSeminar() {
   
@@ -19,6 +20,10 @@ export default function CreateSeminar() {
     const [exercises, setExercises] = useState<ExerciseViewModel[]>([]);
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [wordIndex, setWordIndex] = useState<number>(0);
+    const [showMostImportantWords, setShowMostImportantWords] = useState(false);
+    const [mostImportantWordsIndex, setMostImportantWordsIndex] = useState<number>(0);
+    const [mostImportantWordsFiltered, setImportantWordsFiltered] = useState<string[]>([]);
+    const [mostImportantTranslationsFiltered, setImportantTranslationsFiltered] = useState<string[]>([]);
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);
     const [options, setOptions] = useState<string[]>([]);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -37,6 +42,27 @@ export default function CreateSeminar() {
       backgroundColor: "#fff0f6"
     });
 
+    const languageFromId = 2;
+    const languageToId = 1;
+
+    let hasFetchedData = false;
+    useEffect(() => {
+
+      if(hasFetchedData == false){
+        hasFetchedData = true;
+
+        GET('/Course/GetMostImportantWords?languageId=' + languageFromId)
+        .then((words: WordViewModel[]) => {
+  
+          if(words == null || words == undefined)
+            return;
+  
+          setImportantWordsFiltered(words.map(w => w.name));
+          setImportantTranslationsFiltered(words.map(w => w.translation || ""));
+        });
+      }
+    }, []);
+    
     const openModal = (title: string, body:string, onClick?: Function) => {
       if (modalRef.current) {
 
@@ -58,12 +84,12 @@ export default function CreateSeminar() {
               return;
             }
 
-            setLoading(true);
+            startCourse(text);
 
             const courseRequestModel: CourseRequestModel = {
               "text": text,
-              "languageFromId": 2,
-              "languageToId": 1
+              "languageFromId": languageFromId,
+              "languageToId": languageToId
             };
 
             POST('/Course/Create', JSON.stringify(courseRequestModel))
@@ -75,39 +101,76 @@ export default function CreateSeminar() {
               courseViewModel.words
                 .sort((a, b) => (a.importance > b.importance ? 1 : -1))
                 .forEach(w => {
-                  wordViewModels.push(w)
 
-                  const exerciseRequestModel: ExerciseRequestModel = {
-                    "courseId": courseViewModel.id,
-                    "text": courseRequestModel.text,
-                    "languageFromId": courseRequestModel.languageFromId,
-                    "languageToId": courseRequestModel.languageToId,
-  
-                    "wordId": w.id,
-                    "wordName": w.name,
-                    "rankId": w.importance,
+                  const createDefinitionsModel: CourseRequestModel = {
+                    "text": w.word,
+                    "languageFromId": languageFromId,
+                    "languageToId": languageToId
                   };
+
+                  POST('/Course/CreateDefinitions', JSON.stringify(createDefinitionsModel))
+                  .then((wordViewModel: WordViewModel) => {
   
-                  POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel))
-                  .then((exerciseViewModels: ExerciseViewModel[]) => {
-  
-                    if(exerciseViewModels == null || exerciseViewModels == undefined)
+                    if(wordViewModel == null || wordViewModel == undefined || wordViewModel.id == 0)
                       return;
   
-                    exerciseViewModels.forEach(e => exercises.push(e));
+                    wordViewModels.push(wordViewModel)
 
-                    nextStep(wordIndex);
-                    setLoading(false);
+                    const exerciseRequestModel: ExerciseRequestModel = {
+                      "courseId": courseViewModel.id,
+                      "text": courseRequestModel.text,
+                      "languageFromId": courseRequestModel.languageFromId,
+                      "languageToId": courseRequestModel.languageToId,
+    
+                      "wordId": wordViewModel.id,
+                      "wordName": wordViewModel.name,
+                      "rankId": w.importance,
+                    };
+    
+                    POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel))
+                    .then((exerciseViewModels: ExerciseViewModel[]) => {
+    
+                      if(exerciseViewModels == null || exerciseViewModels.length == 0)
+                        return;
+    
+                      exerciseViewModels.forEach(e => exercises.push(e));
+  
+                      if(exerciseIndex == 0)
+                      {
+                        nextStep(exerciseIndex);
+                      }                     
+  
+                    })});
 
                   })});
-                
-              }).catch(e => {
-                  setLoading(false);
-              });
 
         } catch (error) {
             console.error('Error making API call:', error);
         }
+    };
+
+    const startCourse = (text: string) => {
+
+      const loadingTimeout:Function = async () => {
+
+        setLoading(mostImportantWordsFiltered.length == 0);
+        setShowMostImportantWords(mostImportantWordsFiltered.length > 0);
+      }
+
+      setTimeout(loadingTimeout, 100)
+    }
+
+    const handleWordClick = (translation: string) => {
+      setShowFeedback(true);
+
+      if (mostImportantTranslationsFiltered[mostImportantWordsIndex] == translation) {
+        setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
+        setFeedback("Correct! 🎉");
+        setMostImportantWordsIndex(mostImportantWordsIndex + 1);
+      } else {
+        setFeedbackStyle({color: "#d63384",backgroundColor: "#fff0f6"});
+        setFeedback("Incorrect. Try again! ❌");
+      }
     };
 
     const nextStep = (newIndex: number) => {
@@ -118,7 +181,8 @@ export default function CreateSeminar() {
       setShowCourse(wordViewModel != null 
         && wordViewModel.name != null
         && exercise != null)
-
+      setShowMostImportantWords(false);
+      
       if(wordViewModels[wordIndex] == null){
 
         setWordViewModels([]);
@@ -274,8 +338,8 @@ export default function CreateSeminar() {
                 ))}
               </div>
             </div>
-      
-            {showCourse == false && ( 
+
+            {showCourse == false && showMostImportantWords == false && ( 
               <div>
                 <div style={{textAlign: 'center'}}>
                   <b>Transform your ideas into a unique and impactful learning experience</b>
@@ -294,6 +358,60 @@ export default function CreateSeminar() {
                       />
               </div>
             )}
+
+            {showMostImportantWords && (
+            <div style={{ textAlign: "center" }}>
+              <h3>Match the Spanish word with its translation</h3>
+              <div style={{ display: "flex", justifyContent: "center", gap: "2rem", marginTop: "2rem" }}>
+                <div>
+                  <h4>Spanish Words</h4>
+                  {mostImportantWordsFiltered.map((word, index) => (
+                    <button
+                      key={word}
+                      //onClick={() => handleEnglishClick(word)}
+                      style={{
+                        display: "block",
+                        margin: "0.5rem",
+                        padding: "0.5rem 1rem",
+                        border: "1px solid #ccc",
+                        borderRadius: "20px", // Rounded corners
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        color: "#d63384",
+                        backgroundColor: mostImportantWordsIndex <= index? "#fff0f6" : "grey",
+                      }}
+                        >
+                          {word}
+                        </button>
+                      ))}
+                  </div>
+
+                <div>
+                  <h4>Translations</h4>
+                  {mostImportantTranslationsFiltered.map((translation) => (
+                    <button
+                      key={translation}
+                      onClick={() => handleWordClick(translation)}
+                      style={{
+                        display: "block",
+                        margin: "0.5rem",
+                        padding: "0.5rem 1rem",
+                        border: "1px solid #ccc",
+                        borderRadius: "20px", // Rounded corners
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        color: "#d63384",
+                        backgroundColor: "#fff0f6"
+                      }}
+                    >
+                      {translation}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>)}
 
             {showCourse && (   
               <div>
@@ -323,7 +441,7 @@ export default function CreateSeminar() {
                   <p>No meanings available</p>
                 )}
                 </div>
-                )}
+              )}
    
               <br/>
               <br/>
@@ -331,48 +449,47 @@ export default function CreateSeminar() {
               {showCourse && exercises.length > 0 && exercises[exerciseIndex] != null && (
                 <div>
                   <div className="text-center mb-4">
-                  <div className="p-4 bg-light border rounded shadow-sm">
-                      <blockquote className="quote">
-                        <p className="text-black">
-                        {exercises[exerciseIndex].original}
-                        </p>
-                      </blockquote>
-          
-                      <div>
+                    <div className="p-4 bg-light border rounded shadow-sm">
+                        <blockquote className="quote">
+                          <p className="text-black">
+                          {exercises[exerciseIndex].original}
+                          </p>
+                        </blockquote>
+            
                         <div>
+                          <div>
 
-                          {selectedWords.map((word, index) => (
-                              <Button
-                                  key={index}
-                                  draggable
-                                  onDragStart={() => onDragStart(index)}
-                                  onDragOver={onDragOver}
-                                  onDrop={() => onDrop(index)}
-                                  onClick={() => removeWord(word)}
-                                  className="custom-button" 
-                                >
-                                  {word}
-                            </Button>
-                          ))}
+                            {selectedWords.map((word, index) => (
+                                <Button
+                                    key={index}
+                                    draggable
+                                    onDragStart={() => onDragStart(index)}
+                                    onDragOver={onDragOver}
+                                    onDrop={() => onDrop(index)}
+                                    onClick={() => removeWord(word)}
+                                    className="custom-button" 
+                                  >
+                                    {word}
+                              </Button>
+                            ))}
 
+                          </div>
                         </div>
-                      </div>
+                    </div>
                   </div>
-                </div>
         
-              <div>
-                <div style={{ display: "flex", flexWrap: "wrap" }}>
+                  <div>
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>
 
-                  {options.map((word) => (
-                      <Button onClick={() => addWord(word)} className="custom-button"  >
-                        {word}
-                      </Button>
-                   ))}
+                      {options.map((word) => (
+                          <Button onClick={() => addWord(word)} className="custom-button"  >
+                            {word}
+                          </Button>
+                      ))}
 
-                </div>
-              </div>
-            </div>
-            )}
+                    </div>
+                  </div>
+                </div>)}
           </div>
         </div>
         
@@ -381,7 +498,9 @@ export default function CreateSeminar() {
             <div className="feedback-text">
               <div className="feedback-details">
                 <h3 className="feedback-title">{feedback}</h3>
-                <h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4>
+                {/* <h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4> */}
+
+                
               </div>
             </div>
           )}

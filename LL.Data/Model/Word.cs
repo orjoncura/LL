@@ -7,6 +7,8 @@ public class Word
     public string AudioPath { get; set; } = string.Empty;
     public int LanguageId { get; set; }
     public virtual Language? Language { get; set; }
+    public int ImportanceRatingId { get; set; }
+    public virtual ImportanceRating? ImportanceRating { get; set; }
     
     public bool IsActive { get; set; }
 
