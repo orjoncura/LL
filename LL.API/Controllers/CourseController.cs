@@ -25,7 +25,7 @@ namespace LL.API.Controllers
         /// </summary>
         /// <param name="languageId">LanguageIdFrom (Input language)</param>
         /// <response code="200">The new seminar</response>
-        [HttpGet("GetMostImportantWords")]
+        [HttpGet("GetKeyWords")]
         [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
         public ActionResult GetMostImportantWords([FromQuery] int languageId)
         {

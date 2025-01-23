@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import {CourseRequestModel, ExerciseRequestModel, CourseViewModel, ExerciseViewModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
-import { Inder } from 'next/font/google';
 
 export default function CreateSeminar() {
   
@@ -20,10 +19,11 @@ export default function CreateSeminar() {
     const [exercises, setExercises] = useState<ExerciseViewModel[]>([]);
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [wordIndex, setWordIndex] = useState<number>(0);
-    const [showMostImportantWords, setShowMostImportantWords] = useState(false);
-    const [mostImportantWordsIndex, setMostImportantWordsIndex] = useState<number>(0);
-    const [mostImportantWordsFiltered, setImportantWordsFiltered] = useState<string[]>([]);
-    const [mostImportantTranslationsFiltered, setImportantTranslationsFiltered] = useState<string[]>([]);
+    const [showKeyWords, setShowKeyWords] = useState(false);
+    const [keyWordsIndex, setKeyWordsIndex] = useState<number>(0);
+    const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
+    const [keyWordsFiltered, setKeyWordsFiltered] = useState<string[]>([]);
+    const [keyWordsTranslations, setKeyWordsTranslations] = useState<string[]>([]);
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);
     const [options, setOptions] = useState<string[]>([]);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -51,14 +51,13 @@ export default function CreateSeminar() {
       if(hasFetchedData == false){
         hasFetchedData = true;
 
-        GET('/Course/GetMostImportantWords?languageId=' + languageFromId)
+        GET('/Course/GetKeyWords?languageId=' + languageFromId)
         .then((words: WordViewModel[]) => {
   
           if(words == null || words == undefined)
             return;
   
-          setImportantWordsFiltered(words.map(w => w.name));
-          setImportantTranslationsFiltered(words.map(w => w.translation || ""));
+          setKeyWords(words);
         });
       }
     }, []);
@@ -151,10 +150,15 @@ export default function CreateSeminar() {
 
     const startCourse = (text: string) => {
 
+      let words: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
+
+      setKeyWordsFiltered(words.map(w => w.name));
+      setKeyWordsTranslations(words.map(w => w.translation || ""));
+
       const loadingTimeout:Function = async () => {
 
-        setLoading(mostImportantWordsFiltered.length == 0);
-        setShowMostImportantWords(mostImportantWordsFiltered.length > 0);
+        setLoading(keyWords.length == 0);
+        setShowKeyWords(keyWords.length > 0);
       }
 
       setTimeout(loadingTimeout, 100)
@@ -163,10 +167,10 @@ export default function CreateSeminar() {
     const handleWordClick = (translation: string) => {
       setShowFeedback(true);
 
-      if (mostImportantTranslationsFiltered[mostImportantWordsIndex] == translation) {
+      if (keyWordsTranslations[keyWordsIndex] == translation) {
         setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
         setFeedback("Correct! 🎉");
-        setMostImportantWordsIndex(mostImportantWordsIndex + 1);
+        setKeyWordsIndex(keyWordsIndex + 1);
       } else {
         setFeedbackStyle({color: "#d63384",backgroundColor: "#fff0f6"});
         setFeedback("Incorrect. Try again! ❌");
@@ -181,7 +185,8 @@ export default function CreateSeminar() {
       setShowCourse(wordViewModel != null 
         && wordViewModel.name != null
         && exercise != null)
-      setShowMostImportantWords(false);
+
+      setShowKeyWords(false);
       
       if(wordViewModels[wordIndex] == null){
 
@@ -339,7 +344,7 @@ export default function CreateSeminar() {
               </div>
             </div>
 
-            {showCourse == false && showMostImportantWords == false && ( 
+            {showCourse == false && showKeyWords == false && ( 
               <div>
                 <div style={{textAlign: 'center'}}>
                   <b>Transform your ideas into a unique and impactful learning experience</b>
@@ -359,13 +364,13 @@ export default function CreateSeminar() {
               </div>
             )}
 
-            {showMostImportantWords && (
+            {showKeyWords && (
             <div style={{ textAlign: "center" }}>
               <h3>Match the Spanish word with its translation</h3>
               <div style={{ display: "flex", justifyContent: "center", gap: "2rem", marginTop: "2rem" }}>
                 <div>
                   <h4>Spanish Words</h4>
-                  {mostImportantWordsFiltered.map((word, index) => (
+                  {keyWordsFiltered.map((word, index) => (
                     <button
                       key={word}
                       //onClick={() => handleEnglishClick(word)}
@@ -379,7 +384,7 @@ export default function CreateSeminar() {
                         fontSize: "16px",
                         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                         color: "#d63384",
-                        backgroundColor: mostImportantWordsIndex <= index? "#fff0f6" : "grey",
+                        backgroundColor: keyWordsIndex <= index? "#fff0f6" : "grey",
                       }}
                         >
                           {word}
@@ -389,7 +394,7 @@ export default function CreateSeminar() {
 
                 <div>
                   <h4>Translations</h4>
-                  {mostImportantTranslationsFiltered.map((translation) => (
+                  {keyWordsTranslations.map((translation) => (
                     <button
                       key={translation}
                       onClick={() => handleWordClick(translation)}
