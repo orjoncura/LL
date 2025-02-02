@@ -1,8 +1,6 @@
-using System.Net.Http.Headers;
-using System.Web;
-using LL.Core.Helpers;
+using System.Text;
 using LL.Core.Interfaces.Extensions;
-using LL.Extensions.Models;
+using Newtonsoft.Json;
 
 namespace LL.Extensions.Services;
 
@@ -10,22 +8,42 @@ public class TranslationService: ITranslationService
 {
     public async Task<string> TranslateText(string text, int fromId, int toId)
     {
-        HttpClient client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        // Base URL of the local LibreTranslate server
+        string baseUrl = "http://localhost:5000"; // Adjust if running on a different host/port
+        string endpoint = "/translate";          // API endpoint
 
-        var response = await client.GetAsync($"https://655.mtis.workers.dev/translate?" +
-                                             $"text={HttpUtility.UrlEncode(text)}" +
-                                             $"&source_lang={GetLanguageCode(fromId)}" +
-                                             $"&target_lang={GetLanguageCode(toId)}");
-        response.EnsureSuccessStatusCode();
+        // Translation request payload
+        var payload = new
+        {
+            q = text.ToLower(), // Text to translate
+            source = GetLanguageCode(fromId), // Source language
+            target = GetLanguageCode(toId), // Target language
+            format = "text" // Text format
+        };
         
-        // Deserialize with case-insensitive handling
-        TranslationModel translationModel = 
-            JsonHelper.DeserializeObject<TranslationModel>(await response.Content.ReadAsStringAsync()) 
-            ?? new TranslationModel();
+        // Serialise the payload to JSON
+        string jsonPayload = JsonConvert.SerializeObject(payload);
         
-        return  translationModel.Response.TranslatedText;
+        using (HttpClient client = new HttpClient())
+        {
+            // Set headers (if necessary, depending on your LibreTranslate setup)
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            // Send POST request
+            HttpContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(baseUrl + endpoint, content);
+
+            // Ensure success status
+            response.EnsureSuccessStatusCode();
+
+            // Read response
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            // Parse JSON response
+            dynamic result = JsonConvert.DeserializeObject(responseBody);
+            
+            return  result.translatedText;
+        }
     }
 
     private string GetLanguageCode(int id)

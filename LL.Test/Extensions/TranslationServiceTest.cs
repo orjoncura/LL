@@ -15,7 +15,7 @@ public class TranslationServiceTest
     [Fact]
     public async Task TranslateText_ShouldTranslateText()
     {           
+        Assert.True(_translationService.TranslateText("EN", (int)LanguageEnum.Spanish, (int)LanguageEnum.English).Result.ToUpper() == "IN");
         Assert.True(_translationService.TranslateText("HELLO", (int)LanguageEnum.English, (int)LanguageEnum.Spanish).Result.ToUpper() == "HOLA");
-        Assert.True(_translationService.TranslateText("WORD", (int)LanguageEnum.English, (int)LanguageEnum.Spanish).Result.ToUpper() == "PALABRA");
     } 
 }

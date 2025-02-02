@@ -11,7 +11,6 @@ import {CourseRequestModel, ExerciseRequestModel, CourseViewModel, ExerciseViewM
 import './page.css'; 
 
 export default function CreateSeminar() {
-  
     const modalRef = useRef<any>(null); 
 
     const [courseLength, setCourseLength] = useState<number>(0);  
@@ -20,10 +19,11 @@ export default function CreateSeminar() {
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [wordIndex, setWordIndex] = useState<number>(0);
     const [showKeyWords, setShowKeyWords] = useState(false);
-    const [keyWordsIndex, setKeyWordsIndex] = useState<number>(0);
     const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
-    const [keyWordsFiltered, setKeyWordsFiltered] = useState<string[]>([]);
-    const [keyWordsTranslations, setKeyWordsTranslations] = useState<string[]>([]);
+    const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }>({column1: [], column2: [],});
+    const [activeWord, setActiveWord] = useState<string | null>(null);
+    const [selectedPairs, setSelectedPairs] = useState<{ [key: string]: string }>({});
+    const [message, setMessage] = useState<string | null>(null);
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);
     const [options, setOptions] = useState<string[]>([]);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -73,6 +73,29 @@ export default function CreateSeminar() {
       }
     };
     
+    const handleWordClick = (word: string, column: number) => {
+      if (word === '' || Object.keys(selectedPairs).includes(word) || Object.values(selectedPairs).includes(word)) {
+        return; // Ignore clicks on empty or already selected words
+      }
+  
+      if (column === 1) {
+        setActiveWord(word);
+        setMessage(null);
+      } else if (column === 2 && activeWord) {
+        const index1 = pairs.column1.indexOf(activeWord);
+        const index2 = pairs.column2.indexOf(word);
+        const correct = index1 === index2;
+  
+        if (correct) {
+          setSelectedPairs((prev) => ({ ...prev, [activeWord]: word }));
+          setActiveWord(null);
+          setMessage('Correct match!');
+        } else {
+          setMessage('Incorrect match! Try again.');
+        }
+      }
+    };
+
     const handleSubmit = async () => {
 
         try {
@@ -110,6 +133,8 @@ export default function CreateSeminar() {
                   POST('/Course/CreateDefinitions', JSON.stringify(createDefinitionsModel))
                   .then((wordViewModel: WordViewModel) => {
   
+                    startCourse(text);
+
                     if(wordViewModel == null || wordViewModel == undefined || wordViewModel.id == 0)
                       return;
   
@@ -136,6 +161,7 @@ export default function CreateSeminar() {
   
                       if(exerciseIndex == 0)
                       {
+                        setLoading(false);
                         nextStep(exerciseIndex);
                       }                     
   
@@ -150,32 +176,18 @@ export default function CreateSeminar() {
 
     const startCourse = (text: string) => {
 
-      let words: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
+      if(showCourse == false && showKeyWords == false){
 
-      setKeyWordsFiltered(words.map(w => w.name));
-      setKeyWordsTranslations(words.map(w => w.translation || ""));
+        let words: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
 
-      const loadingTimeout:Function = async () => {
-
-        setLoading(keyWords.length == 0);
+        if(words.length > 0)
+          setPairs({column1: words.map(w => w.name), column2: words.map(w => w.translation || "")});
+        
+        setLoading(keyWords.length == 0 && exercises.length == 0);
         setShowKeyWords(keyWords.length > 0);
+        setShowCourse(exercises.length > 0);
       }
-
-      setTimeout(loadingTimeout, 100)
     }
-
-    const handleWordClick = (translation: string) => {
-      setShowFeedback(true);
-
-      if (keyWordsTranslations[keyWordsIndex] == translation) {
-        setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
-        setFeedback("Correct! 🎉");
-        setKeyWordsIndex(keyWordsIndex + 1);
-      } else {
-        setFeedbackStyle({color: "#d63384",backgroundColor: "#fff0f6"});
-        setFeedback("Incorrect. Try again! ❌");
-      }
-    };
 
     const nextStep = (newIndex: number) => {
 
@@ -184,9 +196,8 @@ export default function CreateSeminar() {
 
       setShowCourse(wordViewModel != null 
         && wordViewModel.name != null
-        && exercise != null)
-
-      setShowKeyWords(false);
+        && exercise != null
+        && showKeyWords == false)
       
       if(wordViewModels[wordIndex] == null){
 
@@ -297,8 +308,14 @@ export default function CreateSeminar() {
     // Check if the user's sentence is correct
     const checkAnswer = () => {
 
-      if(showCourse == false)
+      if(showCourse == false && showKeyWords == false)
         return handleSubmit();
+
+      if(showKeyWords == true){
+       setShowCourse(pairs.column1.length == Object.keys(selectedPairs).length)
+       setShowKeyWords(pairs.column1.length != Object.keys(selectedPairs).length)
+       return;
+      }
 
       if(areArraysEqual(selectedWords, correctOrder)){
 
@@ -365,57 +382,54 @@ export default function CreateSeminar() {
             )}
 
             {showKeyWords && (
-            <div style={{ textAlign: "center" }}>
-              <h3>Match the Spanish word with its translation</h3>
-              <div style={{ display: "flex", justifyContent: "center", gap: "2rem", marginTop: "2rem" }}>
-                <div>
-                  <h4>Spanish Words</h4>
-                  {keyWordsFiltered.map((word, index) => (
-                    <button
-                      key={word}
-                      //onClick={() => handleEnglishClick(word)}
-                      style={{
-                        display: "block",
-                        margin: "0.5rem",
-                        padding: "0.5rem 1rem",
-                        border: "1px solid #ccc",
-                        borderRadius: "20px", // Rounded corners
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                        color: "#d63384",
-                        backgroundColor: keyWordsIndex <= index? "#fff0f6" : "grey",
-                      }}
-                        >
-                          {word}
-                        </button>
-                      ))}
-                  </div>
-
-                <div>
-                  <h4>Translations</h4>
-                  {keyWordsTranslations.map((translation) => (
-                    <button
-                      key={translation}
-                      onClick={() => handleWordClick(translation)}
-                      style={{
-                        display: "block",
-                        margin: "0.5rem",
-                        padding: "0.5rem 1rem",
-                        border: "1px solid #ccc",
-                        borderRadius: "20px", // Rounded corners
-                        cursor: "pointer",
-                        fontSize: "16px",
-                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                        color: "#d63384",
-                        backgroundColor: "#fff0f6"
-                      }}
-                    >
-                      {translation}
-                    </button>
-                  ))}
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', maxWidth: '400px', margin: '0 auto', textAlign: 'center', padding: '16px' }}>
+              <div style={{ gridColumn: 'span 2', marginBottom: '16px' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Match the Words</h1>
+                <p style={{ fontSize: '16px', color: '#555' }}>Select the matching pairs from the two columns below.</p>
               </div>
+              <div>
+                {pairs.column1.map((word) => (
+                  <div
+                    key={word}
+                    style={{
+                      padding: '8px',
+                      marginBottom: '8px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      cursor: Object.keys(selectedPairs).includes(word) ? 'not-allowed' : 'pointer',
+                      backgroundColor: Object.keys(selectedPairs).includes(word) ? '#e0e0e0' : activeWord === word ? '#cce4ff' : '#fff',
+                      color: Object.keys(selectedPairs).includes(word) ? '#888' : '#000',
+                    }}
+                    onClick={() => handleWordClick(word, 1)}
+                  >
+                    {word}
+                  </div>
+                ))}
+              </div>
+              <div>
+                {pairs.column2.map((word) => (
+                  <div
+                    key={word}
+                    style={{
+                      padding: '8px',
+                      marginBottom: '8px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      cursor: Object.values(selectedPairs).includes(word) ? 'not-allowed' : 'pointer',
+                      backgroundColor: Object.values(selectedPairs).includes(word) ? '#e0e0e0' : '#fff',
+                      color: Object.values(selectedPairs).includes(word) ? '#888' : '#000',
+                    }}
+                    onClick={() => handleWordClick(word, 2)}
+                  >
+                    {word}
+                  </div>
+                ))}
+              </div>
+              {message && (
+                <div style={{ gridColumn: 'span 2', marginTop: '16px', padding: '8px', color: '#fff', backgroundColor: '#333', borderRadius: '4px' }}>
+                  {message}
+                </div>
+              )}
             </div>)}
 
             {showCourse && (   
@@ -503,9 +517,7 @@ export default function CreateSeminar() {
             <div className="feedback-text">
               <div className="feedback-details">
                 <h3 className="feedback-title">{feedback}</h3>
-                {/* <h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4> */}
-
-                
+                {exercises[exerciseIndex] != null && (<h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4>)}
               </div>
             </div>
           )}

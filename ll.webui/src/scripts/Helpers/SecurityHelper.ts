@@ -12,7 +12,6 @@ export async function POST(url: string, data: string) {
     })
     .then(response => {
         if (!response.ok) {
-            // Handle non-2xx responses (e.g., 4xx, 5xx)
             console.log(`HTTP error! status: ${response.status}`);
         }else {
             console.log('Data sent successfully:');

@@ -5,6 +5,7 @@ using LL.Core.Interfaces.Extensions;
 using LLama;
 using LL.Extensions.Models;
 using LL.Core.Model.DataTransferObjects;
+using Microsoft.Extensions.AI;
 
 namespace LL.Extensions.Services;
 
@@ -90,6 +91,27 @@ public class AgentService(AgentModel agentModel) : IAgentService
         return output;
     }
 
-    public async Task<string> Run(string input) => await RunGeminiAPI(input);
+    private async Task<string> RunLocalOllama(string input)
+    {
+        IChatClient chatClient =  new OllamaChatClient(new Uri("http://localhost:11434/"), "deepseek-r1:14b");
+        
+        List<ChatMessage> chatHistory = new();
+
+        while (true)
+        {
+            chatHistory.Add(new ChatMessage(ChatRole.User, input));
+
+            var response = "";
+            
+            await foreach (var item in chatClient.CompleteStreamingAsync(chatHistory))
+            {
+                response += item.Text;
+            }
+
+            return response;
+        }
+
+    }
+    public async Task<string> Run(string input) => await RunLocalOllama(input);
 }
 

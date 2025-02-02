@@ -21,10 +21,10 @@ namespace LL.API.Controllers
         IAppMonitoringService appMonitoringService) : Controller
     {
         /// <summary>
-        /// Pass a word amd get its details: meanings, definitions etc
+        /// Pass a languageId to get a list of keywords 
         /// </summary>
         /// <param name="languageId">LanguageIdFrom (Input language)</param>
-        /// <response code="200">The new seminar</response>
+        /// <response code="200">A list of keywords for the selected language</response>
         [HttpGet("GetKeyWords")]
         [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
         public ActionResult GetMostImportantWords([FromQuery] int languageId)
@@ -134,6 +134,11 @@ namespace LL.API.Controllers
             }
         }
         
+        /// <summary>
+        /// Pass a wordId to get an audio for the selected word.
+        /// </summary>
+        /// <param name="wordId">The ID of the selected word</param>
+        /// <response code="200">A FileStreamResult that represents an audio file</response>
         [HttpPost("StreamAudio")]
         [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
         public ActionResult StreamAudio(int wordId)

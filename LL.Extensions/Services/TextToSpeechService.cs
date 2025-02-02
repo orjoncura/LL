@@ -59,53 +59,6 @@ public class TextToSpeechService : ITextToSpeechService
         return [];
     }
      
-    public byte[] CreateAudio1(string text, LanguageEnum lang)
-    {
-        text = text.ToLower().Trim();
-        
-        // Get the resource stream
-        using (var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LL.Extensions.Scripts.TextToSpeech.py"))
-        {
-            if (resourceStream == null)
-                throw new Exception("Resource not found.");
-
-            string tempFilePath = Path.GetTempFileName();
-            using (FileStream tempFile = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
-            {
-                resourceStream.CopyTo(tempFile);
-            }
-            
-            string outputPath = text.Trim().Replace(" ", "_") + ".wav";
-            string pythonPath = "/usr/bin/python3"; // Adjust if needed
-        
-            // Create the process
-            Process process = new Process();
-            process.StartInfo.FileName = pythonPath;
-            process.StartInfo.Arguments = $"{tempFilePath} {text} {GetModelPath(lang)} {outputPath}";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.UseShellExecute = false;
-            
-            // Capture the process output
-            process.Start();
-            string error = process.StandardError.ReadToEnd();
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            if (!string.IsNullOrEmpty(error))
-                return [];
-
-            if (File.Exists(tempFilePath))
-                File.Delete(tempFilePath);
-            
-            // Verify if the audio file was created
-            if (File.Exists(outputPath))
-                return File.ReadAllBytes(outputPath);
-        }
-        
-        return [];
-    }
-    
     private string GetModelPath(LanguageEnum lang)
     {
         string path = "tts_models/en/ljspeech/tacotron2-DDC";
