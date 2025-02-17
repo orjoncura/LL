@@ -48,7 +48,8 @@ namespace LL.Core.Factories
 
             string prompt = string.Format(@"Rank the following word by their importance in the sentence. 
                 By importance i mean, how important they are to understand the given sentence in the given context.
-                all the words need to be in {1}, If the word is in different language, explicit or isn't understandable, just ignore it.
+                all the words need to be in {1}, If the word is in different language, 
+                explicit or isn't understandable, just ignore it, don't include it in the json.
                 Return a ONLY a JSON file and nothing else.
                 For examole if you receive the sentence: 'a set of words that is complete in itself, 
                 typically containing a subject and predicate, conveying a statement,

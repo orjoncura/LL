@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
       </div>
       <ul className={styles.links}>
         <li>
-          <Link href="/Seminar/Create">Home</Link>
+          <Link href="/Course/Create">Home</Link>
         </li>
         <li>
           <Link href="/About">About</Link>

@@ -17,7 +17,8 @@ public class WordData
         (from m in meanings
         select new MeaningShort
         {
-            Type = m.partOfSpeech,
+            //We want to convert 'proper noun' to 'noun'
+            Type = m.partOfSpeech.ToLower().Replace("proper", "").Trim(),
             Definitions = m.definitions.Select(d => d.definition).ToList(),
         }).ToList();
     

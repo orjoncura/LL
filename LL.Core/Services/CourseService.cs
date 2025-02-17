@@ -1,4 +1,5 @@
-﻿using LL.Core.Enums;
+﻿using System.Diagnostics;
+using LL.Core.Enums;
 using LL.Core.Factories;
 using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
@@ -30,8 +31,8 @@ public class CourseService(
         
         courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
-        string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageToId);
-
+        string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageFromId);
+        
         courseViewModel.Words = seminarRequest.Text.Trim().Contains(' ')
             ? JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt)) ?? []
             : [new CourseWordsModel(seminarRequest.Text, 1)];

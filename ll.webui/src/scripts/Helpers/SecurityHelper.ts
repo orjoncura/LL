@@ -1,8 +1,8 @@
 
 import Constants from '../Constants'
 
-export async function POST(url: string, data: string) {
-    return fetch(Constants().API + url, {
+export async function POST(url: string, data: string): Promise<any> {
+    return await fetch(Constants().API + url, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${GetToken()}`,
@@ -11,16 +11,26 @@ export async function POST(url: string, data: string) {
         body: data,
     })
     .then(response => {
+
         if (!response.ok) {
             console.log(`HTTP error! status: ${response.status}`);
+            return null;
         }else {
+
             console.log('Data sent successfully:');
+
+            try {
+                return response.json(); 
+            } catch (e) {
+                return null;
+            }
+
+              
         }
-        return response.json();  // Parse the JSON response
     })
     .catch(error => {
         console.error('Error sending data:', error);
-        throw error;  // Re-throw the error so it can be caught by the caller
+        return null;
     });
 }
 

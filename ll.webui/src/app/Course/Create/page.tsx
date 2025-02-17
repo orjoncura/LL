@@ -45,6 +45,7 @@ export default function CreateSeminar() {
     const languageFromId = 2;
     const languageToId = 1;
 
+    let hasShowKeyWordsUpdated = false;
     let hasFetchedData = false;
     useEffect(() => {
 
@@ -82,9 +83,9 @@ export default function CreateSeminar() {
         setActiveWord(word);
         setMessage(null);
       } else if (column === 2 && activeWord) {
-        const index1 = pairs.column1.indexOf(activeWord);
-        const index2 = pairs.column2.indexOf(word);
-        const correct = index1 === index2;
+
+        const selected: WordViewModel = keyWords.filter(w => w.name == activeWord)[0];
+        const correct: boolean = selected.translation === word;
   
         if (correct) {
           setSelectedPairs((prev) => ({ ...prev, [activeWord]: word }));
@@ -114,77 +115,121 @@ export default function CreateSeminar() {
               "languageToId": languageToId
             };
 
-            POST('/Course/Create', JSON.stringify(courseRequestModel))
-            .then((courseViewModel: CourseViewModel) => {
+            const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+            if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
+              setLoading(false);
+              return;
+            }
 
-              if(courseViewModel == null || courseViewModel == undefined)
-                return;
+            setCourseLength(courseViewModel.words.length * 3);
 
-              courseViewModel.words
-                .sort((a, b) => (a.importance > b.importance ? 1 : -1))
-                .forEach(w => {
+            const sortedWords = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1);
+            for (const word of sortedWords) {
+              let attempt = 0;
+              let maxRetries = 3;
+              let retryDelay = 3;
+              
+              // Retry logic for fetching word definition
+              while (attempt < maxRetries) {
+                  try {
+                      const response = await POST('/Course/CreateDefinitions', 
+                          JSON.stringify({
+                              text: word.word,
+                              languageFromId: languageFromId,
+                              languageToId: languageToId
+                          }));
+          
+                      if (response == null || response.id == null) {
+                          attempt++;
+                          if (attempt < maxRetries) {
+                              await new Promise(resolve => setTimeout(resolve, retryDelay));
+                          }
+                          continue;
+                      }
+          
+                      const wordViewModel = response;
+                      wordViewModels.push(wordViewModel);
+          
+                      // Continue with the rest of your code
+                      if (wordIndex == 0) {
+                          setLoading(false);
+                          startCourse(text);
+                      }       
+          
+                      const exerciseRequestModel: ExerciseRequestModel = {
+                          "courseId": courseViewModel.id,
+                          "text": courseRequestModel.text,
+                          "languageFromId": courseRequestModel.languageFromId,
+                          "languageToId": courseRequestModel.languageToId,
+          
+                          "wordId": wordViewModel.id,
+                          "wordName": wordViewModel.name,
+                          "rankId": word.importance,
+                      };
+          
+                      let exerciseAttempt = 0;
+          
+                      // Retry logic for creating exercises
+                      while (exerciseAttempt < maxRetries) {
+                          try {
+                              const exerciseResponse: ExerciseViewModel[] = await POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel));
+          
+                              if (exerciseResponse && exerciseResponse.length > 0) {
+                                  exerciseResponse.forEach(e => exercises.push(e));
+                              } 
 
-                  const createDefinitionsModel: CourseRequestModel = {
-                    "text": w.word,
-                    "languageFromId": languageFromId,
-                    "languageToId": languageToId
-                  };
+                              break;
+                          } catch (error) {
+                              exerciseAttempt++;
+                              if (exerciseAttempt < maxRetries) {
+                                  await new Promise(resolve => setTimeout(resolve, retryDelay));
+                              }
+                          }
+                      }
+          
+                      break;
+                  } catch (error) {
+                      attempt++;
+                      if (attempt < maxRetries) {
+                          await new Promise(resolve => setTimeout(resolve, retryDelay));
+                      }
+                  }
+              }
+          }
+          
+          } catch (error) {
 
-                  POST('/Course/CreateDefinitions', JSON.stringify(createDefinitionsModel))
-                  .then((wordViewModel: WordViewModel) => {
-  
-                    startCourse(text);
-
-                    if(wordViewModel == null || wordViewModel == undefined || wordViewModel.id == 0)
-                      return;
-  
-                    wordViewModels.push(wordViewModel)
-
-                    const exerciseRequestModel: ExerciseRequestModel = {
-                      "courseId": courseViewModel.id,
-                      "text": courseRequestModel.text,
-                      "languageFromId": courseRequestModel.languageFromId,
-                      "languageToId": courseRequestModel.languageToId,
-    
-                      "wordId": wordViewModel.id,
-                      "wordName": wordViewModel.name,
-                      "rankId": w.importance,
-                    };
-    
-                    POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel))
-                    .then((exerciseViewModels: ExerciseViewModel[]) => {
-    
-                      if(exerciseViewModels == null || exerciseViewModels.length == 0)
-                        return;
-    
-                      exerciseViewModels.forEach(e => exercises.push(e));
-  
-                      if(exerciseIndex == 0)
-                      {
-                        setLoading(false);
-                        nextStep(exerciseIndex);
-                      }                     
-  
-                    })});
-
-                  })});
-
-        } catch (error) {
+            setLoading(false);
             console.error('Error making API call:', error);
         }
     };
 
     const startCourse = (text: string) => {
 
-      if(showCourse == false && showKeyWords == false){
+      if(showCourse == false && showKeyWords == false && hasShowKeyWordsUpdated == false){
 
-        let words: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
+        let kw: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
 
-        if(words.length > 0)
-          setPairs({column1: words.map(w => w.name), column2: words.map(w => w.translation || "")});
+        if(kw.length > 0){
+
+          const uniqueShuffled = shuffle(kw.map(w => w.translation || ""))
+          .filter((val) => {
+              const seen = new Set();
+              if (!seen.has(val)) {
+                  seen.add(val);
+                  return true;
+              }
+              return false;
+          });
+
+          console.log("StartCourse");
+          setPairs({column1: kw.map(w => w.name), column2: uniqueShuffled});
+
+          hasShowKeyWordsUpdated = kw.length > 0;
+        }
         
-        setLoading(keyWords.length == 0 && exercises.length == 0);
-        setShowKeyWords(keyWords.length > 0);
+        setLoading(kw.length == 0 && exercises.length == 0);
+        setShowKeyWords(kw.length > 0);
         setShowCourse(exercises.length > 0);
       }
     }
@@ -225,7 +270,6 @@ export default function CreateSeminar() {
           options = exerciseInCorrectOrder.concat(exercise.extra.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, '')));
       }
       
-      setCourseLength(wordViewModels.length * 3);
       setCorrectOrder(exerciseInCorrectOrder);
       setOptions(shuffle(options));    
       setSelectedWords([]);
@@ -442,13 +486,13 @@ export default function CreateSeminar() {
                 </button>
 
                 {wordViewModels[wordIndex].meanings && wordViewModels[wordIndex].meanings.length > 0 ? (
-                  wordViewModels[wordIndex].meanings.map((meaning, index) => (
-                    <div key={index} style={{ color: 'black', fontFamily: 'fangsong' }}>
+                  wordViewModels[wordIndex].meanings.map((meaning) => (
+                    <div key={wordIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
                       <h3>{meaning.type}</h3>
                       <ul>
                         {meaning.definitions && meaning.definitions.length > 0 ? (
                           meaning.definitions.map((definition, defIndex) => (
-                            <li key={defIndex}>{definition}</li>
+                            <li key={wordIndex}>{definition}</li>
                           ))
                         ) : (
                           <li>No definitions available</li>
