@@ -77,6 +77,7 @@ export interface WordViewModel {
   audio: Uint8Array;
   language?: string;
   meanings?: meaningShort[];
+  importanceRatingId: number
 }
 
 export interface meaningShort {

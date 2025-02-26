@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
 using LL.Core.Enums;
 using LL.Core.Interfaces.Extensions;
 
@@ -20,6 +18,10 @@ public class TextToSpeechService : ITextToSpeechService
         // Text, model name, and output path parameters
         string modelName = GetModelPath(lang); 
         string outputPath = text.Trim().Replace(" ", "_") + ".wav";
+
+        //This models fails with short text.
+        if (text.Length == 1)
+            text += text;
         
         // Construct the TTS command
         var command = new ProcessStartInfo

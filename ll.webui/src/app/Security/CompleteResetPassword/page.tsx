@@ -6,7 +6,7 @@ import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidPassword, IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import {ConfirmationModel} from '@/generated-client/src';
+import {ConfirmationModel} from '@/scripts/models';
 import Link from 'next/link';
 
 export default function CompleteResetPassword() {

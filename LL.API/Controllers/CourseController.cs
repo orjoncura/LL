@@ -24,14 +24,15 @@ namespace LL.API.Controllers
         /// Pass a languageId to get a list of keywords 
         /// </summary>
         /// <param name="languageId">LanguageIdFrom (Input language)</param>
+        /// <param name="importance">The importance level of the words we are looking for/param>
         /// <response code="200">A list of keywords for the selected language</response>
         [HttpGet("GetKeyWords")]
         [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
-        public ActionResult GetMostImportantWords([FromQuery] int languageId)
+        public ActionResult GetKeyWords([FromQuery] int languageId)
         {
             try
             {
-                return Ok(wordRepository.GetMostImportantWords(languageId));
+                return Ok(wordRepository.GetKeyWords(languageId));
             }
             catch (Exception ex)
             {

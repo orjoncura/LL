@@ -1,5 +1,4 @@
 "use client";
-import Button from 'react-bootstrap/Button';
 import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
@@ -7,37 +6,31 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
-import {CourseRequestModel, ExerciseRequestModel, CourseViewModel, ExerciseViewModel, WordViewModel} from '@/scripts/models';
+import {CourseRequestModel, CourseViewModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
 
 export default function CreateSeminar() {
     const modalRef = useRef<any>(null); 
 
     const [courseLength, setCourseLength] = useState<number>(0);  
-    const [exerciseIndex, setExercisesIndex] = useState<number>(0);  
-    const [exercises, setExercises] = useState<ExerciseViewModel[]>([]);
-    const [correctOrder, setCorrectOrder] = useState<string[]>([]);
     const [wordIndex, setWordIndex] = useState<number>(0);
     const [showKeyWords, setShowKeyWords] = useState(false);
     const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
-    const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }>({column1: [], column2: [],});
+    const [pairIndex, setPairIndex] = useState<number>(0);
+    const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }[]>([]);
     const [activeWord, setActiveWord] = useState<string | null>(null);
     const [selectedPairs, setSelectedPairs] = useState<{ [key: string]: string }>({});
     const [message, setMessage] = useState<string | null>(null);
-    const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);
-    const [options, setOptions] = useState<string[]>([]);
-    const [showFeedback, setShowFeedback] = useState(false);
-    const [feedback, setFeedback] = useState("");
+    const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
     const [loading, setLoading] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
     const [text, setText] = useState<string>('');
     const [showCourse, setShowCourse] = useState(false);
-    const [selectedWords, setSelectedWords] = useState<string[]>([]);  
-    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [showMeaning, setShowMeaning] = useState(false);
     const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
 
-    const [feedbackStyle, setFeedbackStyle] = useState<CSSProperties>({
+    const [feedbackStyle] = useState<CSSProperties>({
       color: "#d63384",
       backgroundColor: "#fff0f6"
     });
@@ -45,8 +38,8 @@ export default function CreateSeminar() {
     const languageFromId = 2;
     const languageToId = 1;
 
-    let hasShowKeyWordsUpdated = false;
     let hasFetchedData = false;
+    
     useEffect(() => {
 
       if(hasFetchedData == false){
@@ -75,11 +68,16 @@ export default function CreateSeminar() {
     };
     
     const handleWordClick = (word: string, column: number) => {
-      if (word === '' || Object.keys(selectedPairs).includes(word) || Object.values(selectedPairs).includes(word)) {
+
+      if (word === '' || 
+        (Object.keys(selectedPairs).includes(word) && column == 1) 
+        || (Object.values(selectedPairs).includes(word) && column == 2)) 
         return; // Ignore clicks on empty or already selected words
-      }
-  
+      
       if (column === 1) {
+
+        let keyWordId: number = keyWords.filter(k => k.name == word)[0].id
+        CreateAudio(keyWordId)
         setActiveWord(word);
         setMessage(null);
       } else if (column === 2 && activeWord) {
@@ -91,6 +89,18 @@ export default function CreateSeminar() {
           setSelectedPairs((prev) => ({ ...prev, [activeWord]: word }));
           setActiveWord(null);
           setMessage('Correct match!');
+
+          if(pairs[pairIndex].column1.length == Object.keys(selectedPairs).length + 1){
+
+            if(pairs[pairIndex + 1] == null){
+              setShowKeyWords(false);
+              setShowCourse(true);
+            }else{
+
+              setSelectedPairs({});
+              setPairIndex(pairIndex + 1);
+            }
+          }
         } else {
           setMessage('Incorrect match! Try again.');
         }
@@ -107,7 +117,7 @@ export default function CreateSeminar() {
               return;
             }
 
-            startCourse(text);
+            startCourse(text.replaceAll(/[\r\n]+/g, " "));
 
             const courseRequestModel: CourseRequestModel = {
               "text": text,
@@ -121,7 +131,7 @@ export default function CreateSeminar() {
               return;
             }
 
-            setCourseLength(courseViewModel.words.length * 3);
+            setCourseLength(courseViewModel.words.length);
 
             const sortedWords = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1);
             for (const word of sortedWords) {
@@ -146,46 +156,13 @@ export default function CreateSeminar() {
                           }
                           continue;
                       }
+
+                      wordViewModels.push(response);
           
-                      const wordViewModel = response;
-                      wordViewModels.push(wordViewModel);
-          
-                      // Continue with the rest of your code
                       if (wordIndex == 0) {
                           setLoading(false);
-                          startCourse(text);
+                          startCourse(text.replaceAll(/[\r\n]+/g, " "));
                       }       
-          
-                      const exerciseRequestModel: ExerciseRequestModel = {
-                          "courseId": courseViewModel.id,
-                          "text": courseRequestModel.text,
-                          "languageFromId": courseRequestModel.languageFromId,
-                          "languageToId": courseRequestModel.languageToId,
-          
-                          "wordId": wordViewModel.id,
-                          "wordName": wordViewModel.name,
-                          "rankId": word.importance,
-                      };
-          
-                      let exerciseAttempt = 0;
-          
-                      // Retry logic for creating exercises
-                      while (exerciseAttempt < maxRetries) {
-                          try {
-                              const exerciseResponse: ExerciseViewModel[] = await POST('/Course/CreateExercises', JSON.stringify(exerciseRequestModel));
-          
-                              if (exerciseResponse && exerciseResponse.length > 0) {
-                                  exerciseResponse.forEach(e => exercises.push(e));
-                              } 
-
-                              break;
-                          } catch (error) {
-                              exerciseAttempt++;
-                              if (exerciseAttempt < maxRetries) {
-                                  await new Promise(resolve => setTimeout(resolve, retryDelay));
-                              }
-                          }
-                      }
           
                       break;
                   } catch (error) {
@@ -206,77 +183,80 @@ export default function CreateSeminar() {
 
     const startCourse = (text: string) => {
 
-      if(showCourse == false && showKeyWords == false && hasShowKeyWordsUpdated == false){
+      if(showCourse == false && showKeyWords == false){
 
-        let kw: WordViewModel[] = keyWords.filter(w => text.split(" ").includes(w.name));
+        let wordList = text.split(" ");
+        let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
 
         if(kw.length > 0){
 
-          const uniqueShuffled = shuffle(kw.map(w => w.translation || ""))
-          .filter((val) => {
-              const seen = new Set();
-              if (!seen.has(val)) {
-                  seen.add(val);
-                  return true;
+          const frequency = new Map<string, number>();
+          for (const word of kw.map(kw => kw.translation || ""))
+            frequency.set(word, (frequency.get(word) || 0) + 1);
+
+          const maxCount: number = (frequency.size > 0 ? Math.max(...Array.from(frequency.values())) : 1);
+          const batchSize: number = Math.round(kw.length / maxCount);
+          const keyWordsPairs: { column1: string[]; column2: string[] }[] = []
+
+          let allAddedItems = new Set<string>();
+
+          for (let i = 0; i < maxCount; i++) {
+              const list: WordViewModel[] = [];
+              
+              for (let j = 0; j < batchSize; j++) {
+                  // Find the firstNewItem that meets the conditions
+                  const firstNewItem = kw.find(k => 
+                      !keyWordsPairs.some(lp => lp.column1.includes(k.name)) && 
+                      !allAddedItems.has(k.translation || "")
+                  );
+          
+                  if (firstNewItem) {
+                      list.push(firstNewItem);
+                      allAddedItems.add(firstNewItem.translation || ""); // Track added translations
+                  } else {
+                      break; // If no new item is found, stop the inner loop to avoid empty additions
+                  }
               }
-              return false;
-          });
+          
+              if (list.length > 0) { // Only add to keyWordsPairs if list has items
+                  keyWordsPairs.push({
+                      column1: list.map(w => w.name),
+                      column2: shuffle(list.map(w => w.translation || ""))
+                  });
+              } else {
+                  // Handle the case where no new items were found in this outer loop iteration
+                  break;
+              }
+          }
 
-          console.log("StartCourse");
-          setPairs({column1: kw.map(w => w.name), column2: uniqueShuffled});
-
-          hasShowKeyWordsUpdated = kw.length > 0;
+          setPairs(keyWordsPairs);
         }
         
-        setLoading(kw.length == 0 && exercises.length == 0);
+        setLoading(kw.length == 0);
         setShowKeyWords(kw.length > 0);
-        setShowCourse(exercises.length > 0);
+        setWordViewModels(keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2));
       }
     }
 
     const nextStep = (newIndex: number) => {
 
-      let wordViewModel: WordViewModel = wordViewModels[wordIndex];
-      let exercise: ExerciseViewModel = exercises[newIndex];
+      let wordViewModel: WordViewModel = wordViewModels[newIndex];
 
       setShowCourse(wordViewModel != null 
-        && wordViewModel.name != null
-        && exercise != null
-        && showKeyWords == false)
+        && wordViewModel.name != null);
       
-      if(wordViewModels[wordIndex] == null){
+      if(wordViewModels[newIndex] == null){
 
         setWordViewModels([]);
+        setPairIndex(0);
+        setPairs([]);
         setCourseLength(0);
       }
 
-      setWordIndex(newIndex < wordViewModels.length ? newIndex : 0);
-      setExercisesIndex(newIndex < exercises.length ? newIndex : 0);
-
-      let exerciseInCorrectOrder: string[] = [];
-      let options: string[] = [];
-
-      if(exercise == null){
-
-        setExercises([]);
-        setCourseLength(0);
-        
-      }else{
-
-        if(exercise.translated != null)
-          exerciseInCorrectOrder = exercise.translated.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
-
-        if(exercise.extra != null)
-          options = exerciseInCorrectOrder.concat(exercise.extra.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, '')));
-      }
-      
-      setCorrectOrder(exerciseInCorrectOrder);
-      setOptions(shuffle(options));    
-      setSelectedWords([]);
       setShowFeedback(false);
-      setExercises(exercises);
+      setWordIndex(newIndex);
     }
-
+    
     function shuffle<T>(array: string[]): string[] {
   
       const shuffled = [...array];
@@ -288,95 +268,40 @@ export default function CreateSeminar() {
 
       return shuffled;
     }
-    
-    function areArraysEqual(arr1: string[], arr2: string[]): boolean {
       
-      if (arr1.length !== arr2.length) return false;
-  
-      for (let i = 0; i < arr1.length; i++) {
-          if (arr1[i] !== arr2[i]) {
-              return false;
-          }
-      }
-  
-      return true;
-    }
+    const flipCard = () => {
 
-    const onDragStart = (index: number) => {
-      setDraggedIndex(index);
-    };
-  
-    const onDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
-      event.preventDefault(); // Necessary to allow dropping
-    };
-  
-    const onDrop = (index: number) => {
-      if (draggedIndex === null) return;
-  
-      const newItems = [...selectedWords];
-      const [draggedItem] = newItems.splice(draggedIndex, 1); // Remove dragged item
-      newItems.splice(index, 0, draggedItem); // Insert at drop position
-  
-      setSelectedWords(newItems);
-      setDraggedIndex(null); // Reset dragged index
-      }
-
-    const removeWord = (word: string) => {
-
-      setOptions([...options, word]);
-
-      const updatedSelectedWords = [...selectedWords];
-      const index = selectedWords.indexOf(word);
-      if (index > -1) {
-        updatedSelectedWords.splice(index, 1);
-      }
+      const cardElement = document.querySelector('.flip-card-inner');
     
-      setSelectedWords(updatedSelectedWords);
-    };
+      if (cardElement != null && !cardElement.classList.contains('flipped')) {
+        cardElement.classList.toggle('flipped');
+        setShowMeaning(true);
 
-    // Handle when the user clicks on a word
-    const addWord = (word: string) => {
+      }else if(cardElement != null){
 
-      setSelectedWords([...selectedWords, word]);
-
-      const updatedOptions = [...options];
-
-      const index = updatedOptions.indexOf(word);
-      if (index > -1) {
-        updatedOptions.splice(index, 1);
+        cardElement.classList.remove('flipped');
+        setShowMeaning(false);
       }
+
+    };
     
-      setOptions(updatedOptions);
-    };
+    function highlightWord(word: string): string {
+      const wordSet = new Set(word);
+      const trimmedText = text.trim();
+      if (trimmedText === '') return '';
+      const tokens = trimmedText.split(/\s+/);
+      const highlightedTokens = tokens.map(token => 
+          wordSet.has(token) ? `**${token}**` : 
+  token
+      );
+
+      return highlightedTokens.join(' ');
+  }
   
-    // Check if the user's sentence is correct
-    const checkAnswer = () => {
-
-      if(showCourse == false && showKeyWords == false)
-        return handleSubmit();
-
-      if(showKeyWords == true){
-       setShowCourse(pairs.column1.length == Object.keys(selectedPairs).length)
-       setShowKeyWords(pairs.column1.length != Object.keys(selectedPairs).length)
-       return;
-      }
-
-      if(areArraysEqual(selectedWords, correctOrder)){
-
-        setFeedbackStyle({color: "#0F766E",backgroundColor: "#F0FDFA"});
-        setFeedback("That's Correct");
-
-      }else{
-        
-        setFeedbackStyle({color: "#d63384",backgroundColor: "#fff0f6"});
-        setFeedback("That's incorrect");
-      }
-
-      setShowFeedback(true);
-    };
 
     return (
       <div style={{ background: 'inherit' }} >
+
         <Navbar /> 
 
         <div className="container-flex"                
@@ -394,7 +319,7 @@ export default function CreateSeminar() {
                   <div
                     key={index}
                     className={`flex-fill me-1 progress-bar ${
-                      index < exerciseIndex ? "bg-success" : "bg-secondary"
+                      index < wordIndex ? "bg-success" : "bg-secondary"
                     }`}
                     style={{
                       height: "20px",
@@ -406,7 +331,7 @@ export default function CreateSeminar() {
             </div>
 
             {showCourse == false && showKeyWords == false && ( 
-              <div>
+            <div>
                 <div style={{textAlign: 'center'}}>
                   <b>Transform your ideas into a unique and impactful learning experience</b>
                   <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
@@ -422,7 +347,12 @@ export default function CreateSeminar() {
                         cols={50}
                         style={{ marginBottom: '10px', width: '100%' }}
                       />
-              </div>
+                <div className="feedback-container fixed-bottom" style={feedbackStyle}>
+                    <button className="feedback-button" onClick={handleSubmit}>
+                      <span className="chevron">›</span> Confirm 
+                    </button>
+                </div>
+            </div>
             )}
 
             {showKeyWords && (
@@ -432,7 +362,7 @@ export default function CreateSeminar() {
                 <p style={{ fontSize: '16px', color: '#555' }}>Select the matching pairs from the two columns below.</p>
               </div>
               <div>
-                {pairs.column1.map((word) => (
+                {pairs[pairIndex].column1.map((word) => (
                   <div
                     key={word}
                     style={{
@@ -451,7 +381,7 @@ export default function CreateSeminar() {
                 ))}
               </div>
               <div>
-                {pairs.column2.map((word) => (
+                {pairs[pairIndex].column2.map((word) => (
                   <div
                     key={word}
                     style={{
@@ -478,15 +408,29 @@ export default function CreateSeminar() {
 
             {showCourse && (   
               <div>
-                <h2 style={{ display: 'inline-block', marginRight: '10px' }}>
-                  {wordViewModels[wordIndex].name} - {wordViewModels[wordIndex].translation}
-                </h2>
-                <button onClick={() => CreateAudio(wordViewModels[wordIndex].id)} className='audio'>
-                  <FontAwesomeIcon icon={faVolumeUp} />
-                </button>
+                  <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
+                    <div className="flip-card" onClick={flipCard}>
+                      <div className="flip-card-inner">
+                          <div className="flip-card-front">
+                              <p className="title">{wordViewModels[wordIndex].name}</p>
+                          </div>
+                          <div className="flip-card-back">
+                              <p className="title">{wordViewModels[wordIndex].translation}</p>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
 
-                {wordViewModels[wordIndex].meanings && wordViewModels[wordIndex].meanings.length > 0 ? (
-                  wordViewModels[wordIndex].meanings.map((meaning) => (
+                  <br></br>
+                  <button onClick={() => CreateAudio(wordViewModels[wordIndex].id)} className='audio'>
+                      <FontAwesomeIcon icon={faVolumeUp} />
+                  </button> 
+                  <span>&nbsp;&nbsp;</span>
+                  {showMeaning == false && highlightWord(wordViewModels[wordIndex].name)}
+
+                  {showMeaning &&
+                   (wordViewModels[wordIndex].meanings && wordViewModels[wordIndex].meanings.length > 0 ? (
+                   wordViewModels[wordIndex].meanings.map((meaning) => (
                     <div key={wordIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
                       <h3>{meaning.type}</h3>
                       <ul>
@@ -500,85 +444,16 @@ export default function CreateSeminar() {
                       </ul>
                     </div>
                   ))
-                ) : (
-                  <p>No meanings available</p>
-                )}
-                </div>
-              )}
-   
-              <br/>
-              <br/>
-
-              {showCourse && exercises.length > 0 && exercises[exerciseIndex] != null && (
-                <div>
-                  <div className="text-center mb-4">
-                    <div className="p-4 bg-light border rounded shadow-sm">
-                        <blockquote className="quote">
-                          <p className="text-black">
-                          {exercises[exerciseIndex].original}
-                          </p>
-                        </blockquote>
-            
-                        <div>
-                          <div>
-
-                            {selectedWords.map((word, index) => (
-                                <Button
-                                    key={index}
-                                    draggable
-                                    onDragStart={() => onDragStart(index)}
-                                    onDragOver={onDragOver}
-                                    onDrop={() => onDrop(index)}
-                                    onClick={() => removeWord(word)}
-                                    className="custom-button" 
-                                  >
-                                    {word}
-                              </Button>
-                            ))}
-
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-        
-                  <div>
-                    <div style={{ display: "flex", flexWrap: "wrap" }}>
-
-                      {options.map((word) => (
-                          <Button onClick={() => addWord(word)} className="custom-button"  >
-                            {word}
-                          </Button>
-                      ))}
-
-                    </div>
-                  </div>
-                </div>)}
-          </div>
-        </div>
-        
-        <div className="feedback-container fixed-bottom" style={feedbackStyle}>
-          {showFeedback &&  (
-            <div className="feedback-text">
-              <div className="feedback-details">
-                <h3 className="feedback-title">{feedback}</h3>
-                {exercises[exerciseIndex] != null && (<h4 className="feedback-detail">Answer: {exercises[exerciseIndex].translated}</h4>)}
+                ) : (<p>No meanings available</p> ))}
+                
+              <div className="feedback-container fixed-bottom" style={feedbackStyle}>
+                <button className="feedback-button" onClick={() => nextStep(wordIndex + 1)}>
+                  <span className="chevron">›</span>
+                    Next
+                </button>
               </div>
-            </div>
-          )}
-
-          {showFeedback == false && (
-            <button className="feedback-button" onClick={checkAnswer}>
-              <span className="chevron">›</span>
-              Confirm
-            </button>
-          )}
-
-          {showFeedback && (
-            <button className="feedback-button" onClick={() => nextStep(exerciseIndex + 1)}>
-              <span className="chevron">›</span>
-                Next
-            </button>
-          )}
+             </div> )}
+          </div>
         </div>
 
         {loading && <SpinnerOverlay />}

@@ -9,6 +9,7 @@ using LL.Core.Models.ViewModels;
 using LL.Data.Factories;
 using LL.Data.Model;
 using Microsoft.EntityFrameworkCore;
+using LL.Core.Models.Arguments;
 
 namespace LL.Data.Repositories;
 public class WordRepository(AppDbContext db,
@@ -16,11 +17,12 @@ public class WordRepository(AppDbContext db,
     IStorageService storageService, 
     ITextToSpeechService textToSpeechService) : IWordRepository
 {
-    public List<WordViewModel> GetMostImportantWords(int languageId)
+    public List<WordViewModel> GetKeyWords(int languageId)
     {
         var words = db.WordLinks
             .Where(w => w.Source.LanguageId == languageId
-                        && w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.High
+                        && (w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
+                            || w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.High)
                         && w.IsActive)
             .Include(wordLink => wordLink.Source)
             .Include(wordLink => wordLink.Target).ToList()

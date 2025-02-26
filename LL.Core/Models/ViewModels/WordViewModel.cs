@@ -9,12 +9,14 @@ public class WordViewModel
     public string Name { get; set; } = string.Empty;
     public string Translation { get; set; } = string.Empty;
     public List<MeaningShort> Meanings { get; set; } 
+    public int ImportanceRatingId { get; set; }
 
     public WordViewModel(WordShort wordShort, string translation)
     {
         Id = wordShort.Id;
         Name = wordShort.Name;
         Translation = translation;
+        ImportanceRatingId = wordShort.ImportanceRatingId;
     }
     public WordViewModel(WordShort wordShort, List<MeaningShort> meanings, string translation)
     {

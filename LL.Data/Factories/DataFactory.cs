@@ -13,7 +13,8 @@ public static class DataFactory
         {
             Id = word.Id,
             Name = word.Name,
-            Language = EnumHelper.GetEnumValueById<LanguageEnum>(word.LanguageId)
+            Language = EnumHelper.GetEnumValueById<LanguageEnum>(word.LanguageId),
+            ImportanceRatingId = word.ImportanceRatingId
         };
     
     public static ExerciseViewModel Convert(Exercise exercise) =>

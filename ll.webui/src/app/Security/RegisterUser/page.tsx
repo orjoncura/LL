@@ -6,7 +6,7 @@ import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '../../../components/Modal/ModalView';
 import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
-import {NewUserModel} from '@/generated-client/src';
+import {NewUserModel} from '@/scripts/models';
 import Link from 'next/link';
 
 export default function RegisterUser() {
