@@ -67,6 +67,25 @@ export default function CreateSeminar() {
       }
     };
     
+    const resetAllToDefault = () => {
+      setCourseLength(0);
+      setWordIndex(0);
+      setShowKeyWords(false);
+      setKeyWords([]);
+      setPairIndex(0);
+      setPairs([]);
+      setActiveWord(null);
+      setSelectedPairs({});
+      setMessage(null);
+      setWordViewModels([]);
+      setLoading(false);
+      setModalTitle('');
+      setModalBody('');
+      setText('');
+      setShowCourse(false);
+      setShowMeaning(false);
+    };
+    
     const handleWordClick = (word: string, column: number) => {
 
       if (word === '' || 
@@ -111,30 +130,37 @@ export default function CreateSeminar() {
 
         try {
 
+
             if(text.length == 0)
             {
               openModal("Error", "Text can not be empty.");
               return;
             }
 
-            startCourse(text.replaceAll(/[\r\n]+/g, " "));
+            var textCleaned = text.replaceAll(/[\r\n]+/g, " ");
+            startCourse(textCleaned);
 
-            const courseRequestModel: CourseRequestModel = {
-              "text": text,
-              "languageFromId": languageFromId,
-              "languageToId": languageToId
-            };
+            var words = textCleaned.split(' ');
 
-            const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
-            if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
-              setLoading(false);
-              return;
+            if(words.length > 100){
+              const courseRequestModel: CourseRequestModel = {
+                "text": textCleaned,
+                "languageFromId": languageFromId,
+                "languageToId": languageToId
+              };
+  
+              const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+              if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
+                setLoading(false);
+                return;
+              }
+  
+              words = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1).map(a => a.word);
             }
 
-            setCourseLength(courseViewModel.words.length);
+            setCourseLength(words.length);
 
-            const sortedWords = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1);
-            for (const word of sortedWords) {
+            for (const word of words) {
               let attempt = 0;
               let maxRetries = 3;
               let retryDelay = 3;
@@ -144,7 +170,7 @@ export default function CreateSeminar() {
                   try {
                       const response = await POST('/Course/CreateDefinitions', 
                           JSON.stringify({
-                              text: word.word,
+                              text: word,
                               languageFromId: languageFromId,
                               languageToId: languageToId
                           }));
@@ -245,15 +271,9 @@ export default function CreateSeminar() {
       setShowCourse(wordViewModel != null 
         && wordViewModel.name != null);
       
-      if(wordViewModels[newIndex] == null){
-
-        setWordViewModels([]);
-        setPairIndex(0);
-        setPairs([]);
-        setCourseLength(0);
-      }
-
-      setShowFeedback(false);
+      if(wordViewModels[newIndex] == null)
+        resetAllToDefault();
+      
       setWordIndex(newIndex);
     }
     
@@ -298,7 +318,6 @@ export default function CreateSeminar() {
       return highlightedTokens.join(' ');
   }
   
-
     return (
       <div style={{ background: 'inherit' }} >
 

@@ -9,7 +9,6 @@ using LL.Core.Models.ViewModels;
 using LL.Data.Factories;
 using LL.Data.Model;
 using Microsoft.EntityFrameworkCore;
-using LL.Core.Models.Arguments;
 
 namespace LL.Data.Repositories;
 public class WordRepository(AppDbContext db,
@@ -27,6 +26,15 @@ public class WordRepository(AppDbContext db,
             .Include(wordLink => wordLink.Source)
             .Include(wordLink => wordLink.Target).ToList()
             .Select(w => new WordViewModel(DataFactory.Convert(w.Source), w.Target.Name)).ToList();
+        
+        var wordIds = words.Select(w => w.Id).ToList();
+        
+        var meanings = db.WordMeanings
+            .Include(w => w.Type)
+            .Include(w => w.WordDefinitions)
+            .Where(w => wordIds.Contains(w.WordId) & w.IsActive).ToList();
+        
+        words.ForEach(w => w.Meanings = meanings.Where(m => m.WordId == w.Id).Select(DataFactory.Convert).ToList());
         
         return words;
     }
@@ -72,7 +80,15 @@ public class WordRepository(AppDbContext db,
         
         return  DataFactory.Convert(word);
     }
-
+    public void Insert(string name)
+    {
+        List<Word> words = db.Words.Where(w => w.AudioPath == string.Empty).ToList();
+        
+        words.ForEach(w => w.AudioPath = storageService.SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)w.LanguageId)).Result);
+        
+        db.Add(words);
+        db.SaveChanges();
+    }
     private Word? GetSingleByName(string name, int fromId) => 
         db.Words.FirstOrDefault(w => 
             w.Name.ToLower() == name.Trim().ToLower()

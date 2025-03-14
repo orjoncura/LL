@@ -7,18 +7,19 @@
 /.vscode
 /LL.API/bin
 /LL.API/obj
+/LL.CA/bin
+/LL.CA/obj
 /LL.Core/bin
 /LL.Core/obj
 /LL.Data/bin
 /LL.Data/obj
 /LL.Extensions/bin
 /LL.Extensions/obj
-/LL.SharedDefinitions/obj
 /LL.SharedDefinitions/bin
-/LL.Test/obj
+/LL.SharedDefinitions/obj
 /LL.Test/bin
+/LL.Test/obj
 /ll.webui/.vs
 /ll.webui/obj
-
 
 

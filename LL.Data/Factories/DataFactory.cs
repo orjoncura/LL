@@ -25,4 +25,10 @@ public static class DataFactory
             Translated = exercise.Translated,
             Extra = exercise.Extra
         };
+    public static MeaningShort Convert(WordMeaning wordMeaning) =>
+        new()
+        {
+            Type = wordMeaning.Type.Value,
+            Definitions = wordMeaning.WordDefinitions.Select(w => w.Value).ToList()
+        };
 }
