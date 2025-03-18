@@ -312,7 +312,7 @@ export default function CreateSeminar() {
   }
   
     return (
-      <div style={{ background: 'inherit' }} >
+      <div>
 
         <Navbar /> 
 
@@ -344,23 +344,24 @@ export default function CreateSeminar() {
 
             {showCourse == false && showKeyWords == false && ( 
             <div>
-                <div style={{textAlign: 'center'}}>
-                  <b>Transform your ideas into a unique and impactful learning experience</b>
+                <div  style={{textAlign: 'center'}}>
+                  <b className='mainTxt'>Transform your ideas into a unique and impactful learning experience</b>
                   <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
                         with your specific goals and needs.</label>
-                </div>
+                </div> 
 
                 <br/><br/><br/>
                 <textarea
                         value={text}
                         onChange={e => setText(e.target.value)}
-                        placeholder="Please enter the text you would like to translate..."
+                        placeholder="Please enter your text here..."
+                        className='mainTxt'
                         rows={10}
                         cols={50}
                         style={{ marginBottom: '10px', width: '100%' }}
                       />
                 <div className="feedback-container fixed-bottom" style={feedbackStyle}>
-                    <button className="feedback-button" onClick={handleSubmit}>
+                    <button className="mainBtn feedback-button" onClick={handleSubmit}>
                       <span className="chevron">›</span> Confirm 
                     </button>
                 </div>
@@ -368,7 +369,7 @@ export default function CreateSeminar() {
             )}
 
             {showKeyWords && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', maxWidth: '400px', margin: '0 auto', textAlign: 'center', padding: '16px' }}>
+            <div className='mainTxt' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', maxWidth: '400px', margin: '0 auto', textAlign: 'center', padding: '16px' }}>
               <div style={{ gridColumn: 'span 2', marginBottom: '16px' }}>
                 <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Match the Words</h1>
                 <p style={{ fontSize: '16px', color: '#555' }}>Select the matching pairs from the two columns below.</p>
@@ -421,7 +422,7 @@ export default function CreateSeminar() {
             {showCourse && (   
               <div>
                   <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
-                    <div className="flip-card" onClick={flipCard}>
+                    <div className="mainTxt flip-card" onClick={flipCard}>
                       <div className="flip-card-inner">
                           <div className="flip-card-front">
                               <p className="title">{wordViewModels[wordIndex].name}</p>
@@ -459,7 +460,7 @@ export default function CreateSeminar() {
                 ) : (<p>No meanings available</p> ))}
                 
               <div className="feedback-container fixed-bottom" style={feedbackStyle}>
-                <button className="feedback-button" onClick={() => nextStep(wordIndex + 1)}>
+                <button className="mainBtn feedback-button" onClick={() => nextStep(wordIndex + 1)}>
                   <span className="chevron">›</span>
                     Next
                 </button>

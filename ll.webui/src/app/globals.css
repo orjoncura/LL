@@ -1,3 +1,25 @@
+@font-face {
+  font-family: 'helsinki';
+  src: url('/public/helsinki.ttf');
+}
+
+body {
+  font-family: helsinki;
+}
+
+.mainBtn{
+  font-family: helsinki;
+  font-weight: bold;
+  background-color: #d63384;
+  color: #fff0f6;
+  border-color:#f06595
+}
+
+.mainTxt{
+  font-family: helsinki !important;
+  font-weight: bold !important;
+}
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;

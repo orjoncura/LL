@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar/Navbar';
 
-export default function About() {
+export default function Profile() {
   return (      
     <div>      
       <Navbar /> 

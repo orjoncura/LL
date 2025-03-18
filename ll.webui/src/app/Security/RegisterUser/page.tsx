@@ -86,11 +86,12 @@ export default function RegisterUser() {
         <Container>
             <Row className="justify-content-md-center mt-5">
                 <Col xs={12} md={6}>
-                    <h2 className="text-center mb-4">Create New User </h2>
+                    <h2 className="mainTxt text-center mb-4">Create New User </h2>
 
                     <Form.Control
                         type="email"
                         placeholder="Email address"
+                        className='mainTxt'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -99,16 +100,17 @@ export default function RegisterUser() {
                     <Form.Control
                         type="email"
                         placeholder="Confirm Email"
+                        className='mainTxt'
                         value={confirmEmail}
                         onChange={(e) => setConfirmEmail(e.target.value)}
                     />
 
                     <br/>
-                    <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Confirm </Button>
+                    <Button variant="primary" type="submit" className="mainTxt w-100" onClick={handleSubmit}> Confirm </Button>
 
                     <hr/>
                     <div className="center">
-                        <Link href="/" className='hyperLink'>Sign in</Link>
+                        <Link href="/" className='mainTxt hyperLink'>Sign in</Link>
                     </div>
                 </Col>
             </Row>

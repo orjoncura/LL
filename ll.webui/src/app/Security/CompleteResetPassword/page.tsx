@@ -100,11 +100,12 @@ export default function CompleteResetPassword() {
         <Container>
           <Row className="justify-content-md-center mt-5">
               <Col xs={12} md={6}>
-                  <h2 className="text-center mb-4">Reset Password</h2>
+                  <h2 className="mainTxt text-center mb-4">Reset Password</h2>
     
                   <Form.Control
                       type="password"
                       placeholder="Password"
+                      className='mainTxt'
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                   />
@@ -113,16 +114,17 @@ export default function CompleteResetPassword() {
                   <Form.Control
                       type="password"
                       placeholder="Confirm Password"
+                      className='mainTxt'
                       value={confirmPassword}
                       onChange={(e) => setConfirPassword(e.target.value)}
                   />
     
                   <br/>
-                  <Button variant="primary" type="submit" className="w-100" onClick={handleSubmit}> Confirm </Button>
+                  <Button variant="primary" type="submit" className="mainTxt w-100" onClick={handleSubmit}> Confirm </Button>
 
                   <hr/>
                   <div className="center">
-                      <Link href="/" className='hyperLink'>Sign in</Link>
+                      <Link href="/" className='mainTxt hyperLink'>Sign in</Link>
                   </div>
               </Col>
           </Row>

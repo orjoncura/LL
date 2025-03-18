@@ -90,11 +90,12 @@ export default function Login() {
 
       <Row className="justify-content-md-center mt-5">
           <Col xs={12} md={6}>
-              <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
+              <h2 className="mainTxt text-center mb-4">{Constants().ApplicationName}</h2>
 
               <Form.Control
                   type="email"
                   placeholder="Email address"
+                  className='mainTxt'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
               />
@@ -103,20 +104,21 @@ export default function Login() {
               <Form.Control
                   type="password"
                   placeholder="Password"
+                  className='mainTxt'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
               />
 
               <br/>
-              <Button style={{ background: '#d63384', color: '#fff0f6', borderColor:"#f06595"   }} type="submit" className="w-100" onClick={handleSubmit}> Login </Button>
+              <Button type="submit" className="mainBtn w-100" onClick={handleSubmit}> Login </Button>
 
               <hr/>
               <div className="center">
-                  <Link href="/Security/ResetPassword" className='hyperLink'>Forgotten password?</Link>
+                  <Link href="/Security/ResetPassword" className='customBtn hyperLink'>Forgotten password?</Link>
               </div>
 
               <br/>
-              <Link href="/Security/RegisterUser" className="w-100 button-link btn btn-success">
+              <Link href="/Security/RegisterUser" className="customBtn w-100 button-link btn btn-success">
                   Create new account
               </Link>
           </Col>

@@ -34,17 +34,17 @@ const Navbar: React.FC = () => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
-        <h2>Fluente</h2>
+        <h2 className='mainTxt'>Fluente</h2>
       </div>
       <ul className={styles.links}>
         <li>
-          <Link href="/Course/Create">Home</Link>
+          <Link className='mainTxt' href="/Course/Create">Home</Link>
         </li>
         <li>
-          <Link href="/About">About</Link>
+          <Link className='mainTxt' href="/Profile">Profile</Link>
         </li>
         <li>
-          <button type="button" onClick={logout} className={styles.linkButton}>Logout</button>
+          <button type="button" onClick={logout} className={`${styles.linkButton} mainTxt`}>Logout</button>
         </li>
       </ul>
     </nav>

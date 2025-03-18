@@ -68,20 +68,21 @@ export default function ResetPassword() {
     };
     
     return (
-        <Container>
+        <Container className='mainTxt'>
             <Row className="justify-content-md-center mt-5">
                 <Col xs={12} md={6}>
-                    <h2 className="text-center mb-4">{Constants().ApplicationName}</h2>
+                    <h2 className="mainTxt text-center mb-4">{Constants().ApplicationName}</h2>
 
                     <Form.Control
                         type="email"
                         placeholder="Email address"
+                        className='mainTxt'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     
                     <br/>
-                    <Button variant="success" type="submit" className="w-100" onClick={handleSubmit}> Submit </Button>
+                    <Button variant="success" type="submit" className="mainTxt w-100" onClick={handleSubmit}> Submit </Button>
                 </Col>
             </Row>
 
