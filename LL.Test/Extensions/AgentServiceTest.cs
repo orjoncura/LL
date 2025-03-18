@@ -20,7 +20,8 @@ public class AgentServiceTest
     {                  
         string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(
             "Creo en los milagros desde que te vi", 
-            (int)LanguageEnum.Spanish);
+            (int)LanguageEnum.Spanish, 
+            (int)LanguageEnum.English);
 
         List<CourseWordsModel> words = JsonHelper.Extract<List<CourseWordsModel>>(await _agentService.Run(rankingPrompt));
         

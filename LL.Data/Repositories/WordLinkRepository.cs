@@ -1,5 +1,6 @@
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
 using LL.Data.Contexts;
 using LL.Data.Factories;
@@ -30,21 +31,21 @@ public class WordLinkRepository(AppDbContext db,
         };
     }
     
-    public WordLinkShort Insert(int wordId, string word, int fromId, int toId, int userId)
+    public WordLinkShort Insert(int wordId, DefinitionRequestModel definitionRequestModel, int userId)
     {
         WordLink wordLink = db.WordLinks
             .Include(w => w.Target)
             .Include(w => w.Source)
             .FirstOrDefault(w => 
                 w.SourceId == wordId 
-                && w.Target.LanguageId == toId 
+                && w.Target.LanguageId == definitionRequestModel.LanguageToId 
+                && w.Source.LanguageId == definitionRequestModel.LanguageFromId 
                 && w.Target.IsActive
                 && w.IsActive);
 
         if (wordLink == null)
         {
-            string translatedWord = translationService.TranslateText(word, fromId, toId).Result;
-            WordShort wordShort = wordRepository.Insert(translatedWord, toId, userId);
+            WordShort wordShort = wordRepository.Insert(definitionRequestModel.Translation, definitionRequestModel.LanguageToId, userId);
             
             wordLink = new WordLink()
             {

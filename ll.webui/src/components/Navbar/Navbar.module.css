@@ -4,13 +4,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    background-color: #333;
-    color: white;
+    background-color: #fff0f6;
+    color: #d63384;
+    color: #d63384;
+    font-weight: bold !important
   }
   
   .logo h2 {
     margin: 0;
-    color: #fff;
+    color: #d63384;
   }
   
   .links {
@@ -25,7 +27,7 @@
   }
   
   .links a {
-    color: white;
+    color: #d63384;
     text-decoration: none;
     font-weight: bold;
   }
@@ -37,7 +39,7 @@
   .linkButton {
     background: none;
     border: none;
-    color: white;
+    color:#d63384;
     text-decoration: none;
     cursor: pointer;
     padding: 0;

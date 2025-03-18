@@ -140,27 +140,21 @@ export default function CreateSeminar() {
             var textCleaned = text.replaceAll(/[\r\n]+/g, " ");
             startCourse(textCleaned);
 
-            var words = textCleaned.split(' ');
+            const courseRequestModel: CourseRequestModel = {
+              "text": textCleaned,
+              "languageFromId": languageFromId,
+              "languageToId": languageToId
+            };
 
-            if(words.length > 100){
-              const courseRequestModel: CourseRequestModel = {
-                "text": textCleaned,
-                "languageFromId": languageFromId,
-                "languageToId": languageToId
-              };
-  
-              const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
-              if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
-                setLoading(false);
-                return;
-              }
-  
-              words = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1).map(a => a.word);
+            const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+            if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
+              setLoading(false);
+              return;
             }
 
-            setCourseLength(words.length);
-
-            for (const word of words) {
+            var courseViewModels = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1);
+            
+            for (const courseViewModel of courseViewModels) {
               let attempt = 0;
               let maxRetries = 3;
               let retryDelay = 3;
@@ -170,7 +164,8 @@ export default function CreateSeminar() {
                   try {
                       const response = await POST('/Course/CreateDefinitions', 
                           JSON.stringify({
-                              text: word,
+                              text: courseViewModel.word,
+                              translation: courseViewModel.translation,
                               languageFromId: languageFromId,
                               languageToId: languageToId
                           }));
@@ -200,6 +195,8 @@ export default function CreateSeminar() {
               }
           }
           
+          setCourseLength(wordViewModels.length);
+
           } catch (error) {
 
             setLoading(false);
@@ -261,6 +258,7 @@ export default function CreateSeminar() {
         setLoading(kw.length == 0);
         setShowKeyWords(kw.length > 0);
         setWordViewModels(keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2));
+        setCourseLength(wordViewModels.length);
       }
     }
 
@@ -306,16 +304,11 @@ export default function CreateSeminar() {
     };
     
     function highlightWord(word: string): string {
-      const wordSet = new Set(word);
       const trimmedText = text.trim();
-      if (trimmedText === '') return '';
-      const tokens = trimmedText.split(/\s+/);
-      const highlightedTokens = tokens.map(token => 
-          wordSet.has(token) ? `**${token}**` : 
-  token
-      );
 
-      return highlightedTokens.join(' ');
+      if (trimmedText === '') return '';
+
+      return trimmedText.split('\n\n').filter(t => t.includes(word))[0];
   }
   
     return (

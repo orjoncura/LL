@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
 
 
   return (
-    <nav className={styles.navbar} style={{ background: '#3c0a5d', color: '#fff0f6' }}>
+    <nav className={styles.navbar}>
       <div className={styles.logo}>
         <h2>Fluente</h2>
       </div>

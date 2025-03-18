@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.RegularExpressions;
 using LL.Core.Enums;
 using LL.Core.Factories;
 using LL.Core.Helpers;
@@ -31,34 +34,97 @@ public class CourseService(
         
         courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
-        string rankingPrompt = PromptFactory.CreateCourseWordsPrompt(seminarRequest.Text, seminarRequest.LanguageFromId);
+        var splitTexts = Regex.Split(seminarRequest.Text, @"(\r\n?|\n){2}")
+            .Where(p => p.Any(char.IsLetterOrDigit) && !string.IsNullOrWhiteSpace(p))
+            .ToList();
         
-        courseViewModel.Words = seminarRequest.Text.Trim().Contains(' ')
-            ? JsonHelper.Extract<List<CourseWordsModel>>(await agentService.Run(rankingPrompt)) ?? []
-            : [new CourseWordsModel(seminarRequest.Text, 1)];
+        int charLimit = 1241;
+        List<string> combinedStrings = new List<string>();
+
+        foreach (string text in splitTexts)
+        {
+            StringBuilder currentSegment = new StringBuilder();
+    
+            foreach (char c in text.ToCharArray())
+            {
+                if (currentSegment.Length >= charLimit)
+                    break;
+        
+                currentSegment.Append(c);
+            }
+    
+            if (currentSegment.Length > 0)
+            {
+                if (combinedStrings.Count > 0 && 
+                    combinedStrings[combinedStrings.Count - 1].Length + currentSegment.Length <= charLimit)
+                {
+                    combinedStrings[combinedStrings.Count - 1] += currentSegment.ToString();
+                }
+                else
+                {
+                    combinedStrings.Add(currentSegment.ToString());
+                }
+            }
+        }
+        
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+        
+        List<CourseWordsModel> courseWordsList = new List<CourseWordsModel>();
+
+        foreach (var text in combinedStrings)
+        {
+            var prompt = PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
+    
+            try
+            {
+                var response = agentService.Run(prompt).Result;
+        
+                if (!string.IsNullOrEmpty(response))
+                {
+                    // Safely extract the list of CourseWordsModel from JSON
+                    var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
+            
+                    courseWordsList.AddRange(extractedModels);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing text: {text}\n{ex.Message}");
+            }
+        }
+
+        courseViewModel.Words = courseWordsList;
+        
+        stopwatch.Stop();
+        Console.WriteLine(stopwatch.ElapsedMilliseconds);
         
         return courseViewModel;
     }
-    public async Task<WordViewModel> CreateDefinitions(CourseRequestModel seminarRequest, int userId)
+  
+    public async Task<WordViewModel> CreateDefinitions(DefinitionRequestModel definitionRequestModel, int userId)
     {
-        WordShort wordShort = wordRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, userId);
+        WordShort wordShort = wordRepository.Insert(definitionRequestModel.Text, definitionRequestModel.LanguageFromId, userId);
         
-        WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, definitionRequestModel, userId);
             
         List<MeaningShort> wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
             
         if (wordMeaning == null)
         {
-            string word = LanguageEnum.English.Equals(seminarRequest.LanguageFromId)
-                ? seminarRequest.Text
+            string word = LanguageEnum.English.Equals(definitionRequestModel.LanguageFromId)
+                ? definitionRequestModel.Text
                 : wordLink.Target.Name;
                 
             wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
                 
             foreach (var meaning in wordMeaning)
             {
+                if (!Enum.TryParse(meaning.Type, true, out WordTypeEnum parsedValue))  // `true` for case-insensitive parsing
+                    continue;
+                
                 int wordMeaningId = wordMeaningRepository
-                    .Insert(wordShort.Id, EnumHelper.GetEnumValue(typeof(WordTypeEnum), meaning.Type), userId);
+                    .Insert(wordShort.Id, (int)parsedValue, userId);
             
                 meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
             }

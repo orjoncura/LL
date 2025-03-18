@@ -47,6 +47,16 @@ export interface CourseRequestModel {
   readonly isValid?: boolean;
 }
 
+export interface DefinitionRequestModel {
+  text?: string;
+  translation?: string;
+  languageFromId?: number;
+  languageToId?: number;
+  /** NOTE: This property will not be serialized. It can only be populated by the server. */
+  readonly isValid?: boolean;
+}
+
+
 export interface ExerciseRequestModel {
   courseId: number;
   text?: string;
@@ -67,6 +77,7 @@ export interface CourseViewModel {
 
 export interface CourseWordsModel {
   word: string;
+  translation: string;
   importance: number;
 }
 

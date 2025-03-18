@@ -42,8 +42,9 @@ namespace LL.Core.Factories
             return prompt;
         }
 
-        public static string CreateCourseWordsPrompt(string text, int languageToId)
+        public static string CreateCourseWordsPrompt(string text, int languageFromId, int languageToId)
         {
+            string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
             string prompt = string.Format(@"Rank the following word by their importance in the sentence. 
@@ -58,29 +59,35 @@ namespace LL.Core.Factories
                 sentence, complete, subject, predicate, statement, question, exclamation, command, clause, subordinate will be marked as '1'
                 typically, conveying, main, set, itself, consisting will be marked as '2'
                 a, of, in, teh, and, is, that will be marked as '3'
+                Also return the its translation to {2}, in needs to be in the same context as it is in the provided sentence
+                Please include all the words in the json 
 
                 The JSON file should have the following format:
 
                 [
                   {{
                     ""Word"": ""sentence"",
+                    ""Translation"": ""oración"",
                     ""Importance"": 1
                   }},
                   {{
                     ""Word"": ""typically"",
+                    ""Translation"": ""típicamente"",
                     ""Importance"": 2
                   }},
                   {{
                     ""Word"": ""conveying"",
+                    ""Translation"": ""transmitir"",
                     ""Importance"": 2
                   }},
                   {{
                     ""Word"": ""a"",
+                    ""Translation"": ""una"",
                     ""Importance"": 3
                   }}
                 ]
 
-                Rank the words of the sentence {0}", text, languageTo);
+                Rank the words of the sentence: {0}", text, languageFrom, languageTo);
 
             return prompt;
         }
