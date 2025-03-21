@@ -182,7 +182,7 @@ export default function CreateSeminar() {
           
                       if (wordIndex == 0) {
                           setLoading(false);
-                          startCourse(text.replaceAll(/[\r\n]+/g, " "));
+                          startCourse(textCleaned);
                       }       
           
                       break;
@@ -258,7 +258,6 @@ export default function CreateSeminar() {
         setLoading(kw.length == 0);
         setShowKeyWords(kw.length > 0);
         setWordViewModels(keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2));
-        setCourseLength(wordViewModels.length);
       }
     }
 
@@ -316,13 +315,7 @@ export default function CreateSeminar() {
 
         <Navbar /> 
 
-        <div className="container-flex"                
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}>
+        <div className="container-flex">
 
           <div className="container mt-4" style={{ marginBottom: "25%" }}>
             <div className="mb-4">
@@ -355,6 +348,12 @@ export default function CreateSeminar() {
                         value={text}
                         onChange={e => setText(e.target.value)}
                         placeholder="Please enter your text here..."
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                              handleSubmit();
+                          }}}
+
                         className='mainTxt'
                         rows={10}
                         cols={50}

@@ -17,7 +17,7 @@ namespace LL.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -163,19 +163,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9764), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4900), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "High"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9771), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4906), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Medium"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9773), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4908), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Low"
                         });
                 });
@@ -203,13 +203,13 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(3106), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9667), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "English"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(3111), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9672), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Spanish"
                         });
                 });
@@ -373,19 +373,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2545), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9176), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Queued"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2604), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9224), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Sent"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2605), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9226), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Failed"
                         });
                 });
@@ -650,19 +650,21 @@ namespace LL.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SourceId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TargetId")
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WordId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("SourceId");
-
-                    b.HasIndex("TargetId");
+                    b.HasIndex("WordId");
 
                     b.ToTable("WordLinks");
                 });
@@ -724,43 +726,43 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6911), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2592), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Noun"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6926), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2598), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Verb"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6928), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2599), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adjective"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6929), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2621), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Adverb"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6931), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2622), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Interjection"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6933), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2625), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Preposition"
                         },
                         new
                         {
                             Id = 7,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6935), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2626), new TimeSpan(0, 0, 0, 0, 0)),
                             Value = "Pronoun"
                         });
                 });
@@ -1031,23 +1033,15 @@ namespace LL.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LL.Data.Model.Word", "Source")
+                    b.HasOne("LL.Data.Model.Word", "Word")
                         .WithMany()
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LL.Data.Model.Word", "Target")
-                        .WithMany()
-                        .HasForeignKey("TargetId")
+                        .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("Source");
-
-                    b.Navigation("Target");
+                    b.Navigation("Word");
                 });
 
             modelBuilder.Entity("LL.Data.Model.WordMeaning", b =>

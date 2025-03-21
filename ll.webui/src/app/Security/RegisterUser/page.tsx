@@ -106,7 +106,7 @@ export default function RegisterUser() {
                     />
 
                     <br/>
-                    <Button variant="primary" type="submit" className="mainTxt w-100" onClick={handleSubmit}> Confirm </Button>
+                    <Button variant="primary" type="submit" className="mainBtn w-100" onClick={handleSubmit}> Confirm </Button>
 
                     <hr/>
                     <div className="center">

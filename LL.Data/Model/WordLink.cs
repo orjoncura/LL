@@ -4,11 +4,11 @@ public class WordLink
 {
     public int Id {  get; set; }
     
-    public int SourceId { get; set; }
-    public virtual Word? Source { get; set; }
+    public int WordId { get; set; }
+    public virtual Word? Word { get; set; }
     
-    public int TargetId { get; set; }
-    public virtual Word? Target { get; set; }
+    public string Value { get; set; } = string.Empty;
+    public int LanguageId {  get; set; }
     
     public bool IsActive { get; set; }
 

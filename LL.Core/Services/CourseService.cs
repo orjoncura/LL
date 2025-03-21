@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 using LL.Core.Enums;
@@ -45,7 +44,7 @@ public class CourseService(
         {
             StringBuilder currentSegment = new StringBuilder();
     
-            foreach (char c in text.ToCharArray())
+            foreach (char c in text)
             {
                 if (currentSegment.Length >= charLimit)
                     break;
@@ -114,7 +113,7 @@ public class CourseService(
         {
             string word = LanguageEnum.English.Equals(definitionRequestModel.LanguageFromId)
                 ? definitionRequestModel.Text
-                : wordLink.Target.Name;
+                : wordLink.Translation;
                 
             wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
                 
@@ -131,7 +130,7 @@ public class CourseService(
         }
             
         if(wordMeaning.Any())
-            return new WordViewModel(wordShort, wordMeaning, wordLink.Target.Name);
+            return new WordViewModel(wordShort, wordMeaning, wordLink.Translation);
         
         return null;
     }

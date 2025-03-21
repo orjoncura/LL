@@ -302,18 +302,15 @@ public class AppDbContext : DbContext
         
         modelBuilder.Entity<WordLink>(entity =>
         {
-            entity.Property(ut => ut.SourceId).IsRequired();
-            entity.HasOne(ut => ut.Source)
+            entity.Property(ut => ut.WordId).IsRequired();
+            
+            entity.HasOne(ut => ut.Word)
                 .WithMany()
-                .HasForeignKey(ut => ut.SourceId)
+                .HasForeignKey(ut => ut.WordId)
                 .OnDelete(DeleteBehavior.Restrict);
             
-            entity.Property(ut => ut.TargetId).IsRequired();
-            entity.HasOne(ut => ut.Target)
-                .WithMany()
-                .HasForeignKey(ut => ut.TargetId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
+            entity.Property(ut => ut.LanguageId).IsRequired();
+            entity.Property(ut => ut.Value).IsRequired();
             entity.Property(ut => ut.CreatedById).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
 

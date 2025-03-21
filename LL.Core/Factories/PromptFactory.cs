@@ -60,7 +60,11 @@ namespace LL.Core.Factories
                 typically, conveying, main, set, itself, consisting will be marked as '2'
                 a, of, in, teh, and, is, that will be marked as '3'
                 Also return the its translation to {2}, in needs to be in the same context as it is in the provided sentence
-                Please include all the words in the json 
+                Please include all the words in the json, Ensure that you separate words only when necessary. For example, 'su vida' 
+                should be split into 'su' and 'vida,' but 'otra vez' must stay together 
+                because its meaning would change if separated. If separating two words 
+                does not alter their individual meanings, they should be split; however, 
+                most of them will remain as single words.
 
                 The JSON file should have the following format:
 

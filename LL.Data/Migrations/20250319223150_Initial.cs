@@ -425,8 +425,9 @@ namespace LL.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SourceId = table.Column<int>(type: "int", nullable: false),
-                    TargetId = table.Column<int>(type: "int", nullable: false),
+                    WordId = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LanguageId = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
@@ -441,14 +442,8 @@ namespace LL.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_WordLinks_Words_SourceId",
-                        column: x => x.SourceId,
-                        principalTable: "Words",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WordLinks_Words_TargetId",
-                        column: x => x.TargetId,
+                        name: "FK_WordLinks_Words_WordId",
+                        column: x => x.WordId,
                         principalTable: "Words",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -554,9 +549,9 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9764), new TimeSpan(0, 0, 0, 0, 0)), "High" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9771), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(9773), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
+                    { 1, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4900), new TimeSpan(0, 0, 0, 0, 0)), "High" },
+                    { 2, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4906), new TimeSpan(0, 0, 0, 0, 0)), "Medium" },
+                    { 3, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4908), new TimeSpan(0, 0, 0, 0, 0)), "Low" }
                 });
 
             migrationBuilder.InsertData(
@@ -564,8 +559,8 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(3106), new TimeSpan(0, 0, 0, 0, 0)), "English" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(3111), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
+                    { 1, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9667), new TimeSpan(0, 0, 0, 0, 0)), "English" },
+                    { 2, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9672), new TimeSpan(0, 0, 0, 0, 0)), "Spanish" }
                 });
 
             migrationBuilder.InsertData(
@@ -573,9 +568,9 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2545), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2604), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(2605), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
+                    { 1, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9176), new TimeSpan(0, 0, 0, 0, 0)), "Queued" },
+                    { 2, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9224), new TimeSpan(0, 0, 0, 0, 0)), "Sent" },
+                    { 3, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9226), new TimeSpan(0, 0, 0, 0, 0)), "Failed" }
                 });
 
             migrationBuilder.InsertData(
@@ -588,13 +583,13 @@ namespace LL.Data.Migrations
                 columns: new[] { "Id", "CreatedDate", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6911), new TimeSpan(0, 0, 0, 0, 0)), "Noun" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6926), new TimeSpan(0, 0, 0, 0, 0)), "Verb" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6928), new TimeSpan(0, 0, 0, 0, 0)), "Adjective" },
-                    { 4, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6929), new TimeSpan(0, 0, 0, 0, 0)), "Adverb" },
-                    { 5, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6931), new TimeSpan(0, 0, 0, 0, 0)), "Interjection" },
-                    { 6, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6933), new TimeSpan(0, 0, 0, 0, 0)), "Preposition" },
-                    { 7, new DateTimeOffset(new DateTime(2025, 1, 25, 22, 0, 9, 458, DateTimeKind.Unspecified).AddTicks(6935), new TimeSpan(0, 0, 0, 0, 0)), "Pronoun" }
+                    { 1, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2592), new TimeSpan(0, 0, 0, 0, 0)), "Noun" },
+                    { 2, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2598), new TimeSpan(0, 0, 0, 0, 0)), "Verb" },
+                    { 3, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2599), new TimeSpan(0, 0, 0, 0, 0)), "Adjective" },
+                    { 4, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2621), new TimeSpan(0, 0, 0, 0, 0)), "Adverb" },
+                    { 5, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2622), new TimeSpan(0, 0, 0, 0, 0)), "Interjection" },
+                    { 6, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2625), new TimeSpan(0, 0, 0, 0, 0)), "Preposition" },
+                    { 7, new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2626), new TimeSpan(0, 0, 0, 0, 0)), "Pronoun" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -728,14 +723,9 @@ namespace LL.Data.Migrations
                 column: "CreatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WordLinks_SourceId",
+                name: "IX_WordLinks_WordId",
                 table: "WordLinks",
-                column: "SourceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WordLinks_TargetId",
-                table: "WordLinks",
-                column: "TargetId");
+                column: "WordId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WordMeanings_CreatedById",

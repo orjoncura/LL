@@ -9,15 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LL.Data.Repositories;
 
-public class WordLinkRepository(AppDbContext db,
-    ITranslationService translationService,
-    IWordRepository wordRepository) : IWordLinkRepository
+public class WordLinkRepository(AppDbContext db) : IWordLinkRepository
 {
     public WordLinkShort GetById(int id)
     {
         WordLink wordLink = db.WordLinks
-            .Include(w => w.Source)
-            .Include(w => w.Target)
+            .Include(w => w.Word)
             .FirstOrDefault(w => w.Id == id && w.IsActive);
 
         if (wordLink == null)
@@ -26,31 +23,30 @@ public class WordLinkRepository(AppDbContext db,
         return new WordLinkShort()
         {
             Id = wordLink.Id,
-            Source = DataFactory.Convert(wordLink.Source),
-            Target = DataFactory.Convert(wordLink.Target)
+            Source = DataFactory.Convert(wordLink.Word),
+            Translation = wordLink.Value,
+            LanguageId = wordLink.LanguageId
         };
     }
     
     public WordLinkShort Insert(int wordId, DefinitionRequestModel definitionRequestModel, int userId)
     {
         WordLink wordLink = db.WordLinks
-            .Include(w => w.Target)
-            .Include(w => w.Source)
+            .Include(w => w.Word)
             .FirstOrDefault(w => 
-                w.SourceId == wordId 
-                && w.Target.LanguageId == definitionRequestModel.LanguageToId 
-                && w.Source.LanguageId == definitionRequestModel.LanguageFromId 
-                && w.Target.IsActive
+                w.WordId == wordId 
+                && w.LanguageId == definitionRequestModel.LanguageToId 
+                && w.Word.LanguageId == definitionRequestModel.LanguageFromId 
+                && w.Word.IsActive
                 && w.IsActive);
 
         if (wordLink == null)
         {
-            WordShort wordShort = wordRepository.Insert(definitionRequestModel.Translation, definitionRequestModel.LanguageToId, userId);
-            
             wordLink = new WordLink()
             {
-                SourceId = wordId,
-                TargetId = wordShort.Id,
+                WordId = wordId,
+                Value = definitionRequestModel.Translation,
+                LanguageId = definitionRequestModel.LanguageToId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,
@@ -63,8 +59,9 @@ public class WordLinkRepository(AppDbContext db,
         return new WordLinkShort()
         {
             Id = wordLink.Id,
-            Source = DataFactory.Convert(wordLink.Source),
-            Target = DataFactory.Convert(wordLink.Target)
+            Source = DataFactory.Convert(wordLink.Word),
+            Translation = wordLink.Value,
+            LanguageId = wordLink.LanguageId
         };
     }
     

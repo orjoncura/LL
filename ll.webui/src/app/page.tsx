@@ -114,11 +114,11 @@ export default function Login() {
 
               <hr/>
               <div className="center">
-                  <Link href="/Security/ResetPassword" className='customBtn hyperLink'>Forgotten password?</Link>
+                  <Link href="/Security/ResetPassword" className='mainTxt hyperLink'>Forgotten password?</Link>
               </div>
 
               <br/>
-              <Link href="/Security/RegisterUser" className="customBtn w-100 button-link btn btn-success">
+              <Link href="/Security/RegisterUser" className="mainTxt w-100 button-link btn btn-success">
                   Create new account
               </Link>
           </Col>

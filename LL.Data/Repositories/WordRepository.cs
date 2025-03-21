@@ -19,13 +19,12 @@ public class WordRepository(AppDbContext db,
     public List<WordViewModel> GetKeyWords(int languageId)
     {
         var words = db.WordLinks
-            .Where(w => w.Source.LanguageId == languageId
-                        && (w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
-                            || w.Source.ImportanceRatingId == (int)ImportanceRatingEnum.High)
+            .Where(w => w.Word.LanguageId == languageId
+                        && (w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
+                            || w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.High)
                         && w.IsActive)
-            .Include(wordLink => wordLink.Source)
-            .Include(wordLink => wordLink.Target).ToList()
-            .Select(w => new WordViewModel(DataFactory.Convert(w.Source), w.Target.Name)).ToList();
+            .Include(wordLink => wordLink.Word).ToList()
+            .Select(w => new WordViewModel(DataFactory.Convert(w.Word), w.Value)).ToList();
         
         var wordIds = words.Select(w => w.Id).ToList();
         
@@ -68,7 +67,7 @@ public class WordRepository(AppDbContext db,
                 AudioPath = storageService
                     .SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)).Result,
                 LanguageId = languageId,
-                ImportanceRatingId = (int)ImportanceRatingEnum.Low,
+                ImportanceRatingId = (int)ImportanceRatingEnum.Medium,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,
