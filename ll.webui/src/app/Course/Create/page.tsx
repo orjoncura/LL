@@ -1,12 +1,12 @@
 "use client";
-import React, {useState, useEffect, useRef, CSSProperties} from 'react';
+import React, {useState, useEffect, useRef, CSSProperties, ReactNode} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
-import {CourseRequestModel, CourseViewModel, WordViewModel} from '@/scripts/models';
+import {CourseRequestModel, CourseViewModel, CourseWordsModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
 
 export default function CreateSeminar() {
@@ -16,6 +16,10 @@ export default function CreateSeminar() {
     const [wordIndex, setWordIndex] = useState<number>(0);
     const [showKeyWords, setShowKeyWords] = useState(false);
     const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
+    const [paragraphWords, setParagraphWords] = useState<WordViewModel[]>([]);
+    const [paragraphs, setParagraph] = useState<string[]>([]);
+    const [paragraphIndex, setParagraphIndex] = useState<number>(0);
+    const [courseWordsModels, setCourseWordsModels] = useState<CourseWordsModel[]>([]);
     const [pairIndex, setPairIndex] = useState<number>(0);
     const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }[]>([]);
     const [activeWord, setActiveWord] = useState<string | null>(null);
@@ -70,7 +74,6 @@ export default function CreateSeminar() {
     const resetAllToDefault = () => {
       setCourseLength(0);
       setWordIndex(0);
-      setShowKeyWords(false);
       setKeyWords([]);
       setPairIndex(0);
       setPairs([]);
@@ -83,7 +86,12 @@ export default function CreateSeminar() {
       setModalBody('');
       setText('');
       setShowCourse(false);
+      setShowKeyWords(false);
       setShowMeaning(false);
+      setParagraph([]);
+      setParagraphWords([]);
+      setParagraphIndex(0);
+      setCourseWordsModels([]);
     };
     
     const handleWordClick = (word: string, column: number) => {
@@ -162,7 +170,7 @@ export default function CreateSeminar() {
               // Retry logic for fetching word definition
               while (attempt < maxRetries) {
                   try {
-                      const response = await POST('/Course/CreateDefinitions', 
+                      const response: WordViewModel = await POST('/Course/CreateDefinitions', 
                           JSON.stringify({
                               text: courseViewModel.word,
                               translation: courseViewModel.translation,
@@ -178,9 +186,10 @@ export default function CreateSeminar() {
                           continue;
                       }
 
-                      wordViewModels.push(response);
+                      if(wordViewModels.some(w => w.name == response.name) == false)
+                         wordViewModels.push(response);
           
-                      if (wordIndex == 0) {
+                      if (wordIndex == 0 && showKeyWords == false && loading == true) {
                           setLoading(false);
                           startCourse(textCleaned);
                       }       
@@ -195,7 +204,7 @@ export default function CreateSeminar() {
               }
           }
           
-          setCourseLength(wordViewModels.length);
+          setCourseWordsModels(courseViewModel.words);
 
           } catch (error) {
 
@@ -255,23 +264,43 @@ export default function CreateSeminar() {
           setPairs(keyWordsPairs);
         }
         
-        setLoading(kw.length == 0);
+        const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
+
+        const sortedParagraphs = text.split('\n\n').sort((a, b) => {
+          const aPercentage = Percentage(a, words);
+          const bPercentage = Percentage(b, words);
+        
+          if (aPercentage > bPercentage) return -1;
+          if (aPercentage < bPercentage) return 1;
+        
+          // If both are included or both are not included, sort alphabetically
+          return 0;
+        });
+
+        setParagraph(sortedParagraphs);
+        setParagraphWords(sortBasedOnAppearance(sortedParagraphs[paragraphIndex], words));
+        setCourseLength(paragraphWords.length);
         setShowKeyWords(kw.length > 0);
-        setWordViewModels(keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2));
+        setWordViewModels(words);
+        setLoading(kw.length == 0);
       }
     }
 
     const nextStep = (newIndex: number) => {
 
-      let wordViewModel: WordViewModel = wordViewModels[newIndex];
+      if(paragraphWords[newIndex] == null){
 
-      setShowCourse(wordViewModel != null 
-        && wordViewModel.name != null);
-      
-      if(wordViewModels[newIndex] == null)
+        newIndex = 0;
+        setParagraphIndex(paragraphIndex + 1);
+      }
+
+      if(paragraphs[paragraphIndex] == null)
         resetAllToDefault();
-      
+
       setWordIndex(newIndex);
+      setCourseLength(paragraphWords.length);
+      setShowCourse(paragraphs[paragraphIndex] != null);
+      setParagraphWords(sortBasedOnAppearance(paragraphs[paragraphIndex], wordViewModels));
     }
     
     function shuffle<T>(array: string[]): string[] {
@@ -303,13 +332,61 @@ export default function CreateSeminar() {
     };
     
     function highlightWord(word: string): string {
-      const trimmedText = text.trim();
+        const trimmedText = text.trim();
+        
+        if (trimmedText === '') 
+          return "";
 
-      if (trimmedText === '') return '';
+        const matchingParagraphs = trimmedText.split('\n\n').filter(t => t.includes(word));
+        
+        if (matchingParagraphs.length === 0) 
+          return "";
+        
+        return matchingParagraphs[0].replace(new RegExp("(" + word + ")", "g"), word.bold());
+    }
 
-      return trimmedText.split('\n\n').filter(t => t.includes(word))[0];
-  }
-  
+    function Percentage(paragraph: string, targetWords: WordViewModel[]){
+      const targetSet = new Set(targetWords.map(word => word.name.toLowerCase()));
+      const words = paragraph.toLowerCase().match(/[a-zA-Z0-9]+/g) || [];
+      const uniqueParagraphWords = new Set(words);
+      
+      if (uniqueParagraphWords.size === 0) return 0;
+      
+      const matchingCount = Array.from(uniqueParagraphWords).filter(word => 
+          targetSet.has(word)
+      ).length;
+      
+      return (matchingCount / uniqueParagraphWords.size) * 100;
+    }
+
+    function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
+
+      wordsList = wordsList.filter(w => text.includes(w.name));
+
+      // Normalize the sample text: split into words and convert to lowercase without punctuation
+      const normalizedText = text.split(/\s+/).map(word => word.trim().toLowerCase()).filter(word => word.length > 0);
+
+      // Create an array of objects with each word's position in the text
+      const wordIndices = wordsList.map(word => {
+          const lowerWord = word.name.trim().toLowerCase();
+          // Find the first occurrence index or a large number if not found
+          const index = normalizedText.indexOf(lowerWord);
+          return { originalWord: word, index };
+      });
+
+      // Sort based on the index; handle missing words by placing them last
+      const sorted = [...wordIndices]
+          .sort((a, b) => {
+              if (a.index === -1 && b.index === -1) return 0;
+              if (a.index === -1) return 1;
+              if (b.index === -1) return -1;
+              return a.index - b.index;
+          })
+          .map(item => item.originalWord);
+
+        return sorted;
+    };
+
     return (
       <div>
 
@@ -418,31 +495,30 @@ export default function CreateSeminar() {
               )}
             </div>)}
 
-            {showCourse && (   
+            {showCourse && (paragraphWords[wordIndex].name != null) && (   
               <div>
                   <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
                     <div className="mainTxt flip-card" onClick={flipCard}>
                       <div className="flip-card-inner">
                           <div className="flip-card-front">
-                              <p className="title">{wordViewModels[wordIndex].name}</p>
+                              <p className="title">{paragraphWords[wordIndex].name}</p>
                           </div>
                           <div className="flip-card-back">
-                              <p className="title">{wordViewModels[wordIndex].translation}</p>
+                              <p className="title">{paragraphWords[wordIndex].translation}</p>
                           </div>
                       </div>
                     </div>
                   </div>
 
                   <br></br>
-                  <button onClick={() => CreateAudio(wordViewModels[wordIndex].id)} className='audio'>
+                  <button onClick={() => CreateAudio(paragraphWords[wordIndex].id)} className='audio'>
                       <FontAwesomeIcon icon={faVolumeUp} />
                   </button> 
                   <span>&nbsp;&nbsp;</span>
-                  {showMeaning == false && highlightWord(wordViewModels[wordIndex].name)}
+                  {showMeaning == false && <div dangerouslySetInnerHTML={{ __html: highlightWord(paragraphWords[wordIndex].name) }} />}
 
-                  {showMeaning &&
-                   (wordViewModels[wordIndex].meanings && wordViewModels[wordIndex].meanings.length > 0 ? (
-                   wordViewModels[wordIndex].meanings.map((meaning) => (
+                  {showMeaning && (paragraphWords[wordIndex].meanings && paragraphWords[wordIndex].meanings.length > 0 ? (
+                   paragraphWords[wordIndex].meanings.map((meaning) => (
                     <div key={wordIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
                       <h3>{meaning.type}</h3>
                       <ul>
