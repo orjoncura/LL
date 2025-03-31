@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using System.Text;
 using LL.Core.Interfaces.Extensions;
+using LL.Extensions.Models;
 using Newtonsoft.Json;
 
 namespace LL.Extensions.Services;
 
 public class TranslationService: ITranslationService
 {
-    public async Task<string> TranslateText(string text, int fromId, int toId)
+    public async Task<List<string>> TranslateText(string text, int fromId, int toId)
     {
         // Base URL of the local LibreTranslate server
         string baseUrl = "http://localhost:5000"; // Adjust if running on a different host/port
@@ -41,10 +42,23 @@ public class TranslationService: ITranslationService
             string responseBody = await response.Content.ReadAsStringAsync();
 
             // Parse JSON response
-            dynamic result = JsonConvert.DeserializeObject(responseBody);
-            
-            return  result.translatedText;
+            TranslationModel model = JsonConvert.DeserializeObject<TranslationModel>(responseBody);
+
+            if (model != null && !string.IsNullOrWhiteSpace(model.translatedText))
+            {
+                List<string> translations = new List<string>()
+                {
+                    model.translatedText
+                };
+                
+                if(model.alternatives != null)
+                    translations.AddRange(model.alternatives);
+                
+                return  translations;
+            }
         }
+        
+        return new List<string>();
     }
 
     private string GetLanguageCode(int id)

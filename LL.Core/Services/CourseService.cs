@@ -22,7 +22,8 @@ public class CourseService(
     IExerciseRepository exerciseRepository,
     ICourseWordRepository courseWordRepository,
     IAgentService agentService,
-    IDictionaryService dictionaryService) : ICourseService
+    IDictionaryService dictionaryService,
+    ITranslationService translationService) : ICourseService
 {
     public async Task<CourseViewModel> CreateCourse(CourseRequestModel seminarRequest, int userId)
     {
@@ -102,21 +103,25 @@ public class CourseService(
     }
   
     public async Task<WordViewModel> CreateDefinitions(DefinitionRequestModel definitionRequestModel, int userId)
-    {
+    {            
+        List<string> translations = translationService
+            .TranslateText(definitionRequestModel.Text,
+                definitionRequestModel.LanguageFromId, 
+                definitionRequestModel.LanguageToId).Result;
+
+        definitionRequestModel.Translation = translations.FirstOrDefault(t => definitionRequestModel.Translation.ToLower().Contains(t.ToLower()));
+        
+        List<MeaningShort> wordMeaning = dictionaryService.GetWordDetails(definitionRequestModel.Translation).Result;
+        
+        if(string.IsNullOrEmpty(definitionRequestModel.Translation) || !wordMeaning.Any())
+            return null;
+        
         WordShort wordShort = wordRepository.Insert(definitionRequestModel.Text, definitionRequestModel.LanguageFromId, userId);
         
         WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, definitionRequestModel, userId);
-            
-        List<MeaningShort> wordMeaning = wordMeaningRepository.GetByWordId(wordShort.Id);
-            
-        if (wordMeaning == null)
+        
+        if (wordMeaningRepository.GetByWordId(wordShort.Id) == null)
         {
-            string word = LanguageEnum.English.Equals(definitionRequestModel.LanguageFromId)
-                ? definitionRequestModel.Text
-                : wordLink.Translation;
-                
-            wordMeaning = word.Split(" ").SelectMany(w => dictionaryService.GetWordDetails(w).Result).ToList();
-                
             foreach (var meaning in wordMeaning)
             {
                 if (!Enum.TryParse(meaning.Type, true, out WordTypeEnum parsedValue))  // `true` for case-insensitive parsing

@@ -47,24 +47,22 @@ namespace LL.Core.Factories
             string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
-            string prompt = string.Format(@"Rank the following word by their importance in the sentence. 
-                By importance i mean, how important they are to understand the given sentence in the given context.
-                all the words need to be in {1}, If the word is in different language, 
-                explicit or isn't understandable, just ignore it, don't include it in the json.
-                Return a ONLY a JSON file and nothing else.
-                For examole if you receive the sentence: 'a set of words that is complete in itself, 
-                typically containing a subject and predicate, conveying a statement,
-                 question, exclamation, or command, and consisting of 
-                a main clause and sometimes one or more subordinate clauses.'
-                sentence, complete, subject, predicate, statement, question, exclamation, command, clause, subordinate will be marked as '1'
-                typically, conveying, main, set, itself, consisting will be marked as '2'
-                a, of, in, teh, and, is, that will be marked as '3'
-                Also return the its translation to {2}, in needs to be in the same context as it is in the provided sentence
-                Please include all the words in the json, Ensure that you separate words only when necessary. For example, 'su vida' 
-                should be split into 'su' and 'vida,' but 'otra vez' must stay together 
-                because its meaning would change if separated. If separating two words 
-                does not alter their individual meanings, they should be split; however, 
-                most of them will remain as single words.
+            string prompt = string.Format
+            (@"Rank the following sentence's words by their importance to understand it in context. 
+               By 'importance,' I mean how essential each word is for conveying the sentence's meaning. Only include words in {1} if they are understandable and relevant.
+               Ignore any words that are unclear, explicit, or not in the given context. Do not include them in the JSON output.
+
+                For ranking:
+
+                Words critical to the main meaning of the sentence (e.g., nouns, verbs, key concepts) are ranked as '1'.
+                Less important words (e.g., adverbs, prepositions) are ranked as '2'.
+                Function words (e.g., articles, conjunctions) are ranked as '3'.
+                Additionally:
+
+                Return only a JSON file with the ranking and translations.
+                If a word is part of another language (e.g., 'su vida'), split it into individual words ('su' and 'vida') unless separating them changes meaning (e.g., 'otra vez' remains together).
+                Provide translations to {2} for each ranked word in the context they appear.
+                Example:
 
                 The JSON file should have the following format:
 
