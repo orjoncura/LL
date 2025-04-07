@@ -21,9 +21,7 @@ public class CourseService(
     IWordLinkRepository wordLinkRepository,
     IExerciseRepository exerciseRepository,
     ICourseWordRepository courseWordRepository,
-    IAgentService agentService,
-    IDictionaryService dictionaryService,
-    ITranslationService translationService) : ICourseService
+    IAgentService agentService) : ICourseService
 {
     public async Task<CourseViewModel> CreateCourse(CourseRequestModel seminarRequest, int userId)
     {
@@ -67,18 +65,14 @@ public class CourseService(
             }
         }
         
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
-        
         List<CourseWordsModel> courseWordsList = new List<CourseWordsModel>();
 
         foreach (var text in combinedStrings)
         {
-            var prompt = PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId);
-    
             try
             {
-                var response = agentService.Run(prompt).Result;
+                var response = agentService
+                    .Run(PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId)).Result;
         
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -94,51 +88,45 @@ public class CourseService(
             }
         }
 
-        courseViewModel.Words = courseWordsList;
+        courseWordsList = courseWordsList.Where(c => c.IsValid).ToList();
         
-        stopwatch.Stop();
-        Console.WriteLine(stopwatch.ElapsedMilliseconds);
+        courseViewModel.Words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
+
+        CreateDefinitions(courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
         return courseViewModel;
     }
-  
-    public async Task<WordViewModel> CreateDefinitions(DefinitionRequestModel definitionRequestModel, int userId)
-    {            
-        List<string> translations = translationService
-            .TranslateText(definitionRequestModel.Text,
-                definitionRequestModel.LanguageFromId, 
-                definitionRequestModel.LanguageToId).Result;
-
-        definitionRequestModel.Translation = translations.FirstOrDefault(t => definitionRequestModel.Translation.ToLower().Contains(t.ToLower()));
-        
-        List<MeaningShort> wordMeaning = dictionaryService.GetWordDetails(definitionRequestModel.Translation).Result;
-        
-        if(string.IsNullOrEmpty(definitionRequestModel.Translation) || !wordMeaning.Any())
-            return null;
-        
-        WordShort wordShort = wordRepository.Insert(definitionRequestModel.Text, definitionRequestModel.LanguageFromId, userId);
-        
-        WordLinkShort wordLink = wordLinkRepository.Insert(wordShort.Id, definitionRequestModel, userId);
-        
-        if (wordMeaningRepository.GetByWordId(wordShort.Id) == null)
+    private async Task CreateDefinitions(List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
+    {
+        foreach (var courseWord in courseWordsList)
         {
-            foreach (var meaning in wordMeaning)
+            WordShort wordShort = wordRepository.Insert(courseWord.Word, fromId, userId);
+
+            wordLinkRepository.Insert(wordShort.Id, courseWord.Translation, fromId, toId, userId);
+
+            MeaningShort meaning = new MeaningShort
             {
-                if (!Enum.TryParse(meaning.Type, true, out WordTypeEnum parsedValue))  // `true` for case-insensitive parsing
+                Definitions = new List<string>()
+                {
+                    courseWord.Definition
+                },
+                Type = courseWord.PartOfSpeech
+            };
+
+            if (wordMeaningRepository.GetByWordId(wordShort.Id) == null)
+            {
+                if (!Enum.TryParse(meaning.Type, true,
+                        out WordTypeEnum parsedValue)) // `true` for case-insensitive parsing
                     continue;
-                
+
                 int wordMeaningId = wordMeaningRepository
                     .Insert(wordShort.Id, (int)parsedValue, userId);
-            
+
                 meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
             }
         }
-            
-        if(wordMeaning.Any())
-            return new WordViewModel(wordShort, wordMeaning, wordLink.Translation);
-        
-        return null;
     }
+    
     public async Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId)
     {
         List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();

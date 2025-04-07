@@ -31,9 +31,9 @@ public class JsonHelperTest
     }
     
     [Fact]
-    public void JsonHelper_ExtractSeminarWordsModelList()
+    public void JsonHelper_ExtractCourseWordsModelList()
     {
-        string content = File.ReadAllText(@"../../../Files/SeminarWordsModelListExample.txt");
+        string content = File.ReadAllText(@"../../../Files/CourseWordsModelExample.txt");
 
         List<CourseWordsModel>? seminarWords = JsonHelper.Extract<List<CourseWordsModel>>(content);
         

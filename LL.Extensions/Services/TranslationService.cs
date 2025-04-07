@@ -20,6 +20,7 @@ public class TranslationService: ITranslationService
             q = text.ToLower(), // Text to translate
             source = GetLanguageCode(fromId), // Source language
             target = GetLanguageCode(toId), // Target language
+            alternatives = 3,
             format = "text" // Text format
         };
         

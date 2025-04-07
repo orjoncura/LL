@@ -29,14 +29,14 @@ public class WordLinkRepository(AppDbContext db) : IWordLinkRepository
         };
     }
     
-    public WordLinkShort Insert(int wordId, DefinitionRequestModel definitionRequestModel, int userId)
+    public WordLinkShort Insert(int wordId, string translation, int fromId, int toId, int userId)
     {
         WordLink wordLink = db.WordLinks
             .Include(w => w.Word)
             .FirstOrDefault(w => 
                 w.WordId == wordId 
-                && w.LanguageId == definitionRequestModel.LanguageToId 
-                && w.Word.LanguageId == definitionRequestModel.LanguageFromId 
+                && w.LanguageId == toId
+                && w.Word.LanguageId == fromId 
                 && w.Word.IsActive
                 && w.IsActive);
 
@@ -45,8 +45,8 @@ public class WordLinkRepository(AppDbContext db) : IWordLinkRepository
             wordLink = new WordLink()
             {
                 WordId = wordId,
-                Value = definitionRequestModel.Translation,
-                LanguageId = definitionRequestModel.LanguageToId,
+                Value = translation,
+                LanguageId = toId,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

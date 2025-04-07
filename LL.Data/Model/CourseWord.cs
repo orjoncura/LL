@@ -9,7 +9,6 @@ public class CourseWord
     
     public int CourseId { get; set; }
     public virtual Course? Course { get; set; }
-    
     public int ImportanceRatingId { get; set; }
     public virtual ImportanceRating? ImportanceRating { get; set; }
     

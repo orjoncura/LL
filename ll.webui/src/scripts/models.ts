@@ -70,15 +70,9 @@ export interface ExerciseRequestModel {
 
 export interface CourseViewModel {
   id: number;
-  words: CourseWordsModel[];
+  words: WordViewModel[];
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
-}
-
-export interface CourseWordsModel {
-  word: string;
-  translation: string;
-  importance: number;
 }
 
 export interface WordViewModel {

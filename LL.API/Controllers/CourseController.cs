@@ -77,36 +77,6 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
-        /// Pass a word amd get its details: meanings, definitions etc
-        /// </summary>
-        /// <param name="definitionRequestModel">Contains text, its translation, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
-        /// <response code="200">The new seminar</response>
-        [HttpPost("CreateDefinitions")]
-        [ProducesResponseType(typeof(WordViewModel), StatusCodes.Status200OK)]
-        public async Task<ActionResult> CreateDefinitions([FromBody] DefinitionRequestModel definitionRequestModel)
-        {
-            try
-            {
-                return Ok(await seminarService.CreateDefinitions(definitionRequestModel, 1));
-            }
-            catch (Exception ex)
-            {
-                var exceptionData = new Dictionary<string, object>();
-
-                if (definitionRequestModel != null)
-                {
-                    exceptionData["Text"] = definitionRequestModel.Text;
-                    exceptionData["LanguageIdFrom"] = definitionRequestModel.LanguageFromId;
-                    exceptionData["LanguageIdTo"] = definitionRequestModel.LanguageToId;
-                }
-                
-                appMonitoringService.ExportError(ex, exceptionData);
-                
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
-            }
-        }
-        
-        /// <summary>
         /// Pass a word and the course information to create exercises for the selected word.
         /// </summary>
         /// <param name="exerciseRequest">Contains Course & Word information</param>

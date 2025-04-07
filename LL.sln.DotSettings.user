@@ -44,5 +44,7 @@
     &lt;TestId&gt;xUnit::B2CE3B87-2E75-48B2-AF34-C8F603953FAE::net8.0::LL.Test.Helpers.JsonHelperTest.JsonHelper_ExtractExerciseViewModel&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::B2CE3B87-2E75-48B2-AF34-C8F603953FAE::net8.0::LL.Test.Services.CourseServiceTest.CreateCourse_ShouldCreateCourse&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::B2CE3B87-2E75-48B2-AF34-C8F603953FAE::net8.0::LL.Test.Extensions.AgentServiceTest.Run_RunAgent_Success&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::B2CE3B87-2E75-48B2-AF34-C8F603953FAE::net8.0::LL.Test.Helpers.JsonHelperTest.JsonHelper_ExtractCourseWordsModel&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::B2CE3B87-2E75-48B2-AF34-C8F603953FAE::net8.0::LL.Test.Helpers.JsonHelperTest.JsonHelper_ExtractCourseWordsModelList&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

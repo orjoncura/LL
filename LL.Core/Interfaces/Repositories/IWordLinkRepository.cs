@@ -5,5 +5,5 @@ namespace LL.Core.Interfaces.Repositories;
 
 public interface IWordLinkRepository
 {
-    WordLinkShort Insert(int wordId, DefinitionRequestModel definitionRequestModel, int userId);
+    WordLinkShort Insert(int wordId, string translation, int fromId, int toId, int userId);
 }

@@ -1,4 +1,5 @@
 using LL.Core.Enums;
+using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
 
 namespace LL.Core.Models.ViewModels;
@@ -18,11 +19,21 @@ public class WordViewModel
         Translation = translation;
         ImportanceRatingId = wordShort.ImportanceRatingId;
     }
-    public WordViewModel(WordShort wordShort, List<MeaningShort> meanings, string translation)
+    public WordViewModel(CourseWordsModel courseWordsModel)
     {
-        Id = wordShort.Id;
-        Name = wordShort.Name;
-        Meanings = meanings;
-        Translation = translation;
+        Name = courseWordsModel.Word;
+        Meanings = new List<MeaningShort>()
+        {
+            new()
+            {
+                Type = courseWordsModel.PartOfSpeech,
+                Definitions = new List<string>()
+                {
+                    courseWordsModel.Definition
+                }
+            }
+        };
+        Translation = courseWordsModel.Translation;
+        ImportanceRatingId = courseWordsModel.Importance;
     }
 }

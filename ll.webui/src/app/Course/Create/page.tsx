@@ -6,7 +6,7 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
-import {CourseRequestModel, CourseViewModel, CourseWordsModel, WordViewModel} from '@/scripts/models';
+import {CourseRequestModel, CourseViewModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
 
 export default function CreateSeminar() {
@@ -19,7 +19,6 @@ export default function CreateSeminar() {
     const [paragraphWords, setParagraphWords] = useState<WordViewModel[]>([]);
     const [paragraphs, setParagraph] = useState<string[]>([]);
     const [paragraphIndex, setParagraphIndex] = useState<number>(0);
-    const [courseWordsModels, setCourseWordsModels] = useState<CourseWordsModel[]>([]);
     const [pairIndex, setPairIndex] = useState<number>(0);
     const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }[]>([]);
     const [activeWord, setActiveWord] = useState<string | null>(null);
@@ -91,7 +90,6 @@ export default function CreateSeminar() {
       setParagraph([]);
       setParagraphWords([]);
       setParagraphIndex(0);
-      setCourseWordsModels([]);
     };
     
     const handleWordClick = (word: string, column: number) => {
@@ -160,52 +158,18 @@ export default function CreateSeminar() {
               return;
             }
 
-            var courseViewModels = courseViewModel.words.sort((a, b) => a.importance > b.importance ? 1 : -1);
+            var courseViewModels = courseViewModel.words.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1);
             
             for (const courseViewModel of courseViewModels) {
-              let attempt = 0;
-              let maxRetries = 3;
-              let retryDelay = 3;
               
-              // Retry logic for fetching word definition
-              while (attempt < maxRetries) {
-                  try {
-                      const response: WordViewModel = await POST('/Course/CreateDefinitions', 
-                          JSON.stringify({
-                              text: courseViewModel.word,
-                              translation: courseViewModel.translation,
-                              languageFromId: languageFromId,
-                              languageToId: languageToId
-                          }));
-          
-                      if (response == null || response.id == null) {
-                          attempt++;
-                          if (attempt < maxRetries) {
-                              await new Promise(resolve => setTimeout(resolve, retryDelay));
-                          }
-                          continue;
-                      }
-
-                      if(wordViewModels.some(w => w.name == response.name) == false)
-                         wordViewModels.push(response);
-          
-                      if (wordIndex == 0 && showKeyWords == false && loading == true) {
-                          setLoading(false);
-                          startCourse(textCleaned);
-                      }       
-          
-                      break;
-                  } catch (error) {
-                      attempt++;
-                      if (attempt < maxRetries) {
-                          await new Promise(resolve => setTimeout(resolve, retryDelay));
-                      }
-                  }
-              }
-          }
-          
-          setCourseWordsModels(courseViewModel.words);
-
+              if(wordViewModels.some(w => w.name == courseViewModel.name) == false)
+                wordViewModels.push(courseViewModel);
+ 
+              if (wordIndex == 0 && showKeyWords == false && loading == true) {
+                  setLoading(false);
+                  startCourse(textCleaned);
+              }  
+            }
           } catch (error) {
 
             setLoading(false);
