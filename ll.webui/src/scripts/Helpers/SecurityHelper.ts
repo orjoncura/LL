@@ -30,6 +30,15 @@ export async function POST(url: string, data: string): Promise<any> {
     })
     .catch(error => {
         console.error('Error sending data:', error);
+
+        // Check if the error is related to a connection issue
+        if (error instanceof Error && error.message.includes('Connection refused')
+            ||  error.message.includes('Failed to fetch')) {
+
+            // Redirect to login page
+            location.replace("/")
+        }
+    
         return null;
     });
 }
@@ -53,6 +62,15 @@ export async function GET(url: string) {
     })
     .catch(error => {
         console.error('Error sending data:', error);
+
+        // Check if the error is related to a connection issue
+        if (error instanceof Error && error.message.includes('Connection refused')
+            ||  error.message.includes('Failed to fetch')) {
+
+            // Redirect to login page
+            location.replace("/")
+        }
+
         throw error;  // Re-throw the error so it can be caught by the caller
     });
 }

@@ -73,7 +73,6 @@ export default function CreateSeminar() {
     const resetAllToDefault = () => {
       setCourseLength(0);
       setWordIndex(0);
-      setKeyWords([]);
       setPairIndex(0);
       setPairs([]);
       setActiveWord(null);
@@ -119,7 +118,9 @@ export default function CreateSeminar() {
 
             if(pairs[pairIndex + 1] == null){
               setShowKeyWords(false);
-              setShowCourse(true);
+
+              setShowCourse(wordViewModels[0] != null);
+              setLoading(wordViewModels[0] == null);
             }else{
 
               setSelectedPairs({});
@@ -241,9 +242,10 @@ export default function CreateSeminar() {
           return 0;
         });
 
+        var sortedBasedOnAppearance:any = sortBasedOnAppearance(sortedParagraphs[paragraphIndex], words);
         setParagraph(sortedParagraphs);
-        setParagraphWords(sortBasedOnAppearance(sortedParagraphs[paragraphIndex], words));
-        setCourseLength(paragraphWords.length);
+        setParagraphWords(sortedBasedOnAppearance);
+        setCourseLength(sortedBasedOnAppearance.length);
         setShowKeyWords(kw.length > 0);
         setWordViewModels(words);
         setLoading(kw.length == 0);
@@ -252,19 +254,22 @@ export default function CreateSeminar() {
 
     const nextStep = (newIndex: number) => {
 
+      let newParagraphIndex = paragraphIndex;
       if(paragraphWords[newIndex] == null){
 
         newIndex = 0;
-        setParagraphIndex(paragraphIndex + 1);
+        newParagraphIndex = paragraphIndex + 1;
       }
 
-      if(paragraphs[paragraphIndex] == null)
+      setParagraphIndex(newParagraphIndex);
+      
+      if(paragraphs[newParagraphIndex] == null)
         resetAllToDefault();
 
       setWordIndex(newIndex);
+      setShowCourse(paragraphs[newParagraphIndex] != null);
+      setParagraphWords(sortBasedOnAppearance(paragraphs[newParagraphIndex], wordViewModels));
       setCourseLength(paragraphWords.length);
-      setShowCourse(paragraphs[paragraphIndex] != null);
-      setParagraphWords(sortBasedOnAppearance(paragraphs[paragraphIndex], wordViewModels));
     }
     
     function shuffle<T>(array: string[]): string[] {
@@ -325,6 +330,8 @@ export default function CreateSeminar() {
 
     function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
 
+      if(text == null || wordsList.length == 0) return [];
+
       wordsList = wordsList.filter(w => text.includes(w.name));
 
       // Normalize the sample text: split into words and convert to lowercase without punctuation
@@ -357,25 +364,8 @@ export default function CreateSeminar() {
         <Navbar /> 
 
         <div className="container-flex">
-
           <div className="container mt-4" style={{ marginBottom: "25%" }}>
-            <div className="mb-4">
-              <div className="d-flex">
-                {Array.from({ length: courseLength }).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`flex-fill me-1 progress-bar ${
-                      index < wordIndex ? "bg-success" : "bg-secondary"
-                    }`}
-                    style={{
-                      height: "20px",
-                      marginRight: index < courseLength - 1 ? "2px" : "0",
-                    }}
-                  ></div>
-                ))}
-              </div>
-            </div>
-
+  
             {showCourse == false && showKeyWords == false && ( 
             <div>
                 <div  style={{textAlign: 'center'}}>
@@ -461,6 +451,18 @@ export default function CreateSeminar() {
 
             {showCourse && (paragraphWords[wordIndex].name != null) && (   
               <div>
+                  <div className="mb-4">
+                    <div className="d-flex">
+                      {Array.from({ length: courseLength }).map((_, index) => (
+                        <div
+                          key={index}
+                          className={`flex-fill me-1 progress-bar ${ index < wordIndex ? "bg-success" : "bg-secondary"}`}
+                          style={{height: "20px",marginRight: index < courseLength - 1 ? "2px" : "0",}}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
                     <div className="mainTxt flip-card" onClick={flipCard}>
                       <div className="flip-card-inner">

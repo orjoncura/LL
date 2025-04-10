@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LL.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250319223150_Initial")]
+    [Migration("20250408222556_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -166,19 +166,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4900), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(5221), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "High"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4906), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(5228), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Medium"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(4908), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(5231), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Low"
                         });
                 });
@@ -206,13 +206,13 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9667), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 333, DateTimeKind.Unspecified).AddTicks(9907), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "English"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9672), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 333, DateTimeKind.Unspecified).AddTicks(9912), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Spanish"
                         });
                 });
@@ -376,19 +376,19 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9176), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 333, DateTimeKind.Unspecified).AddTicks(9366), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Queued"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9224), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 333, DateTimeKind.Unspecified).AddTicks(9426), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Sent"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 231, DateTimeKind.Unspecified).AddTicks(9226), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 333, DateTimeKind.Unspecified).AddTicks(9429), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Failed"
                         });
                 });
@@ -729,44 +729,50 @@ namespace LL.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2592), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2909), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Noun"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2598), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2921), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Verb"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2599), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2923), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Adjective"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2621), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2925), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Adverb"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2622), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2927), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Interjection"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2625), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2930), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Preposition"
                         },
                         new
                         {
                             Id = 7,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 3, 19, 22, 31, 50, 232, DateTimeKind.Unspecified).AddTicks(2626), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2931), new TimeSpan(0, 1, 0, 0, 0)),
                             Value = "Pronoun"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 8, 23, 25, 56, 334, DateTimeKind.Unspecified).AddTicks(2933), new TimeSpan(0, 1, 0, 0, 0)),
+                            Value = "Determiner"
                         });
                 });
 

@@ -27,7 +27,7 @@ public class CourseService(
     {
         CourseViewModel courseViewModel = new CourseViewModel();
 
-        if(seminarRequest == null || seminarRequest.IsValid == false) 
+        if(seminarRequest.IsValid == false) 
             return courseViewModel;
         
         courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
@@ -71,8 +71,8 @@ public class CourseService(
         {
             try
             {
-                var response = agentService
-                    .Run(PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId)).Result;
+                var response = await agentService
+                    .Run(PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId));
         
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -91,12 +91,12 @@ public class CourseService(
         courseWordsList = courseWordsList.Where(c => c.IsValid).ToList();
         
         courseViewModel.Words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
-
+        
         CreateDefinitions(courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
         return courseViewModel;
     }
-    private async Task CreateDefinitions(List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
+    private void CreateDefinitions(List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
     {
         foreach (var courseWord in courseWordsList)
         {
