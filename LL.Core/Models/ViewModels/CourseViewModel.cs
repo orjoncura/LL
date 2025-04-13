@@ -1,16 +1,12 @@
-﻿using LL.Core.Models.Arguments;
-
-namespace LL.Core.Models.ViewModels;
+﻿namespace LL.Core.Models.ViewModels;
 
 public class CourseViewModel
 {
     public int Id { get; set; } 
-
-    public List<WordViewModel> Words { get; set; } = new List<WordViewModel>();
+    public string Text { get; set; } = string.Empty;
     
-    public bool IsValid => 
-        Id > 0
-        && Words.Any(w => string.IsNullOrWhiteSpace(w.Name) == false
-                          && string.IsNullOrWhiteSpace(w.Name) == false);
+    public DateTimeViewModel CreatedDate { get; set; }
+    
+    public bool IsValid => Id > 0 && string.IsNullOrEmpty(Text) == false;
 }
 

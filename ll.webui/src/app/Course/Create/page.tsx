@@ -153,18 +153,16 @@ export default function CreateSeminar() {
               "languageToId": languageToId
             };
 
-            const courseViewModel: CourseViewModel =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
-            if(courseViewModel == null || courseViewModel == undefined || courseViewModel.words == undefined){
+            const wordViewModels: WordViewModel[] =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+            if(wordViewModels == null || wordViewModels == undefined){
               setLoading(false);
               return;
             }
-
-            var courseViewModels = courseViewModel.words.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1);
             
-            for (const courseViewModel of courseViewModels) {
+            for (const word of wordViewModels.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1)) {
               
-              if(wordViewModels.some(w => w.name == courseViewModel.name) == false)
-                wordViewModels.push(courseViewModel);
+              if(wordViewModels.some(w => w.name == word.name) == false)
+                wordViewModels.push(word);
  
               if (wordIndex == 0 && showKeyWords == false && loading == true) {
                   setLoading(false);

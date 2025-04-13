@@ -16,7 +16,8 @@ namespace LL.API.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public class CourseController(ICourseService seminarService, 
+    public class CourseController(ICourseService courseService, 
+        ICourseRepository courseRepository,
         IWordRepository wordRepository,
         IAppMonitoringService appMonitoringService) : Controller
     {
@@ -52,12 +53,12 @@ namespace LL.API.Controllers
         /// <param name="courseRequest">Contains text, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
         /// <response code="200">The new seminar</response>
         [HttpPost("Create")]
-        [ProducesResponseType(typeof(CourseViewModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] CourseRequestModel courseRequest)
         {
             try
             {
-                return Ok(await seminarService.CreateCourse(courseRequest, 1));
+                return Ok(await courseService.CreateCourse(courseRequest, 1));
             }
             catch (Exception ex)
             {
@@ -87,7 +88,7 @@ namespace LL.API.Controllers
         {
             try
             {
-                return Ok(await seminarService.CreateExercises(exerciseRequest, 1));
+                return Ok(await courseService.CreateExercises(exerciseRequest, 1));
             }
             catch (Exception ex)
             {
@@ -98,6 +99,31 @@ namespace LL.API.Controllers
                     exceptionData["CourseId"] = exerciseRequest.CourseId;
                     exceptionData["WordId"] = exerciseRequest.WordId;
                 }
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+            }
+        }
+        
+        /// <summary>
+        /// Get a list of courses by the userId
+        /// </summary>
+        /// <param name="userId">The id of the user</param>
+        /// <response code="200">The list of courses</response>
+        [HttpGet("GetCoursesByUserId")]
+        [ProducesResponseType(typeof(List<CourseViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetCoursesByUserId([FromQuery] int userId)
+        {
+            try
+            {
+                return Ok(courseRepository.GetCoursesByUserId(userId));
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+                
+                exceptionData["UserId"] = userId;
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 

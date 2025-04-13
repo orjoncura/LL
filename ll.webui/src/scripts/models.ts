@@ -68,11 +68,17 @@ export interface ExerciseRequestModel {
   rankId?: number;
 }
 
+export interface DateTimeViewModel {
+  minute: number;
+  day: number;
+  month: number;
+  asString:string
+}
+
 export interface CourseViewModel {
   id: number;
-  words: WordViewModel[];
-  /** NOTE: This property will not be serialized. It can only be populated by the server. */
-  readonly isValid?: boolean;
+  text: string;
+  createdDate: DateTimeViewModel;
 }
 
 export interface WordViewModel {

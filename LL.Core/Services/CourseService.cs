@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using LL.Core.Enums;
 using LL.Core.Factories;
@@ -23,14 +22,14 @@ public class CourseService(
     ICourseWordRepository courseWordRepository,
     IAgentService agentService) : ICourseService
 {
-    public async Task<CourseViewModel> CreateCourse(CourseRequestModel seminarRequest, int userId)
+    public async Task<List<WordViewModel>> CreateCourse(CourseRequestModel seminarRequest, int userId)
     {
-        CourseViewModel courseViewModel = new CourseViewModel();
+        List<WordViewModel> words = new List<WordViewModel>();
 
         if(seminarRequest.IsValid == false) 
-            return courseViewModel;
+            return words;
         
-        courseViewModel.Id = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
         var splitTexts = Regex.Split(seminarRequest.Text, @"(\r\n?|\n){2}")
             .Where(p => p.Any(char.IsLetterOrDigit) && !string.IsNullOrWhiteSpace(p))
@@ -90,11 +89,11 @@ public class CourseService(
 
         courseWordsList = courseWordsList.Where(c => c.IsValid).ToList();
         
-        courseViewModel.Words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
+        words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
         
         CreateDefinitions(courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
-        return courseViewModel;
+        return words;
     }
     private void CreateDefinitions(List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
     {
@@ -126,7 +125,6 @@ public class CourseService(
             }
         }
     }
-    
     public async Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId)
     {
         List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();

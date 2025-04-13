@@ -16,7 +16,13 @@ public static class DataFactory
             Language = EnumHelper.GetEnumValueById<LanguageEnum>(word.LanguageId),
             ImportanceRatingId = word.ImportanceRatingId
         };
-    
+    public static CourseViewModel Convert(Course course) =>
+        new()
+        {
+            Id = course.Id,
+            Text = course.Value,
+            CreatedDate = new DateTimeViewModel(course.CreatedDate) 
+        };
     public static ExerciseViewModel Convert(Exercise exercise) =>
         new()
         {

@@ -11,12 +11,8 @@
 /LL.CA/obj
 /LL.Core/bin
 /LL.Core/obj
-/LL.Data/bin
-/LL.Data/obj
-/LL.Extensions/bin
-/LL.Extensions/obj
-/LL.SharedDefinitions/bin
-/LL.SharedDefinitions/obj
+/LL.Resources/bin
+/LL.Resources/obj
 /LL.Test/bin
 /LL.Test/obj
 /ll.webui/.vs

@@ -79,15 +79,24 @@ public class WordRepository(AppDbContext db,
         
         return  DataFactory.Convert(word);
     }
-    public void Insert(string name)
+    /*public List<WordViewModel> GetByCourseId(int id)
     {
-        List<Word> words = db.Words.Where(w => w.AudioPath == string.Empty).ToList();
-        
-        words.ForEach(w => w.AudioPath = storageService.SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)w.LanguageId)).Result);
-        
-        db.Add(words);
-        db.SaveChanges();
-    }
+        var words =
+            (from course in db.Courses
+                join CourseWord in db.CourseWords
+                    on course.Id equals CourseWord.Id
+                join wordLink in db.WordLinks
+                    on CourseWord.WordId equals wordLink.WordId
+                join wordMeaning in db.WordMeanings
+                    on CourseWord.WordId equals wordMeaning.WordId
+                join wordDefinition in db.WordDefinitions
+                    on wordMeaning.Id equals wordDefinition.WordMeaningId
+
+                select new WordViewModel()).ToList();
+
+        return words;
+    }*/
+    
     private Word? GetSingleByName(string name, int fromId) => 
         db.Words.FirstOrDefault(w => 
             w.Name.ToLower() == name.Trim().ToLower()

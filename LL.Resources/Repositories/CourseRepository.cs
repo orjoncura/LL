@@ -1,6 +1,9 @@
 using LL.Resources.Contexts;
 using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.ViewModels;
+using LL.Resources.Factories;
 using LL.Resources.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LL.Resources.Repositories;
 
@@ -27,5 +30,13 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
         }
         
         return course.Id;
+    }
+    public List<CourseViewModel> GetCoursesByUserId(int userId)
+    {
+         List<CourseViewModel> courseViewModels = db.Courses
+            .Where(c => c.CreatedById == userId && c.IsActive)
+            .Select(DataFactory.Convert).ToList();
+
+         return courseViewModels;
     }
 }
