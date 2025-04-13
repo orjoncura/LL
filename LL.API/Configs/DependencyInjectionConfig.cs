@@ -5,8 +5,8 @@ using LL.Core.Interfaces.Services;
 using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
-using LL.Data.Repositories;
-using LL.Extensions.Services;
+using LL.Resources.Repositories;
+using LL.Resources.Services;
 
 namespace LL.API.Configs
 {
@@ -35,9 +35,7 @@ namespace LL.API.Configs
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IAppMonitoringService, AppMonitoringService>();
             services.AddScoped<IStorageService, StorageService>();
-            services.AddScoped<ITranslationService, TranslationService>();
             services.AddScoped<ITextToSpeechService, TextToSpeechService>();
-            services.AddScoped<IDictionaryService, DictionaryService>();
             services.AddScoped<IEncryptionService, EncryptionService>();
 
             //Singletons

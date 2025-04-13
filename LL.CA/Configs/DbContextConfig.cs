@@ -1,5 +1,5 @@
 ﻿using LL.Core.Constants;
-using LL.Data.Contexts;
+using LL.Resources.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

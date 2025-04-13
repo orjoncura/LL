@@ -1,25 +1,24 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+# Use the official .NET Core SDK as a parent image
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["LL.API/LL.API.csproj", "LL.API/"]
-RUN dotnet restore "./LL.API/LL.API.csproj"
+# Copy the project file and restore any dependencies (use .csproj for the project name)
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy the rest of the application code
 COPY . .
-WORKDIR "/src/LL.API"
-RUN dotnet build "./LL.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./LL.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Publish the application
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+# Build the runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/out ./
+
+# Expose the port your application will run on
+EXPOSE 80
+
+# Start the application
 ENTRYPOINT ["dotnet", "LL.API.dll"]

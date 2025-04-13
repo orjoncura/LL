@@ -1,5 +1,5 @@
 ﻿using LL.Core.Constants;
-using LL.Data.Contexts;
+using LL.Resources.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace LL.API.Configs

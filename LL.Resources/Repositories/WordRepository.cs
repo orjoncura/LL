@@ -1,0 +1,97 @@
+﻿using LL.Core.Enums;
+using LL.Core.Helpers;
+using LL.Core.Interfaces.Extensions;
+using LL.Resources.Contexts;
+using LL.Core.Interfaces.Repositories;
+using LL.Core.Models.DataTransferObjects;
+using LL.Core.Models.Short;
+using LL.Core.Models.ViewModels;
+using LL.Resources.Factories;
+using LL.Resources.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace LL.Resources.Repositories;
+public class WordRepository(AppDbContext db,
+    StorageModel storageModel, 
+    IStorageService storageService, 
+    ITextToSpeechService textToSpeechService) : IWordRepository
+{
+    public List<WordViewModel> GetKeyWords(int languageId)
+    {
+        var words = db.WordLinks
+            .Where(w => w.Word.LanguageId == languageId
+                        && (w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
+                            || w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.High)
+                        && w.IsActive)
+            .Include(wordLink => wordLink.Word).ToList()
+            .Select(w => new WordViewModel(DataFactory.Convert(w.Word), w.Value)).ToList();
+        
+        var wordIds = words.Select(w => w.Id).ToList();
+        
+        var meanings = db.WordMeanings
+            .Include(w => w.Type)
+            .Include(w => w.WordDefinitions)
+            .Where(w => wordIds.Contains(w.WordId) & w.IsActive).ToList();
+        
+        words.ForEach(w => w.Meanings = meanings.Where(m => m.WordId == w.Id).Select(DataFactory.Convert).ToList());
+        
+        return words;
+    }
+    public MemoryStream? GetFileStreamById(int wordId)
+    {
+        var word = db.Words.FirstOrDefault(w => w.Id == wordId);
+
+        if (word == null)
+            return null;
+        
+        string audioPath = word.AudioPath;
+        
+        var memoryStream = new MemoryStream();
+        // Write audio data to memoryStream (replace with actual logic)
+        memoryStream.Write(storageService.GetFile(storageModel, audioPath).Result);
+        memoryStream.Seek(0, SeekOrigin.Begin);
+
+        // Return memory stream as content
+        return memoryStream;
+    }
+    
+    public WordShort Insert(string name, int languageId, int userId)
+    {
+        Word? word = GetSingleByName(name, languageId);
+        
+        if (word == null)
+        {
+            word = new Word
+            { 
+                Name = name.Trim().ToLower(),
+                AudioPath = storageService
+                    .SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)).Result,
+                LanguageId = languageId,
+                ImportanceRatingId = (int)ImportanceRatingEnum.Medium,
+                IsActive = true,
+                CreatedById = userId,
+                CreatedDate = DateTime.Now,
+            };
+
+            db.Add(word);
+            db.SaveChanges();
+        }
+        
+        return  DataFactory.Convert(word);
+    }
+    public void Insert(string name)
+    {
+        List<Word> words = db.Words.Where(w => w.AudioPath == string.Empty).ToList();
+        
+        words.ForEach(w => w.AudioPath = storageService.SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)w.LanguageId)).Result);
+        
+        db.Add(words);
+        db.SaveChanges();
+    }
+    private Word? GetSingleByName(string name, int fromId) => 
+        db.Words.FirstOrDefault(w => 
+            w.Name.ToLower() == name.Trim().ToLower()
+            & w.LanguageId == fromId);
+    
+}
+

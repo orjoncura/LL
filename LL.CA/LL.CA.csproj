@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>    
         <UserSecretsId>d6dea0a5-7c05-4e19-a548-e479631e708c</UserSecretsId>
@@ -10,19 +10,19 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LL.Core\LL.Core.csproj" />
-      <ProjectReference Include="..\LL.Data\LL.Data.csproj" />
-      <ProjectReference Include="..\LL.Extensions\LL.Extensions.csproj" />
+      <ProjectReference Include="..\LL.Resources\LL.Resources.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.14" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.2" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.4" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
     </ItemGroup>
 
     <ItemGroup>
