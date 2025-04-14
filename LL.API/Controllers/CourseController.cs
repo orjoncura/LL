@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using System.Security.Claims;
 using LL.API.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
@@ -19,7 +20,7 @@ namespace LL.API.Controllers
     public class CourseController(ICourseService courseService, 
         ICourseRepository courseRepository,
         IWordRepository wordRepository,
-        IAppMonitoringService appMonitoringService) : Controller
+        IAppMonitoringService appMonitoringService) : BaseController
     {
         /// <summary>
         /// Pass a languageId to get a list of keywords 
@@ -43,7 +44,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
         
@@ -58,7 +59,7 @@ namespace LL.API.Controllers
         {
             try
             {
-                return Ok(await courseService.CreateCourse(courseRequest, 1));
+                return Ok(await courseService.CreateCourse(courseRequest, UserId));
             }
             catch (Exception ex)
             {
@@ -73,7 +74,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
         
@@ -88,7 +89,7 @@ namespace LL.API.Controllers
         {
             try
             {
-                return Ok(await courseService.CreateExercises(exerciseRequest, 1));
+                return Ok(await courseService.CreateExercises(exerciseRequest, UserId));
             }
             catch (Exception ex)
             {
@@ -102,7 +103,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
         
@@ -111,25 +112,21 @@ namespace LL.API.Controllers
         /// </summary>
         /// <param name="userId">The id of the user</param>
         /// <response code="200">The list of courses</response>
-        [HttpGet("GetCoursesByUserId")]
+        [HttpGet("GetCourses")]
         [ProducesResponseType(typeof(List<CourseViewModel>), StatusCodes.Status200OK)]
-        public ActionResult GetCoursesByUserId([FromQuery] int userId)
-        {
-            try
+           public ActionResult GetCourses()
             {
-                return Ok(courseRepository.GetCoursesByUserId(userId));
-            }
-            catch (Exception ex)
-            {
-                var exceptionData = new Dictionary<string, object>();
-                
-                exceptionData["UserId"] = userId;
+                try
+                {       
+                    return Ok(courseRepository.GetCoursesByUserId(UserId));
+                }
+                catch (Exception ex)
+                {
+                    appMonitoringService.ExportError(ex);
 
-                appMonitoringService.ExportError(ex, exceptionData);
-                
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                    return ErrorStatusCode;
+                }
             }
-        }
         
         /// <summary>
         /// Pass a wordId to get an audio for the selected word.
@@ -152,7 +149,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
     }

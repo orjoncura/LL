@@ -13,6 +13,6 @@ public class DateTimeViewModel
         Day = dateTime.Day;
         Month = dateTime.Month;
         
-        AsString = dateTime.ToString("DD/MM/YYYY");
+        AsString = dateTime.ToString("dd/MM/yyyy");
     }
 }

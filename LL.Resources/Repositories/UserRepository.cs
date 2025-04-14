@@ -51,8 +51,6 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
 
         db.Add(userToken);
         db.SaveChanges();
-
-        tokenViewModel.UserId = user.Id;
         
         return tokenViewModel;
     }

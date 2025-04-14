@@ -43,7 +43,7 @@ export async function POST(url: string, data: string): Promise<any> {
     });
 }
 
-export async function GET(url: string) {
+export async function GET(url: string): Promise<any> {
     return fetch(Constants().API + url, {
         method: 'GET',
         headers: {

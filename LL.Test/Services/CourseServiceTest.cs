@@ -14,7 +14,7 @@ namespace LL.Test.Services
 {
     public class CourseServiceTest
     {
-        private ICourseService SeminarService { get; set; }
+        private ICourseService courseService { get; set; }
         public CourseServiceTest()
         { 
             var services = Provider.GetRequiredService();
@@ -48,7 +48,7 @@ namespace LL.Test.Services
             services.AddTransient<IStorageService>(_ => mockStorageService.Object);
             services.AddTransient<IDictionaryService>(_ => mockDictionaryService.Object);
 
-            SeminarService = services.BuildServiceProvider().GetRequiredService<ICourseService>();
+            courseService = services.BuildServiceProvider().GetRequiredService<ICourseService>();
         }
         
         [Fact]
@@ -62,10 +62,10 @@ namespace LL.Test.Services
             };
 
             // Act
-            CourseViewModel seminars = await SeminarService.CreateCourse(courseRequest, 1);
+            List<WordViewModel> wordViewModels = await courseService.CreateCourse(courseRequest, 1);
 
             // Assert
-            Assert.True(seminars.IsValid);
+            Assert.True(wordViewModels.Any());
         } 
           
     }   

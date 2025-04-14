@@ -22,7 +22,7 @@ namespace LL.API.Controllers
         ISecurityService securityService, 
         IUserRepository userRepository, 
         IAppMonitoringService appMonitoringService,
-        TokenConfigModel tokenConfigModel) : Controller
+        TokenConfigModel tokenConfigModel) : BaseController
     {
         /// <summary>
         /// Pass username and password and get a security token.
@@ -48,7 +48,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
 
@@ -80,7 +80,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
         
@@ -110,7 +110,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }      
         
@@ -139,7 +139,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }        
         
@@ -168,7 +168,7 @@ namespace LL.API.Controllers
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = AppSettings.Status500InternalServerError });
+                return ErrorStatusCode;
             }
         }
         

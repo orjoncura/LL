@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useEffect, useRef, CSSProperties, ReactNode} from 'react';
+import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
