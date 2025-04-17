@@ -29,7 +29,7 @@ public class CourseService(
         if(seminarRequest.IsValid == false) 
             return words;
         
-        courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        int courseId = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
         var splitTexts = Regex.Split(seminarRequest.Text, @"(\r\n?|\n){2}")
             .Where(p => p.Any(char.IsLetterOrDigit) && !string.IsNullOrWhiteSpace(p))
@@ -91,16 +91,17 @@ public class CourseService(
         
         words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
         
-        CreateDefinitions(courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        CreateDefinitions(courseId, courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
         
         return words;
     }
-    private void CreateDefinitions(List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
+    private void CreateDefinitions(int courseId, List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
     {
         foreach (var courseWord in courseWordsList)
         {
             WordShort wordShort = wordRepository.Insert(courseWord.Word, fromId, userId);
 
+            courseWordRepository.Insert(wordShort.Id, courseId, courseWord.Importance, userId);
             wordLinkRepository.Insert(wordShort.Id, courseWord.Translation, fromId, toId, userId);
 
             MeaningShort meaning = new MeaningShort

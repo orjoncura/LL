@@ -10,7 +10,7 @@ public class WordLink
     public string Value { get; set; } = string.Empty;
     public int LanguageId {  get; set; }
     
-    public bool IsActive { get; set; }
+    public bool  IsActive { get; set; }
 
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }

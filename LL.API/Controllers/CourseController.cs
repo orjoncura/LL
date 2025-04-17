@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
-using System.Security.Claims;
-using LL.API.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -108,25 +106,44 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
-        /// Get a list of courses by the userId
+        /// Get a list of courses by the userId found in the claims of the user.
         /// </summary>
-        /// <param name="userId">The id of the user</param>
         /// <response code="200">The list of courses</response>
         [HttpGet("GetCourses")]
         [ProducesResponseType(typeof(List<CourseViewModel>), StatusCodes.Status200OK)]
-           public ActionResult GetCourses()
-            {
-                try
-                {       
-                    return Ok(courseRepository.GetCoursesByUserId(UserId));
-                }
-                catch (Exception ex)
-                {
-                    appMonitoringService.ExportError(ex);
-
-                    return ErrorStatusCode;
-                }
+        public ActionResult GetCourses()
+        {
+            try
+            {       
+                return Ok(courseRepository.GetCoursesByUserId(UserId));
             }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Get a list of words of a course.
+        /// </summary>
+        /// <response code="200">The list of words</response>
+        [HttpGet("GetCourseWords")]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetCourseWords([FromQuery] int courseId)
+        {
+            try
+            {       
+                return Ok(wordRepository.GetByCourseId(courseId));
+            }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
         
         /// <summary>
         /// Pass a wordId to get an audio for the selected word.

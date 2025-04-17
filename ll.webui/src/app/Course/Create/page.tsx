@@ -3,22 +3,18 @@ import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
+import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
-import {CourseRequestModel, CourseViewModel, WordViewModel} from '@/scripts/models';
+import {CourseRequestModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
 
 export default function CreateSeminar() {
     const modalRef = useRef<any>(null); 
 
-    const [courseLength, setCourseLength] = useState<number>(0);  
-    const [wordIndex, setWordIndex] = useState<number>(0);
     const [showKeyWords, setShowKeyWords] = useState(false);
     const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
-    const [paragraphWords, setParagraphWords] = useState<WordViewModel[]>([]);
-    const [paragraphs, setParagraph] = useState<string[]>([]);
-    const [paragraphIndex, setParagraphIndex] = useState<number>(0);
     const [pairIndex, setPairIndex] = useState<number>(0);
     const [pairs, setPairs] = useState<{ column1: string[]; column2: string[] }[]>([]);
     const [activeWord, setActiveWord] = useState<string | null>(null);
@@ -28,10 +24,9 @@ export default function CreateSeminar() {
     const [loading, setLoading] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalBody, setModalBody] = useState('');
-    const [text, setText] = useState<string>('');
     const [showCourse, setShowCourse] = useState(false);
-    const [showMeaning, setShowMeaning] = useState(false);
     const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+    const [courseText, setCourseText] = useState<string>('');   
 
     const [feedbackStyle] = useState<CSSProperties>({
       color: "#d63384",
@@ -68,27 +63,6 @@ export default function CreateSeminar() {
 
           modalRef.current.openModal(); // Call openModal from the Example component
       }
-    };
-    
-    const resetAllToDefault = () => {
-      setCourseLength(0);
-      setWordIndex(0);
-      setPairIndex(0);
-      setPairs([]);
-      setActiveWord(null);
-      setSelectedPairs({});
-      setMessage(null);
-      setWordViewModels([]);
-      setLoading(false);
-      setModalTitle('');
-      setModalBody('');
-      setText('');
-      setShowCourse(false);
-      setShowKeyWords(false);
-      setShowMeaning(false);
-      setParagraph([]);
-      setParagraphWords([]);
-      setParagraphIndex(0);
     };
     
     const handleWordClick = (word: string, column: number) => {
@@ -138,13 +112,13 @@ export default function CreateSeminar() {
         try {
 
 
-            if(text.length == 0)
+            if(courseText.length == 0)
             {
               openModal("Error", "Text can not be empty.");
               return;
             }
 
-            var textCleaned = text.replaceAll(/[\r\n]+/g, " ");
+            var textCleaned = courseText.replaceAll(/[\r\n]+/g, " ");
             startCourse(textCleaned);
 
             const courseRequestModel: CourseRequestModel = {
@@ -164,7 +138,7 @@ export default function CreateSeminar() {
               if(wordViewModels.some(w => w.name == word.name) == false)
                 wordViewModels.push(word);
  
-              if (wordIndex == 0 && showKeyWords == false && loading == true) {
+              if (showKeyWords == false && loading == true) {
                   setLoading(false);
                   startCourse(textCleaned);
               }  
@@ -229,47 +203,12 @@ export default function CreateSeminar() {
         
         const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
 
-        const sortedParagraphs = text.split('\n\n').sort((a, b) => {
-          const aPercentage = Percentage(a, words);
-          const bPercentage = Percentage(b, words);
-        
-          if (aPercentage > bPercentage) return -1;
-          if (aPercentage < bPercentage) return 1;
-        
-          // If both are included or both are not included, sort alphabetically
-          return 0;
-        });
-
-        var sortedBasedOnAppearance:any = sortBasedOnAppearance(sortedParagraphs[paragraphIndex], words);
-        setParagraph(sortedParagraphs);
-        setParagraphWords(sortedBasedOnAppearance);
-        setCourseLength(sortedBasedOnAppearance.length);
         setShowKeyWords(kw.length > 0);
         setWordViewModels(words);
         setLoading(kw.length == 0);
       }
     }
 
-    const nextStep = (newIndex: number) => {
-
-      let newParagraphIndex = paragraphIndex;
-      if(paragraphWords[newIndex] == null){
-
-        newIndex = 0;
-        newParagraphIndex = paragraphIndex + 1;
-      }
-
-      setParagraphIndex(newParagraphIndex);
-      
-      if(paragraphs[newParagraphIndex] == null)
-        resetAllToDefault();
-
-      setWordIndex(newIndex);
-      setShowCourse(paragraphs[newParagraphIndex] != null);
-      setParagraphWords(sortBasedOnAppearance(paragraphs[newParagraphIndex], wordViewModels));
-      setCourseLength(paragraphWords.length);
-    }
-    
     function shuffle<T>(array: string[]): string[] {
   
       const shuffled = [...array];
@@ -282,80 +221,6 @@ export default function CreateSeminar() {
       return shuffled;
     }
       
-    const flipCard = () => {
-
-      const cardElement = document.querySelector('.flip-card-inner');
-    
-      if (cardElement != null && !cardElement.classList.contains('flipped')) {
-        cardElement.classList.toggle('flipped');
-        setShowMeaning(true);
-
-      }else if(cardElement != null){
-
-        cardElement.classList.remove('flipped');
-        setShowMeaning(false);
-      }
-
-    };
-    
-    function highlightWord(word: string): string {
-        const trimmedText = text.trim();
-        
-        if (trimmedText === '') 
-          return "";
-
-        const matchingParagraphs = trimmedText.split('\n\n').filter(t => t.includes(word));
-        
-        if (matchingParagraphs.length === 0) 
-          return "";
-        
-        return matchingParagraphs[0].replace(new RegExp("(" + word + ")", "g"), word.bold());
-    }
-
-    function Percentage(paragraph: string, targetWords: WordViewModel[]){
-      const targetSet = new Set(targetWords.map(word => word.name.toLowerCase()));
-      const words = paragraph.toLowerCase().match(/[a-zA-Z0-9]+/g) || [];
-      const uniqueParagraphWords = new Set(words);
-      
-      if (uniqueParagraphWords.size === 0) return 0;
-      
-      const matchingCount = Array.from(uniqueParagraphWords).filter(word => 
-          targetSet.has(word)
-      ).length;
-      
-      return (matchingCount / uniqueParagraphWords.size) * 100;
-    }
-
-    function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
-
-      if(text == null || wordsList.length == 0) return [];
-
-      wordsList = wordsList.filter(w => text.includes(w.name));
-
-      // Normalize the sample text: split into words and convert to lowercase without punctuation
-      const normalizedText = text.split(/\s+/).map(word => word.trim().toLowerCase()).filter(word => word.length > 0);
-
-      // Create an array of objects with each word's position in the text
-      const wordIndices = wordsList.map(word => {
-          const lowerWord = word.name.trim().toLowerCase();
-          // Find the first occurrence index or a large number if not found
-          const index = normalizedText.indexOf(lowerWord);
-          return { originalWord: word, index };
-      });
-
-      // Sort based on the index; handle missing words by placing them last
-      const sorted = [...wordIndices]
-          .sort((a, b) => {
-              if (a.index === -1 && b.index === -1) return 0;
-              if (a.index === -1) return 1;
-              if (b.index === -1) return -1;
-              return a.index - b.index;
-          })
-          .map(item => item.originalWord);
-
-        return sorted;
-    };
-
     return (
       <div>
 
@@ -374,8 +239,8 @@ export default function CreateSeminar() {
 
                 <br/><br/><br/>
                 <textarea
-                        value={text}
-                        onChange={e => setText(e.target.value)}
+                        value={courseText}
+                        onChange={e => setCourseText(e.target.value)}
                         placeholder="Please enter your text here..."
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -447,64 +312,7 @@ export default function CreateSeminar() {
               )}
             </div>)}
 
-            {showCourse && (paragraphWords[wordIndex].name != null) && (   
-              <div>
-                  <div className="mb-4">
-                    <div className="d-flex">
-                      {Array.from({ length: courseLength }).map((_, index) => (
-                        <div
-                          key={index}
-                          className={`flex-fill me-1 progress-bar ${ index < wordIndex ? "bg-success" : "bg-secondary"}`}
-                          style={{height: "20px",marginRight: index < courseLength - 1 ? "2px" : "0",}}
-                        ></div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
-                    <div className="mainTxt flip-card" onClick={flipCard}>
-                      <div className="flip-card-inner">
-                          <div className="flip-card-front">
-                              <p className="title">{paragraphWords[wordIndex].name}</p>
-                          </div>
-                          <div className="flip-card-back">
-                              <p className="title">{paragraphWords[wordIndex].translation}</p>
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <br></br>
-                  <button onClick={() => CreateAudio(paragraphWords[wordIndex].id)} className='audio'>
-                      <FontAwesomeIcon icon={faVolumeUp} />
-                  </button> 
-                  <span>&nbsp;&nbsp;</span>
-                  {showMeaning == false && <div dangerouslySetInnerHTML={{ __html: highlightWord(paragraphWords[wordIndex].name) }} />}
-
-                  {showMeaning && (paragraphWords[wordIndex].meanings && paragraphWords[wordIndex].meanings.length > 0 ? (
-                   paragraphWords[wordIndex].meanings.map((meaning) => (
-                    <div key={wordIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
-                      <h3>{meaning.type}</h3>
-                      <ul>
-                        {meaning.definitions && meaning.definitions.length > 0 ? (
-                          meaning.definitions.map((definition, defIndex) => (
-                            <li key={wordIndex}>{definition}</li>
-                          ))
-                        ) : (
-                          <li>No definitions available</li>
-                        )}
-                      </ul>
-                    </div>
-                  ))
-                ) : (<p>No meanings available</p> ))}
-                
-              <div className="feedback-container fixed-bottom" style={feedbackStyle}>
-                <button className="mainBtn feedback-button" onClick={() => nextStep(wordIndex + 1)}>
-                  <span className="chevron">›</span>
-                    Next
-                </button>
-              </div>
-             </div> )}
+            {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)} />)}
           </div>
         </div>
 

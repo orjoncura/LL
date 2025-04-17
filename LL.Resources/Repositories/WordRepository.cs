@@ -79,23 +79,38 @@ public class WordRepository(AppDbContext db,
         
         return  DataFactory.Convert(word);
     }
-    /*public List<WordViewModel> GetByCourseId(int id)
+    
+    public List<WordViewModel> GetByCourseId(int id)
     {
         var words =
             (from course in db.Courses
-                join CourseWord in db.CourseWords
-                    on course.Id equals CourseWord.Id
+                join courseWord in db.CourseWords
+                    on course.Id equals courseWord.CourseId
                 join wordLink in db.WordLinks
-                    on CourseWord.WordId equals wordLink.WordId
-                join wordMeaning in db.WordMeanings
-                    on CourseWord.WordId equals wordMeaning.WordId
-                join wordDefinition in db.WordDefinitions
-                    on wordMeaning.Id equals wordDefinition.WordMeaningId
+                    on courseWord.WordId equals wordLink.WordId
+                join word in db.Words
+                    on wordLink.WordId equals word.Id
+                where course.Id == id
+                   && course.IsActive
+                   && courseWord.IsActive
+                   && wordLink.IsActive  
+                   && word.IsActive 
+                select new WordViewModel(word.Id, word.Name, wordLink.Value, word.ImportanceRatingId)).ToList();
 
-                select new WordViewModel()).ToList();
-
+        List<int> ids = words.Select(w => w.Id).ToList();
+        
+        var wordMeanings = db.WordMeanings
+            .Include(wm => wm.Type)
+            .Include(wm => wm.WordDefinitions)
+            .Where(wm => ids.Contains(wm.WordId) && wm.IsActive 
+               && wm.WordDefinitions.All(wd => wd.IsActive)).ToList();
+        
+        words.ForEach(w =>
+            w.Meanings = wordMeanings.Where(m => m.WordId == w.Id)
+                .Select(DataFactory.Convert).ToList());
+        
         return words;
-    }*/
+    }
     
     private Word? GetSingleByName(string name, int fromId) => 
         db.Words.FirstOrDefault(w => 

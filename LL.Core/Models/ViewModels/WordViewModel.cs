@@ -12,6 +12,13 @@ public class WordViewModel
     public List<MeaningShort> Meanings { get; set; } 
     public int ImportanceRatingId { get; set; }
 
+    public WordViewModel(int id, string name, string translation, int importanceRatingId)
+    {
+        Id = id;
+        Name = name;
+        Translation = translation;
+        ImportanceRatingId = importanceRatingId;
+    }
     public WordViewModel(WordShort wordShort, string translation)
     {
         Id = wordShort.Id;
