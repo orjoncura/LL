@@ -1,0 +1,45 @@
+services:
+  ll_data:
+    image: ll_data
+    container_name: ll_data
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "" 
+      MSSQL_PID: "Express" 
+    ports:
+      - "1433:1433" 
+    networks:
+      - ll_network
+
+  ll_api:
+      image: ll_api
+      container_name: ll_api
+      ports:
+        - "5000:5000"
+      networks:
+        - ll_network
+      depends_on:
+        - ll_data
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ASPNETCORE_URLS=http://+:5000
+      volumes:
+        - ~/.microsoft/usersecrets:/home/app/.microsoft/usersecrets
+
+  ll_webui :
+    image: ll_webui 
+    container_name: ll_webui
+    ports:
+      - "3000:3000" 
+    networks:
+      - ll_network
+    depends_on:
+      - ll_api 
+
+networks:
+  ll_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
