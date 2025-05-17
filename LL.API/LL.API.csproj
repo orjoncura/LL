@@ -25,4 +25,12 @@
     <ProjectReference Include="..\LL.Resources\LL.Resources.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="out\web.config" />
+    <_ContentIncludedByDefault Remove="out\appsettings.json" />
+    <_ContentIncludedByDefault Remove="out\LL.API.deps.json" />
+    <_ContentIncludedByDefault Remove="out\LL.API.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="out\LL.API.staticwebassets.endpoints.json" />
+  </ItemGroup>
+
 </Project>

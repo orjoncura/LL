@@ -26,6 +26,3 @@ ENTRYPOINT ["dotnet", "LL.API.dll"]
 
 ENV ASPNETCORE_ENVIRONMENT=Development
 
-
-
-

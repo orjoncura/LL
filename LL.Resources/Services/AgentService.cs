@@ -11,7 +11,7 @@ namespace LL.Resources.Services;
 
 public class AgentService(AgentModel agentModel) : IAgentService
 {
-    private async Task<string> RunGeminiAPI(string input)
+    private async Task<string> RunGeminiApi(string input)
     {
         // Replace with your actual Google API key
         string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={agentModel.GeminiAPI}";
@@ -64,35 +64,8 @@ public class AgentService(AgentModel agentModel) : IAgentService
             return output;
         }
     }
-    
-    private async Task<string> RunLocalLlama(string input)
-    {
-        var parameters = new ModelParams(agentModel.LLamaModeLocation)
-        {
-            GpuLayerCount = 16 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
-        };
-
-        using var model = LLamaWeights.LoadFromFile(parameters);
-        using var context = model.CreateContext(parameters);
-        var executor = new InteractiveExecutor(context);
-
-        ChatSession session = new(executor);
-
-        InferenceParams inferenceParams = new InferenceParams()
-        {
-            AntiPrompts = new List<string> { "User:" } // Stop generation once antiprompts appear.
-        };
-
-        string output = "";
-
-        await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, input), inferenceParams))
-            output += text;
-
-        return output;
-    }
-
     private async Task<string> RunLocalOllama(string input)
-    {
+    { 
         IChatClient chatClient =  new OllamaChatClient(new Uri("http://localhost:11434/"), "deepseek-r1:14b");
         
         List<ChatMessage> chatHistory = new();
@@ -110,8 +83,14 @@ public class AgentService(AgentModel agentModel) : IAgentService
 
             return response;
         }
-
     }
-    public async Task<string> Run(string input) => await RunLocalOllama(input);
+
+    public async Task<string> Run(string input)
+    {
+        if (string.IsNullOrWhiteSpace(agentModel.GeminiAPI))
+            return await RunLocalOllama(input);
+        
+        return await RunGeminiApi(input);
+    } 
 }
 

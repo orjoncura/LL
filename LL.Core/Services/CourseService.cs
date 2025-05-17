@@ -23,7 +23,7 @@ public class CourseService(
     IAgentService agentService) : ICourseService
 {
     public async Task<List<WordViewModel>> CreateCourse(CourseRequestModel seminarRequest, int userId)
-    {
+    {        
         List<WordViewModel> words = new List<WordViewModel>();
 
         if(seminarRequest.IsValid == false) 
