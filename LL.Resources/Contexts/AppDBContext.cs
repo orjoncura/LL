@@ -1,6 +1,7 @@
 ﻿using LL.Core.Enums;
 using LL.Resources.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LL.Resources.Contexts;
 
@@ -32,8 +33,25 @@ public class AppDbContext : DbContext
     public DbSet<WordLink> WordLinks { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
     
+    public class DateTimeOffsetToUtcConverter : ValueConverter<DateTimeOffset, DateTime>
+    {
+        public DateTimeOffsetToUtcConverter()
+            : base(
+                v => v.UtcDateTime,
+                v => new DateTimeOffset(v, TimeSpan.Zero))
+        { }
+    }
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<DateTimeOffset>()
+            .HaveConversion<DateTimeOffsetToUtcConverter>()
+            .HaveColumnType("timestamp"); // PostgreSQL: stores as UTC
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+         
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.Entity<User>(entity =>

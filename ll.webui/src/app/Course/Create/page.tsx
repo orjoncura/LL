@@ -91,10 +91,13 @@ export default function CreateSeminar() {
           if(pairs[pairIndex].column1.length == Object.keys(selectedPairs).length + 1){
 
             if(pairs[pairIndex + 1] == null){
-              setShowKeyWords(false);
 
+              setShowKeyWords(false);
               setShowCourse(wordViewModels[0] != null);
               setLoading(wordViewModels[0] == null);
+              setPairs([]);
+              setSelectedPairs({});
+              setPairIndex(0);
             }else{
 
               setSelectedPairs({});
@@ -110,7 +113,6 @@ export default function CreateSeminar() {
     const handleSubmit = async () => {
 
         try {
-
 
             if(courseText.length == 0)
             {
