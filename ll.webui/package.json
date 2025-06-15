@@ -2,22 +2,23 @@
   "name": "ll.webui",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint ."
+"scripts": {
+  "dev": "cp .env.development .env && next dev",
+  "dev:local": "cp .env.local .env && next dev",
+  "build:dev": "cp .env.development .env && NODE_ENV=development next build",
+  "build:local": "cp .env.local .env && NODE_ENV=development next build",
+  "build:prod": "cp .env.production .env && NODE_ENV=production next build",
+  "start": "next start",
+  "lint": "eslint ."
   },
   "dependencies": {
-    "@azure/core-auth": "^1.8.0",
-    "@azure/core-client": "^1.9.2",
-    "@azure/core-rest-pipeline": "^1.17.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "audio-buffer-from": "^1.1.1",
     "bootstrap": "^5.3.3",
+    "dotenv": "^16.5.0",
     "jquery": "^3.7.1",
-    "next": "^14.2.15",
+    "next": "^15.3.3",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",

@@ -14,7 +14,7 @@ namespace LL.CA.Configs
 
             if (connectionString == null) throw new Exception("Connection String is null");
 
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
             return services;
         }

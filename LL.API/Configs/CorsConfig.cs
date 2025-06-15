@@ -10,7 +10,7 @@ namespace LL.API.Configs
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    policy => policy.WithOrigins("http://localhost:3000")
+                    policy => policy.WithOrigins("http://localhost:3000", "https://web.fluente.dynv6.net")
                                     .AllowAnyHeader()
                                     .AllowAnyMethod());
             });

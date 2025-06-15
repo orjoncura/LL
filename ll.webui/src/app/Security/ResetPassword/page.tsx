@@ -2,11 +2,13 @@
 import React, {useState, useRef} from 'react';
 import { useRouter } from 'next/navigation'
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
-import Constants from "@/scripts/Constants";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
+import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
 import ModalView from '../../../components/Modal/ModalView';
 import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
+
+const applicationName = getEnv().Application_Name || '';
 
 export default function ResetPassword() {
 
@@ -71,7 +73,7 @@ export default function ResetPassword() {
         <Container className='mainTxt'>
             <Row className="justify-content-md-center mt-5">
                 <Col xs={12} md={6}>
-                    <h2 className="mainTxt text-center mb-4">{Constants().ApplicationName}</h2>
+                    <h2 className="mainTxt text-center mb-4">{applicationName}</h2>
 
                     <Form.Control
                         type="email"

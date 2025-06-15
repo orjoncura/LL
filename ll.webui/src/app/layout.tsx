@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Constants from '../scripts/Constants'
+import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
+
+const applicationName = getEnv().Application_Name || '';
 
 const inter = Inter({ subsets: ["latin"]});
 
 export const metadata: Metadata = {
-    title: Constants().ApplicationName,
+    title: applicationName,
   description: "Become your own teacher",
 };
 

@@ -1,6 +1,6 @@
 --Docker
 
-docker build -t ll_api .
+docker build -t 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api  .
 
 docker network create ll_network
 

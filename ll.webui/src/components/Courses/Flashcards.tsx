@@ -176,7 +176,9 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
             </div>
 
             <br></br>
-            <button onClick={() => CreateAudio(paragraphWords[wordIndex].id)} className='audio'>
+            <button 
+              onTouchStart={() => CreateAudio(paragraphWords[wordIndex].id)} 
+              onClick={() => CreateAudio(paragraphWords[wordIndex].id)} className='audio'>
                 <FontAwesomeIcon icon={faVolumeUp} />
             </button> 
             <span>&nbsp;&nbsp;</span>

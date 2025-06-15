@@ -5,8 +5,6 @@ import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import {CourseRequestModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
 

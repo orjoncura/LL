@@ -1,0 +1,66 @@
+services:
+  ll_data:
+    image: postgres:15
+    container_name: ll_data
+    environment:
+      POSTGRES_USER: 'LL_User'
+      POSTGRES_PASSWORD: 'd0ZGK9Me1UQ*Liv'
+      POSTGRES_DB: 'LL_Local'
+    ports:
+      - "5432:5432"
+    volumes:
+      - .docker/volumes/sql_data:/var/lib/postgresql/data    
+    networks:
+      - bridge_net
+
+  ll_api:
+      image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api
+      container_name: ll_api
+      ports:
+        - "5197:5000"
+      volumes:
+        - ~/.microsoft/Development:/home/app/.microsoft/usersecrets
+      networks:
+        - bridge_net
+      depends_on:
+        - ll_data
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ASPNETCORE_URLS=http://+:5000
+
+  deepseek:
+    image: docker.io/ollama/ollama
+    container_name: deepseek
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    volumes:
+      - ~/.docker/volumes/ollama_data:/root/.ollama
+    networks:
+      - bridge_net
+    restart: unless-stopped
+
+  ll_webui :
+    image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_webui 
+    container_name: ll_webui
+    ports:
+      - "3000:3000" 
+    networks:
+      - bridge_net
+    depends_on:
+      - ll_api 
+
+networks:
+  bridge_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1

@@ -1,8 +1,11 @@
+import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
 
-import Constants from '../Constants'
+const env = getEnv();
+const tokenStorageName = env.Token_Storage_Name || '';
+const api = env.API_URL || '';
 
 export async function POST(url: string, data: string): Promise<any> {
-    return await fetch(Constants().API + url, {
+    return await fetch(api + url, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${GetToken()}`,
@@ -44,7 +47,7 @@ export async function POST(url: string, data: string): Promise<any> {
 }
 
 export async function GET(url: string): Promise<any> {
-    return fetch(Constants().API + url, {
+    return fetch(api + url, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${GetToken()}`,
@@ -77,7 +80,7 @@ export async function GET(url: string): Promise<any> {
 
 
 export async function CreateAudio(id: number | undefined) {
-    return fetch(Constants().API + '/Course/StreamAudio?wordId=' + id, {
+    return fetch(api + '/Course/StreamAudio?wordId=' + id, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${GetToken()}`,
@@ -113,14 +116,14 @@ export async function CreateAudio(id: number | undefined) {
 
 export function StoreToken(token: string) {
 
-    localStorage.setItem(Constants().TokenStorageName, token);
+    localStorage.setItem(tokenStorageName, token);
 }
 
 export function GetToken(): string | null {
-    return localStorage.getItem(Constants().TokenStorageName);
+    return localStorage.getItem(tokenStorageName);
 }
 
 export function RemoveToken() {
-    localStorage.removeItem(Constants().TokenStorageName);
+    localStorage.removeItem(tokenStorageName);
 }
 

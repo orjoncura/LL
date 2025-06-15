@@ -2,14 +2,16 @@
 import React, {useState, useRef} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
-import Constants from '../scripts/Constants'
 import { POST, StoreToken } from '@/scripts/Helpers/SecurityHelper'
+import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
 import { IsValidEmail, IsValidPassword } from "@/scripts/Helpers/TextHelper";
 import {LoginModel, TokenViewModel} from '@/scripts/models';
 import Link from 'next/link';
 import ModalView from '../components/Modal/ModalView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
 import './globals.css'; 
+
+const applicationName = getEnv().Application_Name || '';
 
 export default function Login() {
 
@@ -90,7 +92,7 @@ export default function Login() {
 
       <Row className="justify-content-md-center mt-5">
           <Col xs={12} md={6}>
-              <h2 className="mainTxt text-center mb-4">{Constants().ApplicationName}</h2>
+              <h2 className="mainTxt text-center mb-4">{applicationName}</h2>
 
               <Form.Control
                   type="email"
@@ -123,7 +125,16 @@ export default function Login() {
               </Link>
           </Col>
       </Row>
-
+          {/* <div style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            justifyContent: 'center'
+          }}>
+            Version: {Constants().Version}
+          </div> */}
       {loading && <SpinnerOverlay />}
       <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
     </Container>

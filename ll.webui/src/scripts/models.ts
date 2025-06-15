@@ -1,4 +1,10 @@
-import * as coreClient from "@azure/core-client";
+export interface EnvironmentVariables {
+  Application_Name: string;
+  Version: string;
+  API_URL: string;
+  Token_Storage_Name: string;
+  NODE_ENV: 'local' | 'development' | 'production';
+}
 
 export interface ConfirmationModel {
   password: string;
@@ -104,24 +110,3 @@ export interface ExerciseViewModel {
   readonly isValid?: boolean;
 }
 
-/** Optional parameters. */
-export interface ApiSecurityOptionalParams extends coreClient.OperationOptions {
-  body?: LoginModel;
-}
-
-/** Contains response data for the security operation. */
-export type ApiSecurityResponse = TokenViewModel[];
-
-/** Optional parameters. */
-export interface ApiSeminarOptionalParams extends coreClient.OperationOptions {
-  body?: CourseRequestModel;
-}
-
-/** Contains response data for the seminar operation. */
-export type ApiSeminarResponse = CourseViewModel[];
-
-/** Optional parameters. */
-export interface ApiOptionalParams extends coreClient.ServiceClientOptions {
-  /** Overrides client endpoint. */
-  endpoint?: string;
-}
