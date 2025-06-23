@@ -13,6 +13,7 @@ COPY ["LL.API/LL.API.csproj", "LL.API/"]
 RUN dotnet restore "./LL.API/LL.API.csproj"
 COPY . .
 WORKDIR "/src/LL.API"
+
 RUN dotnet build "./LL.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

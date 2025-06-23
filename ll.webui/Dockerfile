@@ -26,7 +26,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Set environment variable to tell Next.js it's running in production
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Expose the port the app runs on
 EXPOSE 3000

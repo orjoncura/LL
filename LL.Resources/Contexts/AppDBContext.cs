@@ -38,9 +38,10 @@ public class AppDbContext : DbContext
         public DateTimeOffsetToUtcConverter()
             : base(
                 v => v.UtcDateTime,
-                v => new DateTimeOffset(v, TimeSpan.Zero))
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) // ✅ Fix here
         { }
     }
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder

@@ -1,7 +1,4 @@
-﻿using LL.Core.Interfaces;
-using LL.Core.Services;
-
-namespace LL.API.Configs
+﻿namespace LL.API.Configs
 {
     public static class CorsConfig
     {

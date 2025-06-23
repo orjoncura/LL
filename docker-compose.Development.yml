@@ -3,9 +3,9 @@ services:
     image: postgres:15
     container_name: ll_data
     environment:
-      POSTGRES_USER: 'LL_User'
-      POSTGRES_PASSWORD: 'd0ZGK9Me1UQ*Liv'
-      POSTGRES_DB: 'LL_Local'
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -16,17 +16,24 @@ services:
   ll_api:
       image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api
       container_name: ll_api
-      ports:
-        - "5197:5000"
-      volumes:
-        - ~/.microsoft/Development:/home/app/.microsoft/usersecrets
       networks:
         - bridge_net
       depends_on:
         - ll_data
       environment:
+        - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+        - Jwt__Key=${JWT_KEY}
+        - Jwt__Issuer=${JWT_ISSUER}
+        - Jwt__Audience=${JWT_AUDIENCE}
+        - Jwt__ExpiryMinutes=${JWT_EXPIRY_MINUTES}
+        - AWS_ACCESS_KEY_ID=${STORAGE_ACCESS_KEY}
+        - AWS_SECRET_ACCESS_KEY=${STORAGE_SECRET_KEY}
+        - AWS_REGION=${STORAGE_REGION}
+        - S3_BUCKET_NAME=${STORAGE_NAME}
         - ASPNETCORE_ENVIRONMENT=Development
-        - ASPNETCORE_URLS=http://+:5000
+        - ASPNETCORE_URLS=http://+:5000    
+      ports:
+      - "5197:5000"
 
   deepseek:
     image: docker.io/ollama/ollama

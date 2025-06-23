@@ -47,7 +47,7 @@ export default function CompleteUserRegistration() {
                   return;
               }
             
-              const searchParams = new URLSearchParams(window.location.search.toLowerCase());
+              const searchParams = new URLSearchParams(window.location.search);
               let token:string = searchParams.get('token') || '';
               let email:string = searchParams.get('email') || '';
 

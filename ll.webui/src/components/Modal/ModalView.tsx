@@ -2,36 +2,37 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-import './ModalView.css'; 
+import './ModalView.css';
 
 interface ModalViewProps {
   modalTitle: string;
   modalBody: string;
-  onClick?: Function;
+  onClick?: () => void;
 }
 
-const ModalView = forwardRef(({ modalTitle, modalBody, onClick}: ModalViewProps, ref) => {
+export interface ModalViewRef {
+  openModal: () => void;
+  closeModal: () => void;
+}
 
-  const [showModal, setShowModal] = useState(false);
+const ModalView = forwardRef<ModalViewRef, ModalViewProps>(
+  ({ modalTitle, modalBody, onClick }, ref) => {
+    const [showModal, setShowModal] = useState(false);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+    const openModal = () => setShowModal(true);
+    const closeModal = () => setShowModal(false);
 
-  const Confirm = () => {
+    const confirm = () => {
+      if (onClick) onClick();
+      closeModal();
+    };
 
-    if(onClick != null)
-      onClick();
-    
-    closeModal();
-  };
+    useImperativeHandle(ref, () => ({
+      openModal,
+      closeModal,
+    }));
 
-  useImperativeHandle(ref, () => ({
-    openModal,
-    closeModal
-  }));
-
-  return (
-    <>
+    return (
       <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
@@ -41,13 +42,13 @@ const ModalView = forwardRef(({ modalTitle, modalBody, onClick}: ModalViewProps,
           <Button variant="secondary" onClick={closeModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={Confirm}>
-             OK
+          <Button variant="primary" onClick={confirm}>
+            OK
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
-  );
-});
+    );
+  }
+);
 
 export default ModalView;
