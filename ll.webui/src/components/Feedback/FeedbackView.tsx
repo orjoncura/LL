@@ -1,0 +1,48 @@
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import './FeedbackView.css';
+
+interface FeedbackViewProps {
+  feedbackTitle: string;
+  feedbackBody: string;
+  onClick?: () => void;
+}
+
+export interface FeedbackViewRef {
+  open: () => void;
+  close: () => void;
+}
+
+const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
+  ({ feedbackTitle, feedbackBody, onClick }, ref) => {
+    const [showFeedback, setShowFeedback] = useState(false);
+
+    const open = () => setShowFeedback(true);
+    const close = () => setShowFeedback(false);
+
+    const confirm = () => {
+      if (onClick) onClick();
+      close();
+    };
+
+    useImperativeHandle(ref, () => ({
+      open,
+      close,
+    }));
+
+    return showFeedback && (
+          <div className="feedback-container fixed-bottom">
+            <div className="feedback-text" >
+              <div className="feedback-details">
+                <h3 className="feedback-title">{feedbackTitle}</h3>
+                {feedbackBody}
+              </div>
+            </div>
+            <button className="feedback-button mainBtn" onClick={confirm}>
+              Confirm
+            </button>
+        </div>
+    );
+  }
+);
+
+export default FeedbackView;

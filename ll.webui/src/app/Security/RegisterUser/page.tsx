@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
-import ModalView from '../../../components/Modal/ModalView';
+import FeedbackView from '../../../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
 import {NewUserModel} from '@/scripts/models';
 import Link from 'next/link';
@@ -13,24 +13,23 @@ export default function RegisterUser() {
 
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const modalRef = useRef<any>(null); 
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
     const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
-
     const [email, setEmail] = useState('');
     const [confirmEmail, setConfirmEmail] = useState('');
     
-    const openModal = (title: string, body:string, onClick?: Function) => {
-        if (modalRef.current) {
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
 
-            setModalTitle(title);
-            setModalBody(body);
+            setfbhTitle(title);
+            setfbhBody(body);
             setOnModalClick(() => onClick); 
 
-          modalRef.current.openModal(); // Call openModal from the Example component
+            feedbackViewRef.current.open();
         }
-      };
+    };
 
     const handleSubmit = (event:any) => {
 
@@ -41,13 +40,13 @@ export default function RegisterUser() {
 
                 if(IsValidEmail(email) == false || IsValidEmail(confirmEmail) == false) {
 
-                    openModal("Invalid Email", "Please make sure both emails are valid."); 
+                    showFeedback("Invalid Email", "Please make sure both emails are valid."); 
                     return;
                 }
 
                 if(email != confirmEmail) {
 
-                    openModal("Emails don't match", "Please make sure both emails are the same."); 
+                    showFeedback("Emails don't match", "Please make sure both emails are the same."); 
                     return;
                 }
 
@@ -65,16 +64,16 @@ export default function RegisterUser() {
                                     router.push('/', { scroll: false }); 
                                     };
 
-                                openModal("Success", "You will receive an email to confirm your identity", fun);
+                                showFeedback("Success", "You will receive an email to confirm your identity", fun);
                                 
                             }else{
-                                openModal("Error", "Something went wrong the request cannot be completed at this time")
+                                showFeedback("Error", "Something went wrong the request cannot be completed at this time")
                             }
                         
                             setLoading(false);
                         }).catch(e => { 
                             setLoading(false); 
-                            openModal("Error", "The server was unable to complete your request. Please try again later.");
+                            showFeedback("Error", "The server was unable to complete your request. Please try again later.");
                         });
             
         } catch (error) {
@@ -116,7 +115,7 @@ export default function RegisterUser() {
             </Row>
 
             {loading && <SpinnerOverlay />}
-            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
+            <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onModalClick} />
 
         </Container>
     );

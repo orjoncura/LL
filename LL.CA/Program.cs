@@ -45,7 +45,7 @@ public class Program
                 LanguageToId = (int)LanguageEnum.English
             };
 
-            await courseService.CreateCourse(courseRequestModel, -1);
+            //await courseService.CreateCourse(courseRequestModel, -1);
         }
         catch (Exception e)
         {

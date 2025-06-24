@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {IsValidPassword, IsValidEmail} from "@/scripts/Helpers/TextHelper";
-import ModalView from '@/components/Modal/ModalView';
+import FeedbackView from '@/components/Feedback/FeedbackView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import {ConfirmationModel} from '@/scripts/models';
 import Link from 'next/link';
@@ -13,23 +13,23 @@ export default function CompleteResetPassword() {
 
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const modalRef = useRef<any>(null); 
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirPassword] = useState('');
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
 
-    const openModal = (title: string, body:string, onClick?: Function) => {
-        if (modalRef.current) {
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
 
-            setModalTitle(title);
-            setModalBody(body);
-            setOnModalClick(() => onClick); 
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
 
-          modalRef.current.openModal(); // Call openModal from the Example component
+            feedbackViewRef.current.open();
         }
-      };
+    };
 
     const handleSubmit = (event:any) => {
         event.preventDefault();
@@ -37,13 +37,13 @@ export default function CompleteResetPassword() {
         try {
               if(IsValidPassword(password) == false || IsValidPassword(confirmPassword) == false) {
 
-                openModal("Invalid Password", "Please make sure both passwords are valid."); 
+                showFeedback("Invalid Password", "Please make sure both passwords are valid."); 
                 return;
               }
 
               if(password != confirmPassword) {
 
-                  openModal("Passwords don't match", "Please make sure both passwords are the same."); 
+                  showFeedback("Passwords don't match", "Please make sure both passwords are the same."); 
                   return;
               }
             
@@ -51,15 +51,15 @@ export default function CompleteResetPassword() {
               let token:string = searchParams.get('token') || '';
               let email:string = searchParams.get('email') || '';
 
-              if(token.length > 1) {
+              if(token.length < 1) {
 
-                openModal("Invalid Token", "The token provided is invalid or has expired. Please request a new one.");
+                showFeedback("Invalid Token", "The token provided is invalid or has expired. Please request a new one.");
                 return;
               }
               
               if(IsValidEmail(email) == false) {
 
-                openModal("Invalid Link", "This link is invalid or has expired. Please request a new one.");
+                showFeedback("Invalid Link", "This link is invalid or has expired. Please request a new one.");
                 return;
               }
 
@@ -79,16 +79,16 @@ export default function CompleteResetPassword() {
                           router.push('/', { scroll: false }); 
                         };
 
-                      openModal("Success", "Your password has been reset successfully", fun);
+                      showFeedback("Success", "Your password has been reset successfully", fun);
                       
                   }else{
-                      openModal("Error", "Something went wrong the request cannot be completed at this time")
+                      showFeedback("Error", "Something went wrong the request cannot be completed at this time")
                   }
                 
                   setLoading(false);
                 }).catch(e => { 
                   setLoading(false); 
-                  openModal("Error", "The server was unable to complete your request. Please try again later.");
+                  showFeedback("Error", "The server was unable to complete your request. Please try again later.");
               });
 
         } catch (error) {
@@ -118,7 +118,7 @@ export default function CompleteResetPassword() {
                       value={confirmPassword}
                       onChange={(e) => setConfirPassword(e.target.value)}
                   />
-    
+        
                   <br/>
                   <Button variant="primary" type="submit" className="mainBtn w-100" onClick={handleSubmit}> Confirm </Button>
 
@@ -130,7 +130,7 @@ export default function CompleteResetPassword() {
           </Row>
 
           {loading && <SpinnerOverlay />}
-          <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick}/>
+          <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
       </Container>
     );
 };

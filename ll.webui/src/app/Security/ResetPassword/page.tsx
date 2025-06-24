@@ -5,7 +5,7 @@ import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {POST} from "@/scripts/Helpers/SecurityHelper";
 import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
 import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
-import ModalView from '../../../components/Modal/ModalView';
+import FeedbackView from '../../../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
 
 const applicationName = getEnv().Application_Name || '';
@@ -14,23 +14,23 @@ export default function ResetPassword() {
 
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const modalRef = useRef<any>(null); 
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
 
     const [email, setEmail] = useState('');
     
-    const openModal = (title: string, body:string, onClick?: Function) => {
-        if (modalRef.current) {
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
 
-            setModalTitle(title);
-            setModalBody(body);
-            setOnModalClick(() => onClick); 
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
 
-          modalRef.current.openModal(); // Call openModal from the Example component
+            feedbackViewRef.current.open();
         }
-      };
+    };
 
     const handleSubmit = (event:any) => {
         event.preventDefault();
@@ -48,21 +48,21 @@ export default function ResetPassword() {
 
                             let fun = () => {
                                 router.push('/', { scroll: false }); 
-                                };
+                            };
 
-                            openModal("Success", "You will receive an email to confirm your request", fun);
+                            showFeedback("Success", "You will receive an email to confirm your request", fun);
                             
                         }else{
-                            openModal("Error", "Something went wrong the request cannot be completed at this time");
+                            showFeedback("Error", "Something went wrong the request cannot be completed at this time");
                         }
                         
                         setLoading(false);
                     }).catch(e => { 
                         setLoading(false); 
-                        openModal("Error", "The server was unable to complete your request. Please try again later.");
+                        showFeedback("Error", "The server was unable to complete your request. Please try again later.");
                     });
             }else {
-                openModal("Invalid Email", "Please pass a valid email"); 
+                showFeedback("Invalid Email", "Please pass a valid email"); 
             }
         } catch (error) {
             console.error('Error making API call:', error);
@@ -89,7 +89,7 @@ export default function ResetPassword() {
             </Row>
 
             {loading && <SpinnerOverlay />}
-            <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
+            <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
 
         </Container>
     );

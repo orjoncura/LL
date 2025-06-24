@@ -105,9 +105,11 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
         if (user == null) 
             return false;
          
-        user.PasswordHash = password;
+        HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
+        user.PasswordHash = hashPasswordModel.Password;
+        user.Salt = hashPasswordModel.Salt;
          
-        db.Add(user);
+        db.Update(user);
         db.SaveChanges();
          
         var userLog = new UserLog()
@@ -123,6 +125,6 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
         db.Add(userLog);
         db.SaveChanges();
          
-        return user.PasswordHash == password;
+        return user.PasswordHash == hashPasswordModel.Password;
     }
 }

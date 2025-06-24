@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
 import { POST, StoreToken } from '@/scripts/Helpers/SecurityHelper'
@@ -7,7 +7,7 @@ import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
 import { IsValidEmail, IsValidPassword } from "@/scripts/Helpers/TextHelper";
 import {LoginModel, TokenViewModel} from '@/scripts/models';
 import Link from 'next/link';
-import ModalView from '../components/Modal/ModalView';
+import FeedbackView from '../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
 import './globals.css'; 
 
@@ -17,21 +17,23 @@ export default function Login() {
 
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const modalRef = useRef<any>(null); 
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
 
-    const openModal = (title: string, body:string, onClick?: Function) => {
-        if (modalRef.current) {
+    useEffect(() => { console.log("Version:" + getEnv().Version)}, []);
 
-            setModalTitle(title);
-            setModalBody(body);
-            setOnModalClick(() => onClick); 
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
 
-            modalRef.current.openModal(); // Call openModal from the Example component
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
+
+            feedbackViewRef.current.open();
         }
     };
 
@@ -42,13 +44,13 @@ export default function Login() {
         try {
             if (IsValidEmail(email) == false) {
 
-                openModal("Error", "Invalid email address format.");
+                showFeedback("Error", "Invalid email address format.");
                 return;
             }
 
             if (IsValidPassword(password) == false) {
 
-                openModal("Error", "Invalid password format.");
+                showFeedback("Error", "Invalid password format.");
                 return;
             }
   
@@ -67,14 +69,14 @@ export default function Login() {
                         router.push('/Course/Create', { scroll: false });
   
                     } else {
-                        openModal("Error", "It looks like the username or password you entered doesn't match our records." 
+                        showFeedback("Error", "It looks like the username or password you entered doesn't match our records." 
                         + " Please double - check and try again.");
                     }
   
                     setLoading(false);
                 }).catch(e => {
                     setLoading(false);
-                    openModal("Error", "The server was unable to complete your request. Please try again later.");
+                    showFeedback("Error", "The server was unable to complete your request. Please try again later.");
                 });
             
   
@@ -110,7 +112,6 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
               />
-
               <br/>
               <Button type="submit" className="mainBtn w-100" onClick={handleSubmit}> Login </Button>
 
@@ -125,18 +126,8 @@ export default function Login() {
               </Link>
           </Col>
       </Row>
-          {/* <div style={{
-            position: 'fixed',
-            bottom: '0',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            justifyContent: 'center'
-          }}>
-            Version: {Constants().Version}
-          </div> */}
       {loading && <SpinnerOverlay />}
-      <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
+      <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
     </Container>
   );
 }

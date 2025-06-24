@@ -1,15 +1,14 @@
 "use client";
-import React, {useState, useEffect, useRef, CSSProperties} from 'react';
+import React, {useState, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
-import ModalView from '@/components/Modal/ModalView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import {CourseRequestModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
+import { faLariSign } from '@fortawesome/free-solid-svg-icons';
 
-export default function CreateSeminar() {
-    const modalRef = useRef<any>(null); 
+export default function CreateCourse() {
 
     const [showKeyWords, setShowKeyWords] = useState(false);
     const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
@@ -20,22 +19,23 @@ export default function CreateSeminar() {
     const [message, setMessage] = useState<string | null>(null);
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
     const [loading, setLoading] = useState(false);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState('');
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
     const [showCourse, setShowCourse] = useState(false);
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
     const [courseText, setCourseText] = useState<string>('');   
-
-    const [feedbackStyle] = useState<CSSProperties>({
-      color: "#d63384",
-      backgroundColor: "#fff0f6"
-    });
 
     const languageFromId = 2;
     const languageToId = 1;
 
     let hasFetchedData = false;
-    
+
+    useEffect(() => {
+          if(showKeyWords == false && loading == true && wordViewModels.length > 0){
+            setLoading(false);
+            startCourse(courseText.replaceAll(/[\r\n]+/g, " "));
+          }
+    }, [loading, showKeyWords, wordViewModels]);
+
     useEffect(() => {
 
       if(hasFetchedData == false){
@@ -52,15 +52,10 @@ export default function CreateSeminar() {
       }
     }, []);
     
-    const openModal = (title: string, body:string, onClick?: Function) => {
-      if (modalRef.current) {
-
-          setModalTitle(title);
-          setModalBody(body);
-          setOnModalClick(() => onClick); 
-
-          modalRef.current.openModal(); // Call openModal from the Example component
-      }
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        
+          setfbhTitle(title);
+          setfbhBody(body);
     };
     
     const handleWordClick = (word: string, column: number) => {
@@ -114,7 +109,7 @@ export default function CreateSeminar() {
 
             if(courseText.length == 0)
             {
-              openModal("Error", "Text can not be empty.");
+              showFeedback("Error", "Text can not be empty.");
               return;
             }
 
@@ -133,16 +128,14 @@ export default function CreateSeminar() {
               return;
             }
             
+            let wordViewModelsState = wordViewModels;
             for (const word of wordViewModels.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1)) {
               
               if(wordViewModels.some(w => w.name == word.name) == false)
-                wordViewModels.push(word);
- 
-              if (showKeyWords == false && loading == true) {
-                  setLoading(false);
-                  startCourse(textCleaned);
-              }  
+                wordViewModelsState.push(word); 
             }
+
+           setWordViewModels(wordViewModelsState);
           } catch (error) {
 
             setLoading(false);
@@ -200,12 +193,16 @@ export default function CreateSeminar() {
 
           setPairs(keyWordsPairs);
         }
-        
-        const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
+                 
+        if(wordViewModels.length == 0){
+
+          const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
+          setWordViewModels(words);
+        }
 
         setShowKeyWords(kw.length > 0);
-        setWordViewModels(words);
-        setLoading(kw.length == 0);
+        setLoading(wordViewModels.length == 0);
+        setShowCourse(showKeyWords == false && wordViewModels.filter(w => wordList.includes(w.name) && w.importanceRatingId > 1).length > 0)
       }
     }
 
@@ -253,9 +250,16 @@ export default function CreateSeminar() {
                         cols={50}
                         style={{ marginBottom: '10px', width: '100%' }}
                       />
-                <div className="feedback-container fixed-bottom" style={feedbackStyle}>
-                    <button className="mainBtn feedback-button" onClick={handleSubmit}>
-                      <span className="chevron">›</span> Confirm 
+
+                  <div className="feedback-container fixed-bottom">
+                    <div className="feedback-text" >
+                      <div className="feedback-details">
+                        <h3 className="feedback-title">{fbTitle}</h3>
+                        {fbBody}
+                      </div>
+                    </div>
+                    <button className="feedback-button mainBtn" onClick={handleSubmit}>
+                      Confirm
                     </button>
                 </div>
             </div>
@@ -317,7 +321,7 @@ export default function CreateSeminar() {
         </div>
 
         {loading && <SpinnerOverlay />}
-        <ModalView ref={modalRef} modalTitle={modalTitle} modalBody={modalBody} onClick={onModalClick} />
+        
       </div>
     );
   };
