@@ -18,4 +18,4 @@
 /ll.webui/.vs
 /ll.webui/obj
 
-
+.env

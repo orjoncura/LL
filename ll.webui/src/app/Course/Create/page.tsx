@@ -6,7 +6,6 @@ import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import {CourseRequestModel, WordViewModel} from '@/scripts/models';
 import './page.css'; 
-import { faLariSign } from '@fortawesome/free-solid-svg-icons';
 
 export default function CreateCourse() {
 

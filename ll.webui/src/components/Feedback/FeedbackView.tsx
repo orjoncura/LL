@@ -38,7 +38,7 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
               </div>
             </div>
             <button className="feedback-button mainBtn" onClick={confirm}>
-              Confirm
+              OK
             </button>
         </div>
     );
