@@ -16,7 +16,13 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
   ({ feedbackTitle, feedbackBody, onClick }, ref) => {
     const [showFeedback, setShowFeedback] = useState(false);
 
-    const open = () => setShowFeedback(true);
+    const open = () => {
+
+      new Audio('Sounds/warning-message.mp3').play();
+
+      setShowFeedback(true)
+    };
+
     const close = () => setShowFeedback(false);
 
     const confirm = () => {

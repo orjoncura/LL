@@ -27,8 +27,6 @@ export async function POST(url: string, data: string): Promise<any> {
             } catch (e) {
                 return null;
             }
-
-              
         }
     })
     .catch(error => {
@@ -78,7 +76,6 @@ export async function GET(url: string): Promise<any> {
     });
 }
 
-
 export async function CreateAudio(id: number | undefined) {
     return fetch(api + '/Course/StreamAudio?wordId=' + id, {
         method: 'POST',
@@ -95,19 +92,19 @@ export async function CreateAudio(id: number | undefined) {
             console.log('Data sent successfully:');
         }
 
-        return response.arrayBuffer();  // Parse the JSON response
-    }).then(arrayBuffer => {
-        const audioContext = new AudioContext();
-        audioContext.decodeAudioData(arrayBuffer, (buffer) => {
-            console.log('Audio decoded successfully');
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioContext.destination);
-            source.start(0);
-        }, (error) => {
-            console.error('Error decoding audio data:', error);
+        return response.blob(); 
+    }).then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const audio = new Audio(blobUrl);
+        audio.play().catch((err) => {
+          console.error('Audio playback failed:', err);
         });
-    })
+
+        // Optional: revoke the blob URL later to free memory
+        audio.onended = () => {
+          URL.revokeObjectURL(blobUrl);
+        };
+      })
     .catch(error => {
         console.error('Error sending data:', error);
         throw error;  // Re-throw the error so it can be caught by the caller

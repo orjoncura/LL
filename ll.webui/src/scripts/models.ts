@@ -3,7 +3,6 @@ export interface EnvironmentVariables {
   Version: string;
   API_URL: string;
   Token_Storage_Name: string;
-  NODE_ENV: 'local' | 'development' | 'production';
 }
 
 export interface ConfirmationModel {

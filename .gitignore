@@ -19,3 +19,4 @@
 /ll.webui/obj
 
 .env
+ll.webui/.env
