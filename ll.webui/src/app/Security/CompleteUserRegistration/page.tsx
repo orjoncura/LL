@@ -132,7 +132,7 @@ export default function CompleteUserRegistration() {
             </Row>
 
             {loading && <SpinnerOverlay />}
-           <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
+           <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
         </Container>
     );
 };

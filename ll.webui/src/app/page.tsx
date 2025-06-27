@@ -127,7 +127,7 @@ export default function Login() {
           </Col>
       </Row>
       {loading && <SpinnerOverlay />}
-      <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
+      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
     </Container>
   );
 }

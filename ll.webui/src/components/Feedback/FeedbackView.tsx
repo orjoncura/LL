@@ -2,9 +2,11 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import './FeedbackView.css';
 
 interface FeedbackViewProps {
-  feedbackTitle: string;
-  feedbackBody: string;
+  title: string;
+  body: string;
+  text?: string;
   onClick?: () => void;
+  isVisible?: boolean;
 }
 
 export interface FeedbackViewRef {
@@ -13,12 +15,13 @@ export interface FeedbackViewRef {
 }
 
 const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
-  ({ feedbackTitle, feedbackBody, onClick }, ref) => {
-    const [showFeedback, setShowFeedback] = useState(false);
+  ({ title, body, text, onClick, isVisible = false }, ref) => {
+
+    const [showFeedback, setShowFeedback] = useState(isVisible);
 
     const open = () => {
 
-      new Audio('Sounds/warning-message.mp3').play();
+      new Audio('../Sounds/warning-message.mp3').play();
 
       setShowFeedback(true)
     };
@@ -26,8 +29,10 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
     const close = () => setShowFeedback(false);
 
     const confirm = () => {
+
       if (onClick) onClick();
-      close();
+      else close();
+      
     };
 
     useImperativeHandle(ref, () => ({
@@ -39,12 +44,12 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
           <div className="feedback-container fixed-bottom">
             <div className="feedback-text" >
               <div className="feedback-details">
-                <h3 className="feedback-title">{feedbackTitle}</h3>
-                {feedbackBody}
+                <h3 className="feedback-title">{title}</h3>
+                {body}
               </div>
             </div>
             <button className="feedback-button mainBtn" onClick={confirm}>
-              OK
+              {text || "OK"}
             </button>
         </div>
     );

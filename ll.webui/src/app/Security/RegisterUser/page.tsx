@@ -115,7 +115,7 @@ export default function RegisterUser() {
             </Row>
 
             {loading && <SpinnerOverlay />}
-            <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onModalClick} />
+            <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onModalClick} />
 
         </Container>
     );

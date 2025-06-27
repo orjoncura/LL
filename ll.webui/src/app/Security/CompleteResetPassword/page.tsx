@@ -130,7 +130,7 @@ export default function CompleteResetPassword() {
           </Row>
 
           {loading && <SpinnerOverlay />}
-          <FeedbackView ref={feedbackViewRef} feedbackTitle={fbTitle} feedbackBody={fbBody} onClick={onFeedBackViewClick} />
+          <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
       </Container>
     );
 };

@@ -1,9 +1,11 @@
-import { useState, useEffect, CSSProperties } from 'react';
+import { useState, useEffect } from 'react';
 import { WordViewModel } from '@/scripts/models';
 import { CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+
+import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
 interface FlashcardsProps {text:string, words: WordViewModel[]; onDone: (result: boolean) => void;}
@@ -16,11 +18,6 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
     const [paragraphIndex, setParagraphIndex] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [showMeaning, setShowMeaning] = useState(false);
-
-    const [feedbackStyle] = useState<CSSProperties>({
-      color: "#d63384",
-      backgroundColor: "#fff0f6"
-    });
 
     useEffect(() => {
 
@@ -113,7 +110,12 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
         if (matchingParagraphs.length === 0) 
           return "";
         
-        return matchingParagraphs[0].replace(new RegExp("(" + word + ")", "g"), word.bold());
+        let paragraph = matchingParagraphs[0];
+
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapedWord}\\b`, 'g');
+
+        return paragraph.replace(regex, `<b>${word}</b>`); 
     }
 
     function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
@@ -176,12 +178,9 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
             </div>
 
             <br></br>
-            <button 
-              onClick={() => CreateAudio(paragraphWords[wordIndex].id)} className='audio'>
-                <FontAwesomeIcon icon={faVolumeUp} />
-            </button> 
+
             <span>&nbsp;&nbsp;</span>
-            {showMeaning == false && <div dangerouslySetInnerHTML={{ __html: highlightWord(paragraphWords[wordIndex].name) }} />}
+            {showMeaning == false && <div dangerouslySetInnerHTML={{ __html: highlightWord(paragraphWords[wordIndex].name) }} style={{marginBottom: "40%"}} />}
 
             {showMeaning && (paragraphWords[wordIndex].meanings && paragraphWords[wordIndex].meanings.length > 0 ? (
               paragraphWords[wordIndex].meanings.map((meaning) => (
@@ -200,7 +199,11 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
             ))
           ) : (<p>No meanings available</p> ))}
           
-        <div className="feedback-container fixed-bottom" style={feedbackStyle}>
+          
+        <div className="feedback-container fixed-bottom">
+          <button className="feedback-button btn btn-success" style={{ marginLeft: '0', padding: "2%", minWidth:"100px" }} onClick={() => CreateAudio(paragraphWords[wordIndex].id)} >
+                <FontAwesomeIcon icon={faVolumeUp} />
+          </button> 
           <button className="mainBtn feedback-button" onClick={() => nextStep(wordIndex + 1)}>
             <span className="chevron">›</span>
               Next

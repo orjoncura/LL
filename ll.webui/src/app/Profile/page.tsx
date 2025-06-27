@@ -54,7 +54,7 @@ export default function Profile() {
       {showCourse == false && ( 
       <div className="course-list responsive-padding">
         {courses.map((course, index) => (
-          <div className="course-card" onClick={() => handleSubmit(course.id, course.text)}>
+          <div key={index} className="course-card" onClick={() => handleSubmit(course.id, course.text)}>
             <div className="course-header">
               <div className="course-title">
                  {course.text.substring(0, 25)}  

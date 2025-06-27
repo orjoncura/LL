@@ -1,10 +1,13 @@
 "use client";
-import React, {useState, useEffect} from 'react';
+
+import React, {useState, useRef, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
 import {CourseRequestModel, WordViewModel} from '@/scripts/models';
+import FeedbackView from '@/components/Feedback/FeedbackView';
+
 import './page.css'; 
 
 export default function CreateCourse() {
@@ -18,10 +21,16 @@ export default function CreateCourse() {
     const [message, setMessage] = useState<string | null>(null);
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
     const [loading, setLoading] = useState(false);
+    const feedbackViewRef = useRef<any>(null); 
     const [fbTitle, setfbhTitle] = useState('');
     const [fbBody, setfbhBody] = useState('');
     const [showCourse, setShowCourse] = useState(false);
     const [courseText, setCourseText] = useState<string>('');   
+
+    const showFeedback = (title: string, body:string) => {
+            setfbhTitle(title);
+            setfbhBody(body);
+    };
 
     const languageFromId = 2;
     const languageToId = 1;
@@ -50,13 +59,7 @@ export default function CreateCourse() {
         });
       }
     }, []);
-    
-    const showFeedback = (title: string, body:string, onClick?: Function) => {
-        
-          setfbhTitle(title);
-          setfbhBody(body);
-    };
-    
+
     const handleWordClick = (word: string, column: number) => {
 
       if (word === '' || 
@@ -250,17 +253,7 @@ export default function CreateCourse() {
                         style={{ marginBottom: '10px', width: '100%' }}
                       />
 
-                  <div className="feedback-container fixed-bottom">
-                    <div className="feedback-text" >
-                      <div className="feedback-details">
-                        <h3 className="feedback-title">{fbTitle}</h3>
-                        {fbBody}
-                      </div>
-                    </div>
-                    <button className="feedback-button mainBtn" onClick={handleSubmit}>
-                      Confirm
-                    </button>
-                </div>
+                  <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} text={"Confirm"} onClick={handleSubmit} isVisible={true} />
             </div>
             )}
 
