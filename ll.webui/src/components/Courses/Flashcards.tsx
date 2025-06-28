@@ -201,7 +201,7 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
           
           
         <div className="feedback-container fixed-bottom">
-          <button className="feedback-button btn btn-success" style={{ marginLeft: '0', padding: "2%", minWidth:"100px" }} onClick={() => CreateAudio(paragraphWords[wordIndex].id)} >
+          <button className="feedback-button btn btn-success" style={{ marginLeft: '0', padding: "16px 16px", minWidth:"100px" }} onClick={() => CreateAudio(paragraphWords[wordIndex].id)} >
                 <FontAwesomeIcon icon={faVolumeUp} />
           </button> 
           <button className="mainBtn feedback-button" onClick={() => nextStep(wordIndex + 1)}>

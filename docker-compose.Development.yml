@@ -57,12 +57,17 @@ services:
   ll_webui :
     image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_webui 
     container_name: ll_webui
-    ports:
-      - "3000:3000" 
     networks:
       - bridge_net
     depends_on:
       - ll_api 
+    environment:
+      - NEXT_PUBLIC_Application_Name={Application_Name} 
+      - NEXT_PUBLIC_Version={WEB_Version} 
+      - NEXT_PUBLIC_API_URL={API_URL} 
+      - NEXT_PUBLIC_Token_Storage_Name={Token_Storage_Name}  
+    ports:
+      - "3000:3000" 
 
 networks:
   bridge_net:
