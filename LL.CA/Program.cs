@@ -1,7 +1,6 @@
 ﻿using LL.CA.Configs;
 using LL.Core.Enums;
-using LL.Core.Interfaces.Services;
-using LL.Core.Models.Arguments;
+using LL.Core.Interfaces.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +10,7 @@ namespace LL.CA;
 
 public class Program
 {
-    private static ICourseService courseService { get; set; }
+    private static ITextToSpeechService textToSpeechService { get; set; }
     
     public static async Task Main(string[] args)
     {
@@ -32,8 +31,9 @@ public class Program
                 builder.SetMinimumLevel(LogLevel.Information);
             });
             
-            courseService = builder.Services.BuildServiceProvider().GetRequiredService<ICourseService>();
-            //await courseService.CreateCourse(courseRequestModel, -1);
+            textToSpeechService = builder.Services.BuildServiceProvider().GetRequiredService<ITextToSpeechService>();
+
+            textToSpeechService.CreateAudio("Ventana", LanguageEnum.Spanish);
         }
         catch (Exception e)
         {

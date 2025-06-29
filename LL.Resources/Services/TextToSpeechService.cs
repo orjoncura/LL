@@ -1,54 +1,43 @@
 using System.Diagnostics;
+using Google.Cloud.TextToSpeech.V1;
+using LL.Core.Constants;
 using LL.Core.Enums;
 using LL.Core.Interfaces.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace LL.Resources.Services;
 
-public class TextToSpeechService : ITextToSpeechService
+public class TextToSpeechService(IConfiguration configuration) : ITextToSpeechService
 {
     public byte[] CreateAudio(string text, LanguageEnum lang)
     {
-        string virtualEnvPath = "/home/orjoncura/my_tts_env"; // Path to your virtual environment
-        string ttsCommandPath = Path.Combine(virtualEnvPath, "bin", "tts"); // Path to the TTS executable
+        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", configuration[Secrets.GoogleCredentialsPath]);
 
-        // Check if the TTS executable exists
-        if (!File.Exists(ttsCommandPath))
-            return [];
-        
-        // Text, model name, and output path parameters
-        string modelName = GetModelPath(lang); 
-        string outputPath = text.Trim().Replace(" ", "_") + ".wav";
+        var client = TextToSpeechClient.Create();
 
-        //This models fails with short text.
-        if (text.Length == 1)
-            text += text;
-        
-        // Construct the TTS command
-        var command = new ProcessStartInfo
+        var input = new SynthesisInput
         {
-            FileName = ttsCommandPath,
-            Arguments = $"--text \"{text}\" --model_name {modelName} --out_path {outputPath}",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
+            Text = text
         };
 
-        // Start the process
-        using (var process = Process.Start(command))
+        var voice = new VoiceSelectionParams
         {
-            if (process == null)
-                return [];
-            
-            // Read output and error (if any)
-            //string output = process.StandardOutput.ReadToEnd();
-            //string error = process.StandardError.ReadToEnd();
+            LanguageCode = GetLanguageCode(lang),
+            SsmlGender = SsmlVoiceGender.Female
+        };
 
-            // Wait for the process to exit
-            process.WaitForExit();
-        }
+        var config = new AudioConfig
+        {
+            AudioEncoding = AudioEncoding.Mp3
+        };
 
-        // Verify if the audio file was created
+        var response = client.SynthesizeSpeech(input, voice, config);
+        
+        string outputPath = "output.mp3";
+        
+        // Save the audio file
+        File.WriteAllBytes(outputPath, response.AudioContent.ToByteArray());
+        
         if (File.Exists(outputPath))
         {
             var output = File.ReadAllBytes(outputPath);
@@ -61,13 +50,13 @@ public class TextToSpeechService : ITextToSpeechService
         return [];
     }
      
-    private string GetModelPath(LanguageEnum lang)
+    private string GetLanguageCode(LanguageEnum lang)
     {
-        string path = "tts_models/en/ljspeech/tacotron2-DDC";
+        string code = "en-US";
         
         if(lang == LanguageEnum.Spanish)
-            path = "tts_models/es/mai/tacotron2-DDC";
+            code = "es-ES";
 
-        return path;
+        return code;
     }
 }

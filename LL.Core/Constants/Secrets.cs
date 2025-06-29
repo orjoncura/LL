@@ -21,4 +21,6 @@ public class Secrets
     public const string StorageSecretKey = "Storage:SecretKey";
     
     public const string StorageName = "Storage:Name";
+    
+    public const string GoogleCredentialsPath = "GoogleCredentialsPath";
 }
