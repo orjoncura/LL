@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Extensions.Models;
@@ -13,7 +14,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
     {
         // Replace with your actual Google API key
         string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={agentModel.GeminiAPI}";
-
+        
         var payload = new
         {
             contents = new[]
@@ -39,7 +40,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
                 response_mime_type = "application/json"
             }
         };
-
+        
         // Serialize the payload to JSON
         string jsonPayload = JsonHelper.SerializeObject(payload);
 
@@ -52,6 +53,14 @@ public class AgentService(AgentModel agentModel) : IAgentService
             // Send the POST request
             HttpResponseMessage response = await client.PostAsync(url, content);
 
+            // Check if the status code is NOT in the 2xx range
+            if (!response.IsSuccessStatusCode) 
+            {
+                // Attempt to read the error content from the response
+                string errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Reason: {response.ReasonPhrase} - Status code: {(int)response.StatusCode} - Details: {errorContent}");
+            }
+            
             // Ensure the request was successful
             response.EnsureSuccessStatusCode();
 

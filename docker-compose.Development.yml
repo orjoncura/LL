@@ -26,9 +26,9 @@ services:
         - Jwt__Issuer=${JWT_ISSUER}
         - Jwt__Audience=${JWT_AUDIENCE}
         - Jwt__ExpiryMinutes=${JWT_EXPIRY_MINUTES}
-        - AWS_ACCESS_KEY_ID=${STORAGE_ACCESS_KEY}
-        - AWS_SECRET_ACCESS_KEY=${STORAGE_SECRET_KEY}
-        - AWS_REGION=${STORAGE_REGION}
+        - AWS__ACCESS_KEY_ID=${STORAGE_ACCESS_KEY}
+        - AWS__SECRET_ACCESS_KEY=${STORAGE_SECRET_KEY}
+        - AWS__REGION=${STORAGE_REGION}
         - S3_BUCKET_NAME=${STORAGE_NAME}
         - ASPNETCORE_ENVIRONMENT=Development
         - ASPNETCORE_URLS=http://+:5000    
@@ -61,11 +61,6 @@ services:
       - bridge_net
     depends_on:
       - ll_api 
-    environment:
-      - NEXT_PUBLIC_Application_Name={Application_Name} 
-      - NEXT_PUBLIC_Version={WEB_Version} 
-      - NEXT_PUBLIC_API_URL={API_URL} 
-      - NEXT_PUBLIC_Token_Storage_Name={Token_Storage_Name}  
     ports:
       - "3000:3000" 
 

@@ -22,16 +22,16 @@ public class CourseService(
     ICourseWordRepository courseWordRepository,
     IAgentService agentService) : ICourseService
 {
-    public async Task<List<WordViewModel>> CreateCourse(CourseRequestModel seminarRequest, int userId)
+    public async Task<List<WordViewModel>> CreateCourse(CourseRequestModel courseRequest, int userId)
     {
         List<WordViewModel> words = new List<WordViewModel>();
         
-        if(seminarRequest.IsValid == false) 
+        if(courseRequest.IsValid == false) 
             return words;
         
-        int courseId = courseRepository.Insert(seminarRequest.Text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        int courseId = courseRepository.Insert(courseRequest.Text, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
         
-        var splitTexts = Regex.Split(seminarRequest.Text, @"(\r\n?|\n){2}")
+        var splitTexts = Regex.Split(courseRequest.Text, @"(\r\n?|\n){2}")
             .Where(p => p.Any(char.IsLetterOrDigit) && !string.IsNullOrWhiteSpace(p))
             .ToList();
         
@@ -68,30 +68,23 @@ public class CourseService(
 
         foreach (var text in combinedStrings)
         {
-            try
+            var response = await agentService
+                .Run(PromptFactory.CreateCourseWordsPrompt(text, courseRequest.LanguageFromId, courseRequest.LanguageToId));
+
+            if (!string.IsNullOrEmpty(response))
             {
-                var response = await agentService
-                    .Run(PromptFactory.CreateCourseWordsPrompt(text, seminarRequest.LanguageFromId, seminarRequest.LanguageToId));
+                // Safely extract the list of CourseWordsModel from JSON
+                var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
         
-                if (!string.IsNullOrEmpty(response))
-                {
-                    // Safely extract the list of CourseWordsModel from JSON
-                    var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
-            
-                    courseWordsList.AddRange(extractedModels);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing text: {text}\n{ex.Message}");
+                courseWordsList.AddRange(extractedModels);
             }
         }
-
+        
         courseWordsList = courseWordsList.Where(c => c.IsValid).ToList();
         
         words = courseWordsList.Select(cwl => new WordViewModel(cwl)).ToList();
         
-        CreateDefinitions(courseId, courseWordsList, seminarRequest.LanguageFromId, seminarRequest.LanguageToId, userId);
+        CreateDefinitions(courseId, courseWordsList, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
         
         return words;
     }

@@ -23,4 +23,8 @@ public class Secrets
     public const string StorageName = "Storage:Name";
     
     public const string GoogleCredentialsPath = "GoogleCredentialsPath";
+    
+    public const string Version = "Version";
+        
+    public const string BaseUrl = "BaseURL";
 }

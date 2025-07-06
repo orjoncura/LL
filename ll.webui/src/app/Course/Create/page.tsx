@@ -35,15 +35,15 @@ export default function CreateCourse() {
     const languageFromId = 2;
     const languageToId = 1;
 
-    let hasFetchedData = false;
-
     useEffect(() => {
-          if(showKeyWords == false && loading == true && wordViewModels.length > 0){
-            setLoading(false);
-            startCourse(courseText.replaceAll(/[\r\n]+/g, " "));
-          }
+      if(showKeyWords == false && loading == true && wordViewModels.length > 0){
+
+        setLoading(false);
+        setShowCourse(true)
+      }
     }, [loading, showKeyWords, wordViewModels]);
 
+    let hasFetchedData = false;
     useEffect(() => {
 
       if(hasFetchedData == false){
@@ -124,20 +124,17 @@ export default function CreateCourse() {
               "languageToId": languageToId
             };
 
-            const wordViewModels: WordViewModel[] =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
-            if(wordViewModels == null || wordViewModels == undefined){
-              setLoading(false);
-              return;
-            }
-            
-            let wordViewModelsState = wordViewModels;
-            for (const word of wordViewModels.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1)) {
+            const words: WordViewModel[] =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+
+            const newItems = words.filter(w => !wordViewModels.some(m => m.name === w.name));
+            setWordViewModels(prev => [...prev, ...newItems]);
+
+            for (const word of words.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1)) {
               
               if(wordViewModels.some(w => w.name == word.name) == false)
-                wordViewModelsState.push(word); 
+                wordViewModels.push(word); 
             }
 
-           setWordViewModels(wordViewModelsState);
           } catch (error) {
 
             setLoading(false);
@@ -147,65 +144,62 @@ export default function CreateCourse() {
 
     const startCourse = (text: string) => {
 
-      if(showCourse == false && showKeyWords == false){
+      if(showCourse || showKeyWords)
+        return;
 
-        let wordList = text.split(" ");
-        let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
+      let wordList = text.split(" ");
+      let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
 
-        if(kw.length > 0){
+      if(kw.length == 0)
+        return;
 
-          const frequency = new Map<string, number>();
-          for (const word of kw.map(kw => kw.translation || ""))
-            frequency.set(word, (frequency.get(word) || 0) + 1);
+      const frequency = new Map<string, number>();
+      for (const word of kw.map(kw => kw.translation || ""))
+        frequency.set(word, (frequency.get(word) || 0) + 1);
 
-          const maxCount: number = (frequency.size > 0 ? Math.max(...Array.from(frequency.values())) : 1);
-          const batchSize: number = Math.round(kw.length / maxCount);
-          const keyWordsPairs: { column1: string[]; column2: string[] }[] = []
+      const maxCount: number = (frequency.size > 0 ? Math.max(...Array.from(frequency.values())) : 1);
+      const batchSize: number = Math.round(kw.length / maxCount);
+      const keyWordsPairs: { column1: string[]; column2: string[] }[] = []
 
-          let allAddedItems = new Set<string>();
+      let allAddedItems = new Set<string>();
 
-          for (let i = 0; i < maxCount; i++) {
-              const list: WordViewModel[] = [];
-              
-              for (let j = 0; j < batchSize; j++) {
-                  // Find the firstNewItem that meets the conditions
-                  const firstNewItem = kw.find(k => 
-                      !keyWordsPairs.some(lp => lp.column1.includes(k.name)) && 
-                      !allAddedItems.has(k.translation || "")
-                  );
+      for (let i = 0; i < maxCount; i++) {
+          const list: WordViewModel[] = [];
           
-                  if (firstNewItem) {
-                      list.push(firstNewItem);
-                      allAddedItems.add(firstNewItem.translation || ""); // Track added translations
-                  } else {
-                      break; // If no new item is found, stop the inner loop to avoid empty additions
-                  }
-              }
-          
-              if (list.length > 0) { // Only add to keyWordsPairs if list has items
-                  keyWordsPairs.push({
-                      column1: list.map(w => w.name),
-                      column2: shuffle(list.map(w => w.translation || ""))
-                  });
+          for (let j = 0; j < batchSize; j++) {
+              // Find the firstNewItem that meets the conditions
+              const firstNewItem = kw.find(k => 
+                  !keyWordsPairs.some(lp => lp.column1.includes(k.name)) && 
+                  !allAddedItems.has(k.translation || "")
+              );
+      
+              if (firstNewItem) {
+                  list.push(firstNewItem);
+                  allAddedItems.add(firstNewItem.translation || ""); // Track added translations
               } else {
-                  // Handle the case where no new items were found in this outer loop iteration
-                  break;
+                  break; // If no new item is found, stop the inner loop to avoid empty additions
               }
           }
+      
+          if (list.length > 0) { // Only add to keyWordsPairs if list has items
+              keyWordsPairs.push({
+                  column1: list.map(w => w.name),
+                  column2: shuffle(list.map(w => w.translation || ""))
+              });
+          } else {
+              // Handle the case where no new items were found in this outer loop iteration
+              break;
+          }
+      }
 
-          setPairs(keyWordsPairs);
-        }
-                 
-        if(wordViewModels.length == 0){
+      if(wordViewModels.length == 0){
 
           const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
-          setWordViewModels(words);
-        }
-
-        setShowKeyWords(kw.length > 0);
-        setLoading(wordViewModels.length == 0);
-        setShowCourse(showKeyWords == false && wordViewModels.filter(w => wordList.includes(w.name) && w.importanceRatingId > 1).length > 0)
+          setWordViewModels(prev => [...prev, ...words]);
       }
+
+      setPairs(keyWordsPairs);
+      setShowKeyWords(kw.length > 0);
     }
 
     function shuffle<T>(array: string[]): string[] {

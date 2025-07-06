@@ -1,5 +1,5 @@
 using LL.API.Configs;
-using LL.API.Constants;
+using LL.Core.Constants;
 using Microsoft.OpenApi.Models;
 
 internal class Program
@@ -21,7 +21,7 @@ internal class Program
         
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = builder.Configuration.GetSection(AppSettings.Version).Value });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = builder.Configuration.GetSection(Secrets.Version).Value });
         });
 
         var app = builder.Build();

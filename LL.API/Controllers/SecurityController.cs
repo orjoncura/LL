@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 using LL.API.Constants;
+using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -64,7 +65,7 @@ namespace LL.API.Controllers
             try
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-                var url = config[AppSettings.BaseUrl] ?? string.Empty;
+                var url = config[Secrets.BaseUrl] ?? string.Empty;
 
                 return Ok(securityService.RegisterUser(model, ipAddress, url));
             }
@@ -126,7 +127,7 @@ namespace LL.API.Controllers
             try
             {    
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-                var url = config[AppSettings.BaseUrl] ?? string.Empty;
+                var url = config[Secrets.BaseUrl] ?? string.Empty;
 
                 return Ok(securityService.ResetPassword(email, ipAddress, url));
             }

@@ -21,7 +21,10 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
 
     useEffect(() => {
 
-      const sortedParagraphs = text.split('\n\n').sort((a, b) => {
+      //Remove paragraphs with no matching words.
+      const paragraphs = text.split('\n\n').filter(p =>  sortBasedOnAppearance(p, words).length > 0);
+
+      const sortedParagraphs = paragraphs.sort((a, b) => {
         const aPercentage = Percentage(a, words);
         const bPercentage = Percentage(b, words);
       
