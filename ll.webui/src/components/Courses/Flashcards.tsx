@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { WordViewModel } from '@/scripts/models';
-import { CreateAudio } from '@/scripts/Helpers/SecurityHelper'
+import { WordViewModel } from '@/utils/Models/models';
+import { CreateAudio } from '@/utils/Security/httpClient'
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +20,7 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
     const [showMeaning, setShowMeaning] = useState(false);
 
     useEffect(() => {
+      window.scrollTo(0, 0);
 
       //Remove paragraphs with no matching words.
       const paragraphs = text.split('\n\n').filter(p =>  sortBasedOnAppearance(p, words).length > 0);

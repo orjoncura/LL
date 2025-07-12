@@ -2,11 +2,11 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import {POST} from "@/scripts/Helpers/SecurityHelper";
-import {IsValidPassword, IsValidEmail} from "@/scripts/Helpers/TextHelper";
+import {POST} from "@/utils/Security/httpClient";
+import {IsValidPassword, IsValidEmail} from "@/utils/Security/Validators";
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import {ConfirmationModel} from '@/scripts/models';
+import {ConfirmationModel} from '@/utils/Models/models';
 import Link from 'next/link';
 
 export default function CompleteResetPassword() {

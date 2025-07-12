@@ -3,10 +3,10 @@ import React, {useState, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import Flashcards from '@/components/Courses/Flashcards';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import { GET } from '@/scripts/Helpers/SecurityHelper'
+import { GET } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { CourseViewModel, WordViewModel } from '@/scripts/models';
+import { CourseViewModel, WordViewModel } from '@/utils/Models/models';
 import './page.css'; 
 
 export default function Profile() {

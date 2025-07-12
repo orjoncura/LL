@@ -4,8 +4,8 @@ import React, {useState, useRef, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import Flashcards from '@/components/Courses/Flashcards';
-import { GET, POST, CreateAudio } from '@/scripts/Helpers/SecurityHelper'
-import {CourseRequestModel, WordViewModel} from '@/scripts/models';
+import { GET, POST, CreateAudio } from '@/utils/Security/httpClient'
+import {CourseRequestModel, WordViewModel} from '@/utils/Models/models';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import './page.css'; 
@@ -36,6 +36,7 @@ export default function CreateCourse() {
     const languageToId = 1;
 
     useEffect(() => {
+
       if(showKeyWords == false && loading == true && wordViewModels.length > 0){
 
         setLoading(false);

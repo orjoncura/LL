@@ -11,18 +11,19 @@ export default function ServiceWorkerRegistration() {
 
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [showSafariInstructions, setShowSafariInstructions] = useState(false);
-    const [isInstallable, setIsInstallable] = useState(false);
-    const [granted, setGranted] = useState<boolean>(false);  
-
-    let isSafari = null;
-    let isMacOS = null;
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const [isInstallable, setIsInstallable] = useState<boolean>(false);
+    const [isMacOS, setIsMacOS] = useState<boolean>(false);
 
     useEffect(() => {
+        const userAgent = navigator.userAgent.toLowerCase();
 
-        setGranted(Notification.permission === 'granted');
-
-        isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        isMacOS = /Macintosh/i.test(navigator.userAgent);
+        let granted:boolean = (typeof window !== 'undefined' && 'Notification' in window) 
+            ? (Notification.permission === 'granted')
+            : false;
+        
+        let isSafari:boolean = (/safari/.test(userAgent) && !/chrome/.test(userAgent));
+        setIsMacOS(/Macintosh/i.test(navigator.userAgent));
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
@@ -44,6 +45,7 @@ export default function ServiceWorkerRegistration() {
             setShowSafariInstructions(isInStandaloneMode == false);
         }
 
+        setShowNotifications(isInstallable && !showSafariInstructions && !granted);
     }, []);
 
     const handleInstallClick = async () => {
@@ -60,8 +62,9 @@ export default function ServiceWorkerRegistration() {
     const requestNotificationPermission = async () => {
 
         try {
+            //Hide notification if permissions have been granted.
             const permission = await Notification.requestPermission();
-            setGranted(permission === 'granted');
+            setShowNotifications(permission != 'granted');
         } catch (err) {
             console.error('Error requesting notification permission:', err);
         }
@@ -69,9 +72,6 @@ export default function ServiceWorkerRegistration() {
 
     return (
         <div>
-            {isInstallable == false && isSafari == false && isMacOS == false && granted == false
-                && (<button onClick={requestNotificationPermission} className='btn btn-primary' style={{width:"100%", borderRadius:"0"}}> Enable Notifications </button> )}
-
             {isInstallable && (<button onClick={handleInstallClick} style={{width:"100%"}}> Install App & Enable Notifications </button> )}
 
             {showSafariInstructions && (
@@ -91,6 +91,10 @@ export default function ServiceWorkerRegistration() {
                 </button>
                 </div>
             )}
+
+            {showNotifications && (
+                <button onClick={requestNotificationPermission} className='btn btn-primary' style={{width:"100%", borderRadius:"0"}}> Enable Notifications </button> )}
+
         </div>
     );
 }

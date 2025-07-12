@@ -2,11 +2,11 @@
 import React, {useState, useRef} from 'react';
 import { useRouter } from 'next/navigation'
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
-import {POST} from "@/scripts/Helpers/SecurityHelper";
-import {IsValidEmail} from "@/scripts/Helpers/TextHelper";
+import {POST} from "@/utils/Security/httpClient";
+import {IsValidEmail} from "@/utils/Security/Validators";
 import FeedbackView from '../../../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../../../components/Spinner/SpinnerOverlay';
-import {NewUserModel} from '@/scripts/models';
+import {NewUserModel} from '@/utils/Models/models';
 import Link from 'next/link';
 
 export default function RegisterUser() {

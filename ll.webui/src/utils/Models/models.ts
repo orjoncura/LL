@@ -1,9 +1,3 @@
-export interface EnvironmentVariables {
-  Application_Name: string;
-  Version: string;
-  API_URL: string;
-  Token_Storage_Name: string;
-}
 
 export interface ConfirmationModel {
   password: string;
@@ -60,7 +54,6 @@ export interface DefinitionRequestModel {
   /** NOTE: This property will not be serialized. It can only be populated by the server. */
   readonly isValid?: boolean;
 }
-
 
 export interface ExerciseRequestModel {
   courseId: number;

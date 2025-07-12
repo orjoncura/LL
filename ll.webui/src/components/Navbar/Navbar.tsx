@@ -3,7 +3,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import styles from './Navbar.module.css';
-import { POST, RemoveToken } from '@/scripts/Helpers/SecurityHelper'
+import { POST } from '@/utils/Security/httpClient'
+import { RemoveToken } from '@/utils/Security/AuthManager'
 
 const Navbar: React.FC = () => {
 

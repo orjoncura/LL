@@ -2,10 +2,11 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
-import { POST, StoreToken } from '@/scripts/Helpers/SecurityHelper'
-import {getEnv} from '@/scripts/Helpers/EnvironmentVariables';
-import { IsValidEmail, IsValidPassword } from "@/scripts/Helpers/TextHelper";
-import {LoginModel, TokenViewModel} from '@/scripts/models';
+import { POST } from '@/utils/Security/httpClient'
+import { StoreToken } from '@/utils/Security/AuthManager'
+import {getEnv} from '@/utils/Models/EnvironmentVariables';
+import { IsValidEmail, IsValidPassword } from "@/utils/Security/Validators";
+import {LoginModel, TokenViewModel} from '@/utils/Models/models';
 import Link from 'next/link';
 import FeedbackView from '../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';

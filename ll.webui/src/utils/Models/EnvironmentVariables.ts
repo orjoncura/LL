@@ -1,5 +1,5 @@
 
-import {EnvironmentVariables} from '@/scripts/models';
+import {EnvironmentVariables} from '@/utils/Models/Types';
 
 export function getEnv(): EnvironmentVariables {
 

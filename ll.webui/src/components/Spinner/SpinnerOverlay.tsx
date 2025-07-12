@@ -5,12 +5,6 @@ const SpinnerOverlay = () => {
   return (
     <div className="spinner-overlay">
       <div className="loader">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
       </div>
     </div>
   );
