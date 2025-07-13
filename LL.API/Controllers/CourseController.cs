@@ -146,6 +146,26 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
+        /// Delete selected course by id.
+        /// </summary>
+        /// <response code="200">Success/fail</response>
+        [HttpGet("DeleteCourseById")]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        public ActionResult DeleteCourseById([FromQuery] int courseId)
+        {
+            try
+            {       
+                return Ok(courseRepository.DeleteCourseById(courseId, UserId));
+            }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
         /// Pass a wordId to get an audio for the selected word.
         /// </summary>
         /// <param name="wordId">The ID of the selected word</param>

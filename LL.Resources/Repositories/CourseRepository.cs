@@ -31,6 +31,25 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
         
         return course.Id;
     }
+
+    public bool DeleteCourseById(int id, int userId)
+    {
+        Course? course = db.Courses.FirstOrDefault(c => c.Id == id && c.IsActive);
+        
+        if(course != null)
+        {
+            course.IsActive = false;
+            course.UpdatedById = userId;
+            course.UpdatedDate = DateTime.Now;
+            
+            db.Courses.Update(course);
+            db.SaveChanges();
+            
+            return true;
+        }
+        
+        return false;
+    }
     public List<CourseViewModel> GetCoursesByUserId(int userId)
     {
          List<CourseViewModel> courseViewModels = db.Courses

@@ -1,12 +1,16 @@
 "use client";
-import React, {useState, useEffect} from 'react';
+
+import React, {useState, useRef, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import Flashcards from '@/components/Courses/Flashcards';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
+import FeedbackView from '@/components/Feedback/FeedbackView';
+
 import { GET } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { CourseViewModel, WordViewModel } from '@/utils/Models/models';
+
 import './page.css'; 
 
 export default function Profile() {
@@ -16,6 +20,21 @@ export default function Profile() {
   const [showCourse, setShowCourse] = useState(false);
   const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]); 
   const [courseText, setCourseText] = useState<string>('');   
+  const feedbackViewRef = useRef<any>(null); 
+  const [fbTitle, setfbhTitle] = useState('');
+  const [fbBody, setfbhBody] = useState('');
+  const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
+
+  const showFeedback = (title: string, body:string, onClick?: Function) => {
+      if (feedbackViewRef.current) {
+
+          setfbhTitle(title);
+          setfbhBody(body);
+          setOnFeedBackViewClick(() => onClick); 
+
+          feedbackViewRef.current.open();
+      }
+  };
 
   useEffect(() => {
       GET('/Course/GetCourses')
@@ -47,31 +66,57 @@ export default function Profile() {
 
   };
 
+    const DeleteCourse = async (id: number) => {
+      setLoading(true);
+
+      GET('/Course/DeleteCourseById?courseId=' + id)
+      .then((hasBeenDeleted: boolean) => {
+
+        if(hasBeenDeleted)
+          setCourses(courses.filter(c => c.id != id));
+        
+        if(hasBeenDeleted == false)
+          showFeedback("Error", "Please try again later.");
+
+        setWordViewModels(wordViewModels);
+      }).catch(() => showFeedback("Error", "Something went wrong - Please try again later."))
+      .finally(() => setLoading(false));
+
+  };
+
   return (      
     <div>      
       <Navbar /> 
       <br />
       {showCourse == false && ( 
-      <div className="course-list responsive-padding">
+      <div className="course-list ">
         {courses.map((course, index) => (
-          <div key={index} className="course-card" onClick={() => handleSubmit(course.id, course.text)}>
-            <div className="course-header">
-              <div className="course-title">
-                 {course.text.substring(0, 25)}  
+          <div key={index} className="position-relative" >
+            <button className="close-button" onClick={() => DeleteCourse(course.id)}>
+              &times;
+            </button>
+
+            <div className="course-card" onClick={() => handleSubmit(course.id, course.text)}>
+              <div className="course-header">
+                <div className="course-title">
+                  {course.text.substring(0, 25)}  
+                </div>
+                <div className="course-date"><FontAwesomeIcon icon={faCalendar} className="icon" /> <span>{course.createdDate.asString}</span></div>
               </div>
-              <div className="course-date"><FontAwesomeIcon icon={faCalendar} className="icon" /> <span>{course.createdDate.asString}</span></div>
+            <hr className="course-divider" />
+            <div className="course-detail">
+              {<span>{course.text.substring(0, 300)}</span> }
             </div>
-          <hr className="course-divider" />
-          <div className="course-detail">
-             {<span>{course.text.substring(0, 300)}</span> }
           </div>
-        </div>
+          </div>
+
         ))}
     </div>)}
 
     {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)} />)}
 
-    {loading && <SpinnerOverlay />}
+    {loading && <SpinnerOverlay />}      
+    <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
     </div>
   );
 };

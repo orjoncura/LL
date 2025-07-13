@@ -3,7 +3,8 @@ import { WordViewModel } from '@/utils/Models/models';
 import { CreateAudio } from '@/utils/Security/httpClient'
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight } from '@fortawesome/free-solid-svg-icons';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
@@ -203,16 +204,19 @@ export const Flashcards = ({ text, words, onDone }: FlashcardsProps) => {
             ))
           ) : (<p>No meanings available</p> ))}
           
-          
-        <div className="feedback-container fixed-bottom">
-          <button className="feedback-button btn btn-success" style={{ marginLeft: '0', padding: "16px 16px", minWidth:"100px" }} onClick={() => CreateAudio(paragraphWords[wordIndex].id)} >
-                <FontAwesomeIcon icon={faVolumeUp} />
-          </button> 
-          <button className="mainBtn feedback-button" onClick={() => nextStep(wordIndex + 1)}>
-            <span className="chevron">›</span>
-              Next
-          </button>
-        </div>
+          <div className="feedback-container fixed-bottom" style={{justifyContent:"flex-end"}}>
+            <div className="row">
+                <button className="mainBtn flashcardBtn mx-1" onClick={() => nextStep(wordIndex - 1)}>
+                  <FontAwesomeIcon icon={faSquareCaretLeft} />
+                </button>
+                <button className="btn btn-success flashcardBtn mx-1" onClick={() => CreateAudio(paragraphWords[wordIndex].id)}>
+                  <FontAwesomeIcon icon={faVolumeUp} />
+                </button>
+                <button className="mainBtn flashcardBtn mx-1" onClick={() => nextStep(wordIndex + 1)}>
+                  <FontAwesomeIcon icon={faSquareCaretRight} />
+                </button>
+            </div>
+          </div>
         </div> }
 
       {loading && <SpinnerOverlay />}

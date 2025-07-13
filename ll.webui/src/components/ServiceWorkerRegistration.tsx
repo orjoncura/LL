@@ -62,7 +62,6 @@ export default function ServiceWorkerRegistration() {
     const requestNotificationPermission = async () => {
 
         try {
-            //Hide notification if permissions have been granted.
             const permission = await Notification.requestPermission();
             setShowNotifications(permission != 'granted');
         } catch (err) {

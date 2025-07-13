@@ -37,8 +37,8 @@ public class AppDbContext : DbContext
     {
         public DateTimeOffsetToUtcConverter()
             : base(
-                v => v.UtcDateTime,
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) // ✅ Fix here
+                v => DateTime.SpecifyKind(v.UtcDateTime, DateTimeKind.Unspecified),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) 
         { }
     }
 
@@ -377,7 +377,9 @@ public class AppDbContext : DbContext
             
             entity.Property(ut => ut.IsActive).IsRequired();
             entity.Property(ut => ut.CreatedById).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(ut => ut.CreatedDate).IsRequired();
+            entity.Property(ut => ut.UpdatedById).IsRequired(false);
+            entity.Property(ut => ut.UpdatedDate).IsRequired(false);
             
             entity.HasOne(ut => ut.LanguageFrom)
                 .WithMany()
@@ -392,6 +394,11 @@ public class AppDbContext : DbContext
             entity.HasOne(ut => ut.CreatedBy)
                 .WithMany()
                 .HasForeignKey(ut => ut.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
