@@ -73,3 +73,29 @@ transform: rotateY(180deg);
   cursor: pointer;
   width: 100px; 
 }
+
+.icon-button {
+  color: #d63384;
+  width: 60px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-label {
+  font-size: 14px;
+  color: #333;
+}
+
+.buttonDiv {
+  margin-bottom: 5px;
+  text-align: center;
+  width: 85px
+}
+

@@ -7,6 +7,7 @@ interface FeedbackViewProps {
   text?: string;
   onClick?: () => void;
   isVisible?: boolean;
+  showCloseBtn?: boolean;
 }
 
 export interface FeedbackViewRef {
@@ -15,7 +16,7 @@ export interface FeedbackViewRef {
 }
 
 const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
-  ({ title, body, text, onClick, isVisible = false }, ref) => {
+  ({ title, body, text, onClick, isVisible = false, showCloseBtn = false }, ref) => {
 
     const [showFeedback, setShowFeedback] = useState(isVisible);
 
@@ -30,8 +31,10 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
 
     const confirm = () => {
 
-      if (onClick) onClick();
-      else close();
+      if (onClick) 
+        onClick();
+      
+     close();
       
     };
 
@@ -51,6 +54,9 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
             <button className="feedback-button mainBtn" onClick={confirm}>
               {text || "OK"}
             </button>
+            {showCloseBtn && <button className="feedback-button mainBtn" onClick={close}>
+              Close
+            </button>}
         </div>
     );
   }

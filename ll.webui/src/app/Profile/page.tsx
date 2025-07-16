@@ -19,7 +19,7 @@ export default function Profile() {
   const [courses, setCourses] = useState<CourseViewModel[]>([]);
   const [showCourse, setShowCourse] = useState(false);
   const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]); 
-  const [courseText, setCourseText] = useState<string>('');   
+  const [selectedCourse, setSelectedCourse] = useState<CourseViewModel>(courses[0]);   
   const feedbackViewRef = useRef<any>(null); 
   const [fbTitle, setfbhTitle] = useState('');
   const [fbBody, setfbhBody] = useState('');
@@ -48,10 +48,10 @@ export default function Profile() {
     
   }, []);
   
-  const handleSubmit = async (id: number, content:string) => {
+  const handleSubmit = async (course: CourseViewModel) => {
       setLoading(true);
 
-      GET('/Course/GetCourseWords?courseId=' + id)
+      GET('/Course/GetCourseWords?courseId=' + course.id)
       .then((wordViewModels: WordViewModel[]) => {
 
         if(wordViewModels == null || wordViewModels == undefined)
@@ -59,7 +59,7 @@ export default function Profile() {
 
         setWordViewModels(wordViewModels);
       }).finally(() => {
-          setCourseText(content);
+          setSelectedCourse(course);
           setLoading(false);
           setShowCourse(true);
         });
@@ -96,7 +96,7 @@ export default function Profile() {
               &times;
             </button>
 
-            <div className="course-card" onClick={() => handleSubmit(course.id, course.text)}>
+            <div className="course-card" onClick={() => handleSubmit(course)}>
               <div className="course-header">
                 <div className="course-title">
                   {course.text.substring(0, 25)}  
@@ -113,7 +113,7 @@ export default function Profile() {
         ))}
     </div>)}
 
-    {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)} />)}
+    {showCourse && (<Flashcards text={selectedCourse.text} words={wordViewModels} courseId={selectedCourse.id} onDone={() => setShowCourse(false)} />)}
 
     {loading && <SpinnerOverlay />}      
     <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />

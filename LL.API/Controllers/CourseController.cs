@@ -146,6 +146,34 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
+        /// Delete selected course word by courseId and wordId.
+        /// </summary>
+        /// <response code="200">Success/fail</response>
+        [HttpPost("DeleteCourseWord")]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        public ActionResult DeleteCourseWord([FromBody] DeleteCourseWordModel model)
+        {
+            try
+            {       
+                return Ok(courseRepository.DeleteCourseWord(model.CourseId, model.WordId, UserId));
+            }
+            catch (Exception ex)
+            {               
+                var exceptionData = new Dictionary<string, object>();
+
+                if (model != null)
+                {
+                    exceptionData["CourseId"] = model.CourseId;
+                    exceptionData["wordId"] = model.WordId;
+                }
+
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
         /// Delete selected course by id.
         /// </summary>
         /// <response code="200">Success/fail</response>
@@ -158,7 +186,11 @@ namespace LL.API.Controllers
                 return Ok(courseRepository.DeleteCourseById(courseId, UserId));
             }
             catch (Exception ex)
-            {
+            {               
+                var exceptionData = new Dictionary<string, object>();
+                
+                exceptionData["courseId"] = courseId;
+                
                 appMonitoringService.ExportError(ex);
 
                 return ErrorStatusCode;

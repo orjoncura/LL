@@ -32,6 +32,25 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
         return course.Id;
     }
 
+    public bool DeleteCourseWord(int courseId, int wordId, int userId)
+    {
+        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.CourseId == courseId && c.WordId == wordId && c.IsActive);
+        
+        if(courseWord != null)
+        {
+            courseWord.IsActive = false;
+            courseWord.UpdatedById = userId;
+            courseWord.UpdatedDate = DateTime.Now;
+            
+            db.CourseWords.Update(courseWord);
+            db.SaveChanges();
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
     public bool DeleteCourseById(int id, int userId)
     {
         Course? course = db.Courses.FirstOrDefault(c => c.Id == id && c.IsActive);

@@ -14,7 +14,7 @@ services:
       - bridge_net
 
   ll_api:
-      image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api
+      image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api:1.0.0.0
       container_name: ll_api
       networks:
         - bridge_net

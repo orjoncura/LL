@@ -46,6 +46,11 @@ export interface CourseRequestModel {
   readonly isValid?: boolean;
 }
 
+export interface DeleteCourseWordModel {
+  courseId?: number;
+  wordId?: number;
+}
+
 export interface DefinitionRequestModel {
   text?: string;
   translation?: string;

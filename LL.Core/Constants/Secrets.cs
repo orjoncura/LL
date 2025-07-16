@@ -27,4 +27,6 @@ public class Secrets
     public const string Version = "Version";
         
     public const string BaseUrl = "BaseURL";
+    
+    public const string Cors = "Cors";
 }

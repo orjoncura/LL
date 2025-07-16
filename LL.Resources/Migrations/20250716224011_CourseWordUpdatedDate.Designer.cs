@@ -3,6 +3,7 @@ using System;
 using LL.Resources.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LL.Resources.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716224011_CourseWordUpdatedDate")]
+    partial class CourseWordUpdatedDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,19 +150,11 @@ namespace LL.Resources.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseWordId");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Exercises");
                 });
@@ -187,19 +182,19 @@ namespace LL.Resources.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 359, DateTimeKind.Unspecified).AddTicks(2860),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 769, DateTimeKind.Unspecified).AddTicks(8949),
                             Value = "High"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 359, DateTimeKind.Unspecified).AddTicks(3187),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 769, DateTimeKind.Unspecified).AddTicks(9110),
                             Value = "Medium"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 359, DateTimeKind.Unspecified).AddTicks(3215),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 769, DateTimeKind.Unspecified).AddTicks(9135),
                             Value = "Low"
                         });
                 });
@@ -227,13 +222,13 @@ namespace LL.Resources.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 352, DateTimeKind.Unspecified).AddTicks(6132),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 763, DateTimeKind.Unspecified).AddTicks(2028),
                             Value = "English"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 352, DateTimeKind.Unspecified).AddTicks(6290),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 763, DateTimeKind.Unspecified).AddTicks(2206),
                             Value = "Spanish"
                         });
                 });
@@ -397,19 +392,19 @@ namespace LL.Resources.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 345, DateTimeKind.Unspecified).AddTicks(1328),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 755, DateTimeKind.Unspecified).AddTicks(3692),
                             Value = "Queued"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 351, DateTimeKind.Unspecified).AddTicks(2417),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 761, DateTimeKind.Unspecified).AddTicks(7719),
                             Value = "Sent"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 351, DateTimeKind.Unspecified).AddTicks(2542),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 761, DateTimeKind.Unspecified).AddTicks(7857),
                             Value = "Failed"
                         });
                 });
@@ -782,49 +777,49 @@ namespace LL.Resources.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4726),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2390),
                             Value = "Noun"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4883),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2561),
                             Value = "Verb"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4915),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2594),
                             Value = "Adjective"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4917),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2597),
                             Value = "Adverb"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4919),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2599),
                             Value = "Interjection"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4923),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2603),
                             Value = "Preposition"
                         },
                         new
                         {
                             Id = 7,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4925),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2604),
                             Value = "Pronoun"
                         },
                         new
                         {
                             Id = 8,
-                            CreatedDate = new DateTime(2025, 7, 18, 5, 57, 56, 356, DateTimeKind.Unspecified).AddTicks(4926),
+                            CreatedDate = new DateTime(2025, 7, 16, 22, 40, 10, 767, DateTimeKind.Unspecified).AddTicks(2606),
                             Value = "Determiner"
                         });
                 });
@@ -919,16 +914,9 @@ namespace LL.Resources.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LL.Resources.Models.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("SeminarWord");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("LL.Resources.Models.LoginHistory", b =>

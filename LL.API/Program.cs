@@ -14,7 +14,7 @@ internal class Program
         builder.Services
             .AddDbContextConfig(builder.Configuration)
             .AddJwtConfig(builder.Configuration)
-            .AddCorsConfig()
+            .AddCorsConfig(builder.Configuration)
             .AddDependencyInjectionConfig(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();
