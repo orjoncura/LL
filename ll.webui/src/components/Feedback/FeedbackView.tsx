@@ -33,9 +33,8 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
 
       if (onClick) 
         onClick();
-      
-     close();
-      
+
+       close();
     };
 
     useImperativeHandle(ref, () => ({

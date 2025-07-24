@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
-import { CourseViewModel, WordViewModel } from '@/utils/Models/models';
+import { useState, useRef, useEffect, ReactNode, ReactElement } from 'react';
+import { WordViewModel } from '@/utils/Models/models';
 import { POST, CreateAudio } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faBoxArchive } from '@fortawesome/free-solid-svg-icons';
-import {DeleteCourseWordModel} from '@/utils/Models/models';
-import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
+import { DeleteCourseWordModel } from '@/utils/Models/models';
 
+import { motion } from "framer-motion";
+import FeedbackView from '@/components/Feedback/FeedbackView';
+import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
 interface FlashcardsProps { text:string, words: WordViewModel[], courseId?:number; onDone: (result: boolean) => void;}
+interface CardProps {  id:number, name: string; translation: string; style?: React.CSSProperties; }
 
 export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
@@ -18,8 +21,22 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
     const [paragraphs, setParagraph] = useState<string[]>([]);
     const [paragraphIndex, setParagraphIndex] = useState<number>(0);
     const [currentFlashcard, setCurrentFlashcard] = useState<WordViewModel>();
+    const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showMeaning, setShowMeaning] = useState(false);
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
+
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
+            feedbackViewRef.current.open();
+        }
+    };
 
     useEffect(() => {
       window.scrollTo(0, 0);
@@ -42,6 +59,14 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
       setParagraph(sortedParagraphs);
       setParagraphWords(sortedBasedOnAppearance);
       setCurrentFlashcard(sortedBasedOnAppearance[0]);
+
+      //Back to the parent page.
+      const handlePopState = () => {
+        onDone(false); 
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
     }, []);
 
     function Percentage(paragraph: string, targetWords: WordViewModel[]){
@@ -69,7 +94,7 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
       onDone(false)
     };
     
-    const nextStep = (newIndex: number) => {
+    const navigateToFlashcardByIndex = (newIndex: number) => {
 
       let newParagraphIndex = paragraphIndex;
       if(paragraphWords[newIndex] == null){
@@ -92,65 +117,52 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
           
           if(courseId === null) return;
 
-          setLoading(true); 
-          
           const word: WordViewModel = paragraphWords[index]
 
-          const data: DeleteCourseWordModel = {
-            "courseId": courseId,
-            "wordId": word.id
+          let fun = () => {
+            setLoading(true); 
+            
+            const data: DeleteCourseWordModel = {
+              "courseId": courseId,
+              "wordId": word.id
+            };
+
+            POST('/Course/DeleteCourseWord', JSON.stringify(data))                
+            .then(isSuccessfull => { 
+
+                if(isSuccessfull) {
+                    var wordsList = paragraphWords.filter(p => p.id !== word.id);
+                    setFlashcards(flashcards.filter(f => f.id !== word.id));
+                    setParagraphWords(wordsList);
+
+                    if(wordsList[index] != null) 
+                      setCurrentFlashcard(wordsList[index]) 
+                    else
+                      resetAllToDefault();
+                }
+                
+            }).finally(() => {setLoading(false)});
           };
 
-          POST('/Course/DeleteCourseWord', JSON.stringify(data))                
-          .then(isSuccessfull => { 
-
-              if(isSuccessfull) {
-                  var wordsList = paragraphWords.filter(p => p.id !== word.id);
-                  setFlashcards(flashcards.filter(f => f.id !== word.id));
-                  setParagraphWords(wordsList);
-
-                  if(wordsList[index] != null) 
-                    setCurrentFlashcard(wordsList[index]) 
-                  else
-                    resetAllToDefault();
-              }
-              
-            }).finally(() => {setLoading(false)});
+        showFeedback("Warning", "Would you like to archive '" + word.name + "'", fun);
     }
-
-    const flipCard = () => {
-
-      const cardElement = document.querySelector('.flip-card-inner');
     
-      if (cardElement != null && !cardElement.classList.contains('flipped')) {
-        cardElement.classList.toggle('flipped');
-        setShowMeaning(true);
-
-      }else if(cardElement != null){
-
-        cardElement.classList.remove('flipped');
-        setShowMeaning(false);
-      }
-
-    };
-    
-    function highlightWord(word: string): string {
-        const trimmedText = text.trim();
-        
-        if (trimmedText === '') 
-          return "";
-
-        const matchingParagraphs = trimmedText.split('\n\n').filter(t => t.includes(word));
-        
-        if (matchingParagraphs.length === 0) 
-          return "";
-        
-        let paragraph = matchingParagraphs[0];
+    function highlightWord(word:string): ReactElement {
 
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`\\b${escapedWord}\\b`, 'g');
 
-        return paragraph.replace(regex, `<b>${word}</b>`); 
+        if(escapedWord == paragraphWords[flashcardIndex].name)
+          return <b style={{ marginRight: 2 }}>{word}</b>;
+
+        // Check if any of the extracted words match the paragraphWords list
+        if(paragraphWords.some(w => w.name == escapedWord)){
+            
+          const index = paragraphWords.findIndex(p => p.name === word);  
+          return <span style={{ textDecoration: 'underline dotted', cursor:'pointer', marginRight: 2}} 
+                onClick={() => navigateToFlashcardByIndex(index)}>{word}</span>
+        }
+
+        return <p style={{ marginRight: 2 }}>{word}</p>;
     }
 
     function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
@@ -198,24 +210,37 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
                 ))}
               </div>
             </div>
-
-            <div style={{  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px'}}>
-              <div className="mainTxt flip-card" onClick={flipCard}>
-                <div className="flip-card-inner">
-                    <div className="flip-card-front">
-                        <p className="title">{currentFlashcard.name}</p>
-                    </div>
-                    <div className="flip-card-back">
-                        <p className="title">{currentFlashcard.translation}</p>
-                    </div>
-                </div>
-              </div>
+            
+            <div className='card-con'>
+              {paragraphWords.map((card, index) => 
+                index >= flashcardIndex ?
+                  (<motion.div
+                    key={card.id}
+                    className={`flip-card ${index == flashcardIndex ? "main" : ""}`}
+                    drag
+                    dragElastic={1}
+                    style={{ zIndex: flashcards.length - index  }}
+                    onClick={() => !isDragging && setShowMeaning(!showMeaning)}
+                    onDragStart={() => setIsDragging(true)}
+                    onDragEnd={() => {
+                      setIsDragging(false);
+                      navigateToFlashcardByIndex(flashcardIndex + 1);
+                    }}
+                    whileTap={{ scale: 1.1 }}
+                  >
+                  <div className={`card-inner mainTxt ${showMeaning ? "flipped" : ""}`}>
+                    <div className="card-face">{card.name}</div>
+                    <div className="card-face card-back">{card.translation}</div>
+                  </div>
+                </motion.div>)
+                : null)}
             </div>
 
             <br></br>
-
-            <span>&nbsp;&nbsp;</span>
-            {showMeaning == false && <div dangerouslySetInnerHTML={{ __html: highlightWord(currentFlashcard.name) }} style={{marginBottom: "40%"}} />}
+ 
+            {showMeaning == false && <div style={{marginBottom: "40%", display: 'ruby'}}>
+              {text.trim().split(' ').map((word) => highlightWord(word))}
+            </div>}
 
             {showMeaning && (currentFlashcard.meanings && currentFlashcard.meanings.length > 0 ? (
               currentFlashcard.meanings.map((meaning) => (
@@ -234,10 +259,10 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
             ))
           ) : (<p>No meanings available</p> ))}
           
-          <div className="feedback-container fixed-bottom" style={{justifyContent:"flex-end"}}>
-            <div className="row" >
+          <div className="flashcardCon fixed-bottom" style={{justifyContent:"flex-end"}}>
+            <div className="row" style={{marginTop: "-5px"}} >
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => nextStep(flashcardIndex - 1)}>
+                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex - 1)}>
                     <FontAwesomeIcon icon={faSquareCaretLeft} />
                   </button>
                   <div className="button-label">Back</div>
@@ -259,7 +284,7 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
                 </div>
 
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => nextStep(flashcardIndex + 1)}>
+                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex + 1)}>
                     <FontAwesomeIcon icon={faSquareCaretRight} />
                   </button>
                   <div className="button-label">Next</div>
@@ -268,7 +293,8 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
           </div>
         </div> }
 
-      {loading && <SpinnerOverlay />}
+      {loading && <SpinnerOverlay />}    
+      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} showCloseBtn={true} />
     </div>
   );
 };

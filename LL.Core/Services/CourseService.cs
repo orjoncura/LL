@@ -119,32 +119,29 @@ public class CourseService(
             }
         }
     }
-    public async Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId)
+    public async Task<List<ExerciseViewModel>> CreateExercises(int courseId, int userId)
     {
         List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();
         
-        if (exerciseRequest.IsValid == false || userId == 0)
-            return exercises; 
-        
-        int courseWordId = courseWordRepository.Insert(exerciseRequest.WordId, exerciseRequest.CourseId, exerciseRequest.RankId, userId);
+        wordRepository.GetByCourseId(courseId);
 
-        exercises = exerciseRepository.GetByCourseWordId(courseWordId);
+        exercises = exerciseRepository.GetByCourseId(courseId);
 
         if (exercises.Any() == false)
         {
-            string prompt = PromptFactory.CreateCoursePrompt(
+            /*string prompt = PromptFactory.CreateCoursePrompt(
                 exerciseRequest.WordName,
                 exerciseRequest.LanguageFromId, 
                 exerciseRequest.LanguageToId, 
                 exerciseRequest.Text);
         
-            exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));
+            exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));*/
         
             if (exercises != null && exercises.Any(s => s.IsValid))
             {       
                 exercises = exercises.Where(e => e.IsValid).ToList();
             
-                exerciseRepository.InsertRange(courseWordId, exercises, userId);
+                exerciseRepository.InsertRange(courseId, exercises, userId);
             }
         }
         

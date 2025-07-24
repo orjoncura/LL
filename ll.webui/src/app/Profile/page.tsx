@@ -58,6 +58,8 @@ export default function Profile() {
           return;
 
         setWordViewModels(wordViewModels);
+
+        window.history.pushState({ modalOpen: true }, "", "Profile/Flashcards");
       }).finally(() => {
           setSelectedCourse(course);
           setLoading(false);

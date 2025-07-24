@@ -1,4 +1,5 @@
-﻿using LL.Core.Constants;
+﻿using System.Diagnostics;
+using LL.Core.Constants;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace LL.API.Configs
@@ -7,7 +8,7 @@ namespace LL.API.Configs
     {
         public static IServiceCollection AddCorsConfig(this IServiceCollection services, IConfiguration config)
         {
-            string[] cors = config.GetSection(Secrets.Cors).Get<string[]>() ?? [];
+            string cors = config.GetSection(Secrets.BaseUrl).Get<string>() ?? string.Empty;
             
             services.AddCors(options =>
             {

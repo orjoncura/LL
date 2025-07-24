@@ -7,60 +7,83 @@
   font-size: '22px'
 }
 
-.flip-card {
-  background-color: transparent;
+.title {
+  font-size: 1.5em;
+  font-weight: 900;
+  text-align: center;
+  margin: 0;
+}
+
+.card-con {
   width: 290px;
   height: 354px;
+  margin: 20px auto;
+  margin-bottom: 0px;
+  position: relative;
+}
+
+.flip-card {
+  position: absolute;
+  width: 290px;
+  height: 354px;
+  border-radius: 12px;
   perspective: 1000px;
-  margin-top: 5%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.title {
-font-size: 1.5em;
-font-weight: 900;
-text-align: center;
-margin: 0;
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
 }
 
-.flip-card-inner {
-position: relative;
-width: 100%;
-height: 100%;
-text-align: center;
-transition: transform 0.8s;
-transform-style: preserve-3d;
+.card-inner.flipped {
+  transform: rotateY(180deg);
 }
 
-.flipped {
-transform: rotateY(180deg);
+.flip-card.main {
+  box-shadow: 0 8px 14px 0 rgba(0, 0, 0, .2);
 }
 
-.flip-card-front, .flip-card-back {
-box-shadow: 0 8px 14px 0 rgba(0,0,0,0.2);
-position: absolute;
-display: flex;
-flex-direction: column;
-justify-content: center;
-width: 100%;
-height: 100%;
--webkit-backface-visibility: hidden;
-backface-visibility: hidden;
-border: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
-border-radius: 1rem;
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  border-radius: 12px;
+  user-select: none;
+  background-color: rgb(195, 177, 225);
 }
 
-.flip-card-front {
-background-color: rgb(195, 177, 225);
-color: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%)
+.card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+  color: white;
 }
 
-.flip-card-back {
-background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
 
-color: white;
-transform: rotateY(180deg);
-}
-
+.flashcardCon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-top: 2px solid #fccde2; /* Light pink border */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+    gap: 16px; /* Spacing between elements */
+    background: #fef0f6;
+    display: "flex"
+  }
+  
 .flashcardBtn{
   padding: 16px;
   display: inline-flex;

@@ -353,16 +353,16 @@ public class AppDbContext : DbContext
         {
             entity.Property(ut => ut.Original).IsRequired();
             entity.Property(ut => ut.Translated).IsRequired();
-            entity.Property(ut => ut.CourseWordId).IsRequired();
+            entity.Property(ut => ut.CourseId).IsRequired();
             entity.Property(ut => ut.IsActive).IsRequired();
             entity.Property(ut => ut.CreatedById).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
             entity.Property(ut => ut.UpdatedById).IsRequired(false);
             entity.Property(ut => ut.UpdatedDate).IsRequired(false);
             
-            entity.HasOne(ut => ut.SeminarWord)
+            entity.HasOne(ut => ut.Course)
                 .WithMany()
-                .HasForeignKey(ut => ut.CourseWordId)
+                .HasForeignKey(ut => ut.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.HasOne(ut => ut.CreatedBy)

@@ -6,6 +6,6 @@ namespace LL.Core.Interfaces.Services
     public interface ICourseService
     {
         Task<List<WordViewModel>> CreateCourse(CourseRequestModel courseRequest, int userId);
-        Task<List<ExerciseViewModel>> CreateExercises(ExerciseRequestModel exerciseRequest, int userId);
+        Task<List<ExerciseViewModel>> CreateExercises(int courseId, int userId);
     }
 }

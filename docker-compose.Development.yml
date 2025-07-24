@@ -20,18 +20,8 @@ services:
         - bridge_net
       depends_on:
         - ll_data
-      environment:
-        - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
-        - Jwt__Key=${JWT_KEY}
-        - Jwt__Issuer=${JWT_ISSUER}
-        - Jwt__Audience=${JWT_AUDIENCE}
-        - Jwt__ExpiryMinutes=${JWT_EXPIRY_MINUTES}
-        - AWS__ACCESS_KEY_ID=${STORAGE_ACCESS_KEY}
-        - AWS__SECRET_ACCESS_KEY=${STORAGE_SECRET_KEY}
-        - AWS__REGION=${STORAGE_REGION}
-        - S3_BUCKET_NAME=${STORAGE_NAME}
-        - ASPNETCORE_ENVIRONMENT=Development
-        - ASPNETCORE_URLS=http://+:5000    
+      env_file:
+        - .env.dev
       ports:
       - "5197:5000"
 

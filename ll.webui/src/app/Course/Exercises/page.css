@@ -1,0 +1,202 @@
+.feedback-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-top: 2px solid #fccde2; /* Light pink border */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+    gap: 16px; /* Spacing between elements */
+  }
+  
+  .audio{
+      display: 'inline-block';
+      background: 'none';
+      border: 'none';
+      font-Weight: 'bold';
+      color: 'black';
+      font-size: '22px'
+  }
+  
+  @media (min-width: 640px) {
+    .feedback-container {
+      flex-direction: row; /* Align items side by side on larger screens */
+    }
+  }
+  
+  .feedback-text {
+    display: flex;
+    align-items: flex-start; /* Align text to the top */
+    gap: 12px; /* Add spacing between icon and text */
+    flex-grow: 1; /* Make the text section grow to fill available space */
+  }
+  
+  .feedback-details {
+    line-height: 1.5; /* Proper line spacing for better readability */
+  }
+  
+  .feedback-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .feedback-detail {
+    font-size: 0.875rem;
+    margin: 4px 0 0 0;
+    color: #a61d55; /* Slightly lighter pink for detail text */
+  }
+  
+  .feedback-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Spacing between text and chevron */
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #f06595; /* Pink background */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%; /* Button takes full width by default */
+  }
+  
+  .feedback-button:hover {
+    background-color: #e64980; /* Darker pink on hover */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+  }
+  
+  .feedback-button:active {
+    background-color: #d63384; /* Even darker pink when active */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  }
+  
+  .chevron {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  @media (min-width: 640px) {
+    .feedback-button {
+      width: auto; /* Button shrinks to fit content on larger screens */
+      margin-left: auto; /* Aligns button to the right */
+    }
+  }
+  
+  :root {
+    --ring-offset-shadow: 0 0 #0000; /* Default offset shadow */
+    --ring-shadow: 0 0 #0000; /* Default ring shadow */
+    --tw-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06); /* Button shadow */
+  }
+  
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9; /* Light background for contrast */
+  }
+  
+  .center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .custom-button {
+    padding: 10px 24px; /* Padding for a pill shape */
+    border: 1px solid #d3d3d3; /* Light gray border */
+    border-radius: 10px; /* Fully rounded corners for pill effect */
+    background-color: white; /* White background */
+    font-size: 14px; /* Text size */
+    color: black; /* Text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    outline: none; /* Remove focus outline */
+    box-shadow: var(--ring-offset-shadow), var(--ring-shadow), var(--tw-shadow); /* Combined shadows */
+    transition: box-shadow 0.2s ease, transform 0.2s ease; /* Smooth hover effect */
+  }
+  
+  .custom-button:hover {  
+    background-color: #f06595; /* Keep the background color unchanged */
+    border-color: #f06595;
+    outline: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15), 0px 2px 4px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+  }
+  
+  .custom-button:active {
+    background-color: #f06595 !important; /* Keep the background color unchanged */
+    border-color: #f06595 !important;
+    transform: translateY(1px); /* Button depresses */
+  }
+  .custom-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .card {
+    position: relative;
+    width: 190px;
+    height: 254px;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding: 12px;
+    gap: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transform-style: preserve-3d;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: -5px;
+    width: 200px;
+    height: 264px;
+    border-radius: 10px;
+    background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+    z-index: -1;
+    pointer-events: none;
+    transform-origin: center;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+    transform: translate3d(0, 0, 0) scale(0.95);
+    filter: blur(20px);
+    z-index: -2;
+  }
+  
+  .card:hover::after {
+    filter: blur(30px);
+    opacity: 0.6;
+  }
+  
+  .card:hover::before {
+    transform: rotate(-90deg) scaleX(1.34) scaleY(0.77);
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+  
+  .card {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px) rotateX(10deg);
+  }
+  
+  
+  

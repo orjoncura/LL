@@ -73,6 +73,7 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
     {
          List<CourseViewModel> courseViewModels = db.Courses
             .Where(c => c.CreatedById == userId && c.IsActive)
+            .OrderByDescending(c => c.CreatedDate)
             .Select(DataFactory.Convert).ToList();
 
          return courseViewModels;

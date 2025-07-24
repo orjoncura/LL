@@ -81,23 +81,19 @@ namespace LL.API.Controllers
         /// </summary>
         /// <param name="exerciseRequest">Contains Course & Word information</param>
         /// <response code="200">The new exercises</response>
-        [HttpPost("CreateExercises")]
+        [HttpGet("CreateExercises")]
         [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> CreateExercises([FromBody] ExerciseRequestModel exerciseRequest)
+        public async Task<ActionResult> CreateExercises([FromQuery] int courseId)
         {
             try
             {
-                return Ok(await courseService.CreateExercises(exerciseRequest, UserId));
+                return Ok(await courseService.CreateExercises(courseId, UserId));
             }
             catch (Exception ex)
             {
                 var exceptionData = new Dictionary<string, object>();
 
-                if (exerciseRequest != null && exerciseRequest.IsValid)
-                {
-                    exceptionData["CourseId"] = exerciseRequest.CourseId;
-                    exceptionData["WordId"] = exerciseRequest.WordId;
-                }
+                exceptionData["courseId"] = courseId;
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 

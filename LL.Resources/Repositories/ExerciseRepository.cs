@@ -7,15 +7,15 @@ using LL.Resources.Models;
 namespace LL.Resources.Repositories;
 public class ExerciseRepository(AppDbContext db) : IExerciseRepository
 {
-    public List<ExerciseViewModel> GetByCourseWordId(int courseWordId)
+    public List<ExerciseViewModel> GetByCourseId(int courseId)
     {
-        List<Exercise> exercises = db.Exercises.Where(e => e.CourseWordId == courseWordId && e.IsActive).ToList();
+        List<Exercise> exercises = db.Exercises.Where(e => e.CourseId == courseId && e.IsActive).ToList();
         List<ExerciseViewModel> exerciseViewModels = exercises.Any() ? exercises.Select(DataFactory.Convert).ToList() : [];
 
         return exerciseViewModels;
     }
     
-    public List<int> InsertRange(int seminarWordId, List<ExerciseViewModel> exerciseViewModels, int userId)
+    public List<int> InsertRange(int courseId, List<ExerciseViewModel> exerciseViewModels, int userId)
     {
         var exercises = new List<Exercise>();
         
@@ -23,7 +23,7 @@ public class ExerciseRepository(AppDbContext db) : IExerciseRepository
         {
             var ex = new Exercise
             {
-                CourseWordId = seminarWordId,
+                CourseId = courseId,
                 Original = exerciseViewModel.Original,
                 Translated = exerciseViewModel.Translated,
                 Extra = exerciseViewModel.Extra,
