@@ -12,7 +12,6 @@ import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
 interface FlashcardsProps { text:string, words: WordViewModel[], courseId?:number; onDone: (result: boolean) => void;}
-interface CardProps {  id:number, name: string; translation: string; style?: React.CSSProperties; }
 
 export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
@@ -111,6 +110,7 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
       setFlashcardIndex(newIndex);
       setParagraphWords(sortBasedOnAppearance(paragraphs[newParagraphIndex], flashcards));
       setCurrentFlashcard(paragraphWords[newIndex]);
+      setShowMeaning(false);
     }
     
     const archive = (index:number) => {
@@ -147,22 +147,26 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
         showFeedback("Warning", "Would you like to archive '" + word.name + "'", fun);
     }
     
-    function highlightWord(word:string): ReactElement {
+    function highlightWord(word:string, wordIndex: number): ReactElement {
+
+      if(!word) return <p></p>;
 
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const wordKey = "pw_" + wordIndex;
 
         if(escapedWord == paragraphWords[flashcardIndex].name)
-          return <b style={{ marginRight: 2 }}>{word}</b>;
+          return <b key={wordKey} style={{ marginRight: 2 }}>{word}</b>;
 
         // Check if any of the extracted words match the paragraphWords list
         if(paragraphWords.some(w => w.name == escapedWord)){
-            
-          const index = paragraphWords.findIndex(p => p.name === word);  
-          return <span style={{ textDecoration: 'underline dotted', cursor:'pointer', marginRight: 2}} 
+             
+          const index = paragraphWords.findIndex(p => p.name === word); 
+          return <span key={wordKey} style={{ textDecorationLine: 'underline', 
+            WebkitTextDecorationLine: 'underline', cursor:'pointer', marginRight: 2}} 
                 onClick={() => navigateToFlashcardByIndex(index)}>{word}</span>
         }
 
-        return <p style={{ marginRight: 2 }}>{word}</p>;
+        return <p key={wordKey} style={{ marginRight: 2 }}>{word}</p>;
     }
 
     function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
@@ -238,8 +242,8 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
 
             <br></br>
  
-            {showMeaning == false && <div style={{marginBottom: "40%", display: 'ruby'}}>
-              {text.trim().split(' ').map((word) => highlightWord(word))}
+            {showMeaning == false && <div style={{marginBottom: "40%", display: 'inline-flex', flexWrap: 'wrap'}}>
+              {text.trim().split(' ').map((word, index) => highlightWord(word, index))}
             </div>}
 
             {showMeaning && (currentFlashcard.meanings && currentFlashcard.meanings.length > 0 ? (

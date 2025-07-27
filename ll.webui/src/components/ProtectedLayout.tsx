@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GetToken } from '@/utils/Security/AuthManager'
-import ServiceWorkerRegistration from '../components/ServiceWorkerRegistration';
+import ServiceWorkerRegistration from './System/ServiceWorkerRegistration';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);

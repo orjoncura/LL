@@ -1,5 +1,6 @@
 "use client";
 
+import { tr } from 'framer-motion/client';
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -18,10 +19,6 @@ export default function ServiceWorkerRegistration() {
     useEffect(() => {
         const userAgent = navigator.userAgent.toLowerCase();
 
-        let granted:boolean = (typeof window !== 'undefined' && 'Notification' in window) 
-            ? (Notification.permission === 'granted')
-            : false;
-        
         let isSafari:boolean = (/safari/.test(userAgent) && !/chrome/.test(userAgent));
         setIsMacOS(/Macintosh/i.test(navigator.userAgent));
 
@@ -29,6 +26,12 @@ export default function ServiceWorkerRegistration() {
             navigator.serviceWorker
             .register('/service-worker.js');
         }
+
+        let granted:boolean = (typeof window !== 'undefined' && 'Notification' in window) 
+        ? (Notification.permission === 'granted')
+        : false;
+
+        if(granted) return;
 
         if ('beforeinstallprompt' in window) {
             const handler = (e: Event) => {
@@ -40,12 +43,17 @@ export default function ServiceWorkerRegistration() {
 
             return () => window.removeEventListener('beforeinstallprompt', handler);
         } else if (isSafari) {
-            const isInStandaloneMode = 'standalone' in window.navigator && window.navigator.standalone;
+
+            const isInStandaloneMode = ('standalone' in window.navigator && (window.navigator as any).standalone) 
+            || window.matchMedia('(display-mode: standalone)').matches;
 
             setShowSafariInstructions(isInStandaloneMode == false);
+            setShowNotifications(isInStandaloneMode);
+        }else{
+
+            setShowNotifications(isInstallable && !showSafariInstructions && !granted);
         }
 
-        setShowNotifications(isInstallable && !showSafariInstructions && !granted);
     }, []);
 
     const handleInstallClick = async () => {
@@ -85,9 +93,6 @@ export default function ServiceWorkerRegistration() {
                     On macOS, you can also use the “Add to Dock” option in the address bar.
                     </p>
                 )}
-                <button className='btn btn-primary' onClick={requestNotificationPermission}>
-                    Enable Notifications
-                </button>
                 </div>
             )}
 
