@@ -1,6 +1,5 @@
 "use client";
 
-import { tr } from 'framer-motion/client';
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {

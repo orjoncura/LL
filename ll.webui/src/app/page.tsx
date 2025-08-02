@@ -6,7 +6,6 @@ import { POST } from '@/utils/Security/httpClient'
 import { StoreToken } from '@/utils/Security/AuthManager'
 import {getEnv} from '@/utils/Models/EnvironmentVariables';
 import { IsValidEmail, IsValidPassword } from "@/utils/Security/Validators";
-import { SendLocalNotifications } from "@/utils/System/Notification";
 import {LoginModel, TokenViewModel} from '@/utils/Models/models';
 import Link from 'next/link';
 import FeedbackView from '../components/Feedback/FeedbackView';

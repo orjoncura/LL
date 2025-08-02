@@ -34,12 +34,14 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.logo}>
-        <h2 className='mainTxt'>Fluente</h2>
+      <div className={styles.links}>
+        <h2>
+          <Link className='mainTxt' href="/Course/Create">Fluente</Link>
+        </h2>
       </div>
       <ul className={styles.links}>
         <li>
-          <Link className='mainTxt' href="/Course/Create">Home</Link>
+          <Link className='mainTxt' href="/Course/CourseList" prefetch={true}>Courses</Link>
         </li>
         <li>
           <Link className='mainTxt' href="/Profile">Profile</Link>

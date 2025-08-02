@@ -20,7 +20,7 @@ export async function SendLocalNotifications(title: string, body: string): Promi
     // Create and display the local notification
     new Notification(title, {
       body: body,
-      icon: '/icons/icon-192x192.png', // Path to your PWA icon
+      icon: '/favicon.ico', 
     });
 
     return 'Local notification displayed!';

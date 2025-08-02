@@ -73,7 +73,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
     }
     private async Task<string> RunLocalOllama(string input)
     { 
-        IChatClient chatClient =  new OllamaChatClient(new Uri("http://localhost:11434/"), "deepseek-r1:14b");
+        IChatClient chatClient =  new OllamaChatClient(new Uri(agentModel.LLamaModeLocation), "deepseek-r1:14b");
         
         List<ChatMessage> chatHistory = new();
 

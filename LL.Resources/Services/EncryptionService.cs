@@ -2,15 +2,17 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using LL.Core.Constants;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.ViewModels;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 
 namespace LL.Resources.Services;
 
-public class EncryptionService : IEncryptionService
+public class EncryptionService(IConfiguration configuration) : IEncryptionService
 {
     public HashPasswordModel HashPassword(string password)
     {
@@ -55,7 +57,40 @@ public class EncryptionService : IEncryptionService
             .Replace("/", "_")
             .Replace("=", "");
     }
+    public string Encrypt(int number)
+    {
+        string encryptionKey = configuration[Secrets.EncryptionKey];
+        int half = encryptionKey.Length / 2;
+        string key = encryptionKey.Substring(0, half);
+        string iv = encryptionKey.Substring(half);
+        
+        byte[] plainBytes = BitConverter.GetBytes(number);
+        using var aes = Aes.Create();
+        aes.Key = Encoding.ASCII.GetBytes(key);
+        aes.IV = Encoding.ASCII.GetBytes(iv);
 
+        using var encryptor = aes.CreateEncryptor();
+        byte[] encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
+
+        return Convert.ToBase64String(encryptedBytes).Replace("+", "-").Replace("/", "_"); 
+    }
+    public int Decrypt(string encrypted)
+    {               
+        string encryptionKey = configuration[Secrets.EncryptionKey];
+        int half = encryptionKey.Length / 2;
+        string key = encryptionKey.Substring(0, half);
+        string iv = encryptionKey.Substring(half);
+        
+        byte[] encryptedBytes = Convert.FromBase64String(encrypted.Replace("-", "+").Replace("_", "/"));
+        using var aes = Aes.Create();
+        aes.Key = Encoding.ASCII.GetBytes(key);
+        aes.IV = Encoding.ASCII.GetBytes(iv);
+
+        using var decryptor = aes.CreateDecryptor();
+        byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
+        return BitConverter.ToInt32(decryptedBytes, 0);
+    }
+    
     // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
     private string Hash(string password, byte[] salt) =>
         Convert.ToBase64String(KeyDerivation.Pbkdf2(

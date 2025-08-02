@@ -1,5 +1,4 @@
 ﻿using LL.Core.Enums;
-using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Resources.Contexts;
 using LL.Core.Interfaces.Repositories;
@@ -14,32 +13,25 @@ namespace LL.Resources.Repositories;
 public class WordRepository(AppDbContext db,
     StorageModel storageModel, 
     IStorageService storageService, 
-    ITextToSpeechService textToSpeechService) : IWordRepository
+    ITextToSpeechService textToSpeechService,
+    IEncryptionService encryptionService) : IWordRepository
 {
     public List<WordViewModel> GetKeyWords(int languageId)
     {
         var words = db.WordLinks
+            .Include(w => w.Word)
+            .Include(w => w.Word.WordMeanings)
             .Where(w => w.Word.LanguageId == languageId
-                        && (w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
-                            || w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.High)
-                        && w.IsActive)
-            .Include(wordLink => wordLink.Word).ToList()
-            .Select(w => new WordViewModel(DataFactory.Convert(w.Word), w.Value)).ToList();
-        
-        var wordIds = words.Select(w => w.Id).ToList();
-        
-        var meanings = db.WordMeanings
-            .Include(w => w.Type)
-            .Include(w => w.WordDefinitions)
-            .Where(w => wordIds.Contains(w.WordId) & w.IsActive).ToList();
-        
-        words.ForEach(w => w.Meanings = meanings.Where(m => m.WordId == w.Id).Select(DataFactory.Convert).ToList());
+                && (w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
+                    || w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.High)
+                && w.IsActive).ToList()
+            .Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
         
         return words;
     }
-    public MemoryStream? GetFileStreamById(int wordId)
+    public MemoryStream? GetFileStreamById(string wordId)
     {
-        var word = db.Words.FirstOrDefault(w => w.Id == wordId);
+        var word = db.Words.FirstOrDefault(w => w.Id == encryptionService.Decrypt(wordId));
 
         if (word == null)
             return null;
@@ -80,34 +72,26 @@ public class WordRepository(AppDbContext db,
         return  DataFactory.Convert(word);
     }
     
-    public List<WordViewModel> GetByCourseId(int id)
+    public List<WordViewModel> GetByModuleId(string id)
     {
-        var words =
-            (from course in db.Courses
-                join courseWord in db.CourseWords
-                    on course.Id equals courseWord.CourseId
+        int moduleId = encryptionService.Decrypt(id);
+        
+        List<WordViewModel> words =
+            (from courseWord in db.CourseWords
                 join wordLink in db.WordLinks
-                    on courseWord.WordId equals wordLink.WordId
-                join word in db.Words
-                    on wordLink.WordId equals word.Id
-                where course.Id == id
-                   && course.IsActive
+               on courseWord.WordId equals wordLink.WordId
+             where courseWord.ModuleId == moduleId 
                    && courseWord.IsActive
+                   && courseWord.Module.IsActive
                    && wordLink.IsActive  
-                   && word.IsActive 
-                select new WordViewModel(word.Id, word.Name, wordLink.Value, word.ImportanceRatingId)).ToList();
-
-        List<int> ids = words.Select(w => w.Id).ToList();
-        
-        var wordMeanings = db.WordMeanings
-            .Include(wm => wm.Type)
-            .Include(wm => wm.WordDefinitions)
-            .Where(wm => ids.Contains(wm.WordId) && wm.IsActive 
-               && wm.WordDefinitions.All(wd => wd.IsActive)).ToList();
-        
-        words.ForEach(w =>
-            w.Meanings = wordMeanings.Where(m => m.WordId == w.Id)
-                .Select(DataFactory.Convert).ToList());
+                   && wordLink.Word.IsActive 
+                   && wordLink.Word.IsActive 
+             select wordLink)
+            .Include(w => w.Word.WordMeanings)
+            .ThenInclude(w => w.WordDefinitions)
+            .Include(w => w.Word.WordMeanings)
+            .ThenInclude(w => w.Type)
+            .ToList().Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
         
         return words;
     }

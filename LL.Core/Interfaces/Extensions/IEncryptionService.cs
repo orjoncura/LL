@@ -9,4 +9,6 @@ public interface IEncryptionService
     TokenViewModel GenerateAuthenticationToken(int id, string email, TokenConfigModel token);
     bool VerifyPassword(string password, string hashedPassword, string salt);
     string GenerateSecureToken(int length = 64);
+    string Encrypt(int number);
+    int Decrypt(string encrypted);
 }

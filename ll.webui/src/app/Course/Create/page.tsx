@@ -7,6 +7,7 @@ import Flashcards from '@/components/Courses/Flashcards';
 import { GET, POST, CreateAudio } from '@/utils/Security/httpClient'
 import {CourseRequestModel, WordViewModel} from '@/utils/Models/models';
 import FeedbackView from '@/components/Feedback/FeedbackView';
+import { SendLocalNotifications } from '@/utils/System/Notification'
 
 import './page.css'; 
 
@@ -70,7 +71,7 @@ export default function CreateCourse() {
       
       if (column === 1) {
 
-        let keyWordId: number = keyWords.filter(k => k.name == word)[0].id
+        let keyWordId: string = keyWords.filter(k => k.name == word)[0].id
         CreateAudio(keyWordId)
         setActiveWord(word);
         setMessage(null);
@@ -110,6 +111,7 @@ export default function CreateCourse() {
 
         try {
 
+            setLoading(true);
             if(courseText.length == 0)
             {
               showFeedback("Error", "Text can not be empty.");
@@ -125,17 +127,12 @@ export default function CreateCourse() {
               "languageToId": languageToId
             };
 
-            const words: WordViewModel[] =  await POST('/Course/Create', JSON.stringify(courseRequestModel));
+            var words: WordViewModel[] = await POST('/Course/Create', JSON.stringify(courseRequestModel));
 
-            const newItems = words.filter(w => !wordViewModels.some(m => m.name === w.name));
-            setWordViewModels(prev => [...prev, ...newItems]);
+            if(words.length > 0)
+              SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
 
-            for (const word of words.sort((a, b) => a.importanceRatingId > b.importanceRatingId ? 1 : -1)) {
-              
-              if(wordViewModels.some(w => w.name == word.name) == false)
-                wordViewModels.push(word); 
-            }
-
+            setLoading(false);
           } catch (error) {
 
             setLoading(false);
@@ -248,7 +245,7 @@ export default function CreateCourse() {
                         style={{ marginBottom: '10px', width: '100%' }}
                       />
 
-                  <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} text={"Confirm"} onClick={handleSubmit} isVisible={true} />
+                  <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} text={"Confirm"} onClick={handleSubmit} isVisible={true} showCloseBtn={false} />
             </div>
             )}
 
@@ -303,7 +300,7 @@ export default function CreateCourse() {
               )}
             </div>)}
 
-            {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)} />)}
+            {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)}  />)}
           </div>
         </div>
 

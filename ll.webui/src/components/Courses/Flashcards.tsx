@@ -11,14 +11,11 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
-interface FlashcardsProps { text:string, words: WordViewModel[], courseId?:number; onDone: (result: boolean) => void;}
+interface FlashcardsProps { text:string, words: WordViewModel[], moduleId?:string; onDone: (result: boolean) => void;}
 
-export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) => {
+export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
     const [flashcardIndex, setFlashcardIndex] = useState<number>(0);
-    const [paragraphWords, setParagraphWords] = useState<WordViewModel[]>([]);
-    const [paragraphs, setParagraph] = useState<string[]>([]);
-    const [paragraphIndex, setParagraphIndex] = useState<number>(0);
     const [currentFlashcard, setCurrentFlashcard] = useState<WordViewModel>();
     const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -38,107 +35,48 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
     };
 
     useEffect(() => {
-      window.scrollTo(0, 0);
-
-      //Remove paragraphs with no matching words.
-      const paragraphs = text.split('\n\n').filter(p =>  sortBasedOnAppearance(p, flashcards).length > 0);
-
-      const sortedParagraphs = paragraphs.sort((a, b) => {
-        const aPercentage = Percentage(a, flashcards);
-        const bPercentage = Percentage(b, flashcards);
-      
-        if (aPercentage > bPercentage) return -1;
-        if (aPercentage < bPercentage) return 1;
-      
-        // If both are included or both are not included, sort alphabetically
-        return 0;
-      });
-
-      var sortedBasedOnAppearance:any = sortBasedOnAppearance(sortedParagraphs[paragraphIndex], words);
-      setParagraph(sortedParagraphs);
-      setParagraphWords(sortedBasedOnAppearance);
-      setCurrentFlashcard(sortedBasedOnAppearance[0]);
-
-      //Back to the parent page.
-      const handlePopState = () => {
-        onDone(false); 
-      };
-
-      window.addEventListener("popstate", handlePopState);
-      return () => window.removeEventListener("popstate", handlePopState);
+      var sortedBasedOnAppearance:any = sortBasedOnAppearance(text, words);
+      setFlashcards(sortedBasedOnAppearance)
+      setCurrentFlashcard(sortedBasedOnAppearance[0]); 
     }, []);
+    
 
-    function Percentage(paragraph: string, targetWords: WordViewModel[]){
-      const targetSet = new Set(targetWords.map(word => word.name.toLowerCase()));
-      const words = paragraph.toLowerCase().match(/[a-zA-Z0-9]+/g) || [];
-      const uniqueParagraphWords = new Set(words);
-      
-      if (uniqueParagraphWords.size === 0) return 0;
-      
-      const matchingCount = Array.from(uniqueParagraphWords).filter(word => 
-          targetSet.has(word)
-      ).length;
-      
-      return (matchingCount / uniqueParagraphWords.size) * 100;
-    }
-    
-    const resetAllToDefault = () => {
-      setFlashcards([]);
-      setFlashcardIndex(0);
-      setLoading(false);
-      setShowMeaning(false);
-      setParagraph([]);
-      setParagraphWords([]);
-      setParagraphIndex(0);
-      onDone(false)
-    };
-    
     const navigateToFlashcardByIndex = (newIndex: number) => {
 
-      let newParagraphIndex = paragraphIndex;
-      if(paragraphWords[newIndex] == null){
+      if(newIndex >= flashcards.length){
 
-        newIndex = 0;
-        newParagraphIndex = paragraphIndex + 1;
+        onDone(true);
+      }else{
+
+        setFlashcardIndex(newIndex);
+        setCurrentFlashcard(flashcards[newIndex]);
+        setShowMeaning(false);
       }
-
-      setParagraphIndex(newParagraphIndex);
-      
-      if(paragraphs[newParagraphIndex] == null)
-        resetAllToDefault();
-
-      setFlashcardIndex(newIndex);
-      setParagraphWords(sortBasedOnAppearance(paragraphs[newParagraphIndex], flashcards));
-      setCurrentFlashcard(paragraphWords[newIndex]);
-      setShowMeaning(false);
     }
     
     const archive = (index:number) => {
           
-          if(courseId === null) return;
+          if(moduleId === null) return;
 
-          const word: WordViewModel = paragraphWords[index]
+          const word: WordViewModel = flashcards[index]
 
           let fun = () => {
             setLoading(true); 
             
             const data: DeleteCourseWordModel = {
-              "courseId": courseId,
-              "wordId": word.id
+                "moduleId": moduleId,
+                "wordId": word.id
             };
 
             POST('/Course/DeleteCourseWord', JSON.stringify(data))                
             .then(isSuccessfull => { 
 
                 if(isSuccessfull) {
-                    var wordsList = paragraphWords.filter(p => p.id !== word.id);
-                    setFlashcards(flashcards.filter(f => f.id !== word.id));
-                    setParagraphWords(wordsList);
+                    var wordsList = flashcards.filter(p => p.id !== word.id);
+                    setFlashcards(wordsList);
 
                     if(wordsList[index] != null) 
                       setCurrentFlashcard(wordsList[index]) 
-                    else
-                      resetAllToDefault();
                 }
                 
             }).finally(() => {setLoading(false)});
@@ -154,13 +92,13 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
         const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const wordKey = "pw_" + wordIndex;
 
-        if(escapedWord == paragraphWords[flashcardIndex].name)
+        if(escapedWord == flashcards[flashcardIndex].name)
           return <b key={wordKey} style={{ marginRight: 2 }}>{word}</b>;
 
         // Check if any of the extracted words match the paragraphWords list
-        if(paragraphWords.some(w => w.name == escapedWord)){
+        if(flashcards.some(w => w.name == escapedWord)){
              
-          const index = paragraphWords.findIndex(p => p.name === word); 
+          const index = flashcards.findIndex(p => p.name === word); 
           return <span key={wordKey} style={{ textDecorationLine: 'underline', 
             WebkitTextDecorationLine: 'underline', cursor:'pointer', marginRight: 2}} 
                 onClick={() => navigateToFlashcardByIndex(index)}>{word}</span>
@@ -205,18 +143,18 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
         <div className="container">
             <div className="mt-4">
               <div className="d-flex">
-                {Array.from({ length: paragraphWords.length }).map((_, index) => (
+                {Array.from({ length: flashcards.length }).map((_, index) => (
                   <div
                     key={index}
                     className={`flex-fill me-1 progress-bar ${ index < flashcardIndex ? "bg-success" : "bg-secondary"}`}
-                    style={{height: "20px",marginRight: index < paragraphWords.length  - 1 ? "2px" : "0",}}
+                    style={{height: "20px",marginRight: index < flashcards.length  - 1 ? "2px" : "0",}}
                   ></div>
                 ))}
               </div>
             </div>
             
             <div className='card-con'>
-              {paragraphWords.map((card, index) => 
+              {flashcards.map((card, index) => 
                 index >= flashcardIndex ?
                   (<motion.div
                     key={card.id}
@@ -272,7 +210,7 @@ export const Flashcards = ({ text, words, courseId, onDone }: FlashcardsProps) =
                   <div className="button-label">Back</div>
                 </div>
 
-                {courseId != null && 
+                {moduleId != null && 
                 <div className='buttonDiv'>
                   <button className="icon-button mb-1" onClick={() => archive(flashcardIndex)}>
                     <FontAwesomeIcon icon={faBoxArchive} />

@@ -4,7 +4,7 @@ namespace LL.Core.Models.ViewModels;
 
 public class ExerciseViewModel
 {
-    public int Id { get; set; }
+    public string Id { get; set; }
     public string Original { get; set; }
     public string Translated { get; set; }
     public string Extra { get; set; }

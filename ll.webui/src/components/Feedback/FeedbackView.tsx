@@ -16,7 +16,7 @@ export interface FeedbackViewRef {
 }
 
 const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
-  ({ title, body, text, onClick, isVisible = false, showCloseBtn = false }, ref) => {
+  ({ title, body, text, onClick, isVisible = false, showCloseBtn = true }, ref) => {
 
     const [showFeedback, setShowFeedback] = useState(isVisible);
 
@@ -28,14 +28,6 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
     };
 
     const close = () => setShowFeedback(false);
-
-    const confirm = () => {
-
-      if (onClick) 
-        onClick();
-
-       close();
-    };
 
     useImperativeHandle(ref, () => ({
       open,
@@ -50,9 +42,9 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
                 {body}
               </div>
             </div>
-            <button className="feedback-button mainBtn" onClick={confirm}>
-              {text || "OK"}
-            </button>
+            {onClick && <button className="feedback-button mainBtn" onClick={onClick}>
+              {text}
+            </button>}
             {showCloseBtn && <button className="feedback-button mainBtn" onClick={close}>
               Close
             </button>}

@@ -17,7 +17,9 @@ namespace LL.API.Controllers
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public class CourseController(ICourseService courseService, 
         ICourseRepository courseRepository,
+        IModuleRepository  moduleRepository,
         IWordRepository wordRepository,
+        IExerciseRepository exerciseRepository,
         IAppMonitoringService appMonitoringService) : BaseController
     {
         /// <summary>
@@ -83,7 +85,7 @@ namespace LL.API.Controllers
         /// <response code="200">The new exercises</response>
         [HttpGet("CreateExercises")]
         [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> CreateExercises([FromQuery] int courseId)
+        public async Task<ActionResult> CreateExercises([FromQuery] string courseId)
         {
             try
             {
@@ -94,6 +96,31 @@ namespace LL.API.Controllers
                 var exceptionData = new Dictionary<string, object>();
 
                 exceptionData["courseId"] = courseId;
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Pass the Id of a course to get exercises for the selected course.
+        /// </summary>
+        /// <param name="courseId">The course id of the exercises</param>
+        /// <response code="200">The new exercises</response>
+        [HttpGet("GetExercisesByModuleId")]
+        [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetExercisesByModuleId([FromQuery] string moduleId)
+        {
+            try
+            {
+                return Ok(exerciseRepository.GetByModuleId(moduleId));
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+
+                exceptionData["moduleId"] = moduleId;
 
                 appMonitoringService.ExportError(ex, exceptionData);
                 
@@ -122,16 +149,36 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
+        /// Get all the modules of a course by course id.
+        /// </summary>
+        /// <response code="200">The list of courses</response>
+        [HttpGet("GetModulesByCourseId")]
+        [ProducesResponseType(typeof(List<ModuleViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetModulesByCourseId(string courseId)
+        {
+            try
+            {       
+                return Ok(moduleRepository.GetByCourseId(courseId));
+            }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
         /// Get a list of words of a course.
         /// </summary>
         /// <response code="200">The list of words</response>
         [HttpGet("GetCourseWords")]
         [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
-        public ActionResult GetCourseWords([FromQuery] int courseId)
+        public ActionResult GetCourseWords([FromQuery] string moduleId)
         {
             try
             {       
-                return Ok(wordRepository.GetByCourseId(courseId));
+                return Ok(wordRepository.GetByModuleId(moduleId));
             }
             catch (Exception ex)
             {
@@ -151,7 +198,7 @@ namespace LL.API.Controllers
         {
             try
             {       
-                return Ok(courseRepository.DeleteCourseWord(model.CourseId, model.WordId, UserId));
+                return Ok(courseRepository.DeleteCourseWord(model.ModuleId, model.WordId, UserId));
             }
             catch (Exception ex)
             {               
@@ -159,7 +206,7 @@ namespace LL.API.Controllers
 
                 if (model != null)
                 {
-                    exceptionData["CourseId"] = model.CourseId;
+                    exceptionData["CourseId"] = model.ModuleId;
                     exceptionData["wordId"] = model.WordId;
                 }
 
@@ -175,7 +222,7 @@ namespace LL.API.Controllers
         /// <response code="200">Success/fail</response>
         [HttpGet("DeleteCourseById")]
         [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
-        public ActionResult DeleteCourseById([FromQuery] int courseId)
+        public ActionResult DeleteCourseById([FromQuery] string courseId)
         {
             try
             {       
@@ -200,7 +247,7 @@ namespace LL.API.Controllers
         /// <response code="200">A FileStreamResult that represents an audio file</response>
         [HttpPost("StreamAudio")]
         [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
-        public ActionResult StreamAudio(int wordId)
+        public ActionResult StreamAudio(string wordId)
         {
             try
             {

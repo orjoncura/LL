@@ -23,7 +23,7 @@ export async function GET(url: string): Promise<any> {
     .catch(error => HandleApiError(error));
 }
 
-export async function CreateAudio(id: number | undefined) {
+export async function CreateAudio(id: string | undefined) {
     return fetch(api + '/Course/StreamAudio?wordId=' + id, {
         method: 'POST',
         headers: GetHeader()

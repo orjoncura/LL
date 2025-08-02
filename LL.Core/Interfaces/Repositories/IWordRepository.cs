@@ -6,8 +6,8 @@ namespace LL.Core.Interfaces.Repositories;
 public interface IWordRepository
 {
     List<WordViewModel> GetKeyWords(int languageId);
-    MemoryStream? GetFileStreamById(int wordId);
+    MemoryStream? GetFileStreamById(string wordId);
     WordShort Insert(string name, int languageId, int userId);
-    List<WordViewModel> GetByCourseId(int id);
+    List<WordViewModel> GetByModuleId(string id);
 }
 

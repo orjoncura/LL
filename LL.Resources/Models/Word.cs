@@ -9,11 +9,11 @@ public class Word
     public virtual Language? Language { get; set; }
     public int ImportanceRatingId { get; set; }
     public virtual ImportanceRating? ImportanceRating { get; set; }
-    
     public bool IsActive { get; set; }
-
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
+    
+    public virtual List<WordMeaning> WordMeanings { get; set; }
 }
 

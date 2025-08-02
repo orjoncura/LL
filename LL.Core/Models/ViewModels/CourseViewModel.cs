@@ -2,11 +2,11 @@
 
 public class CourseViewModel
 {
-    public int Id { get; set; } 
+    public string Id { get; set; } 
     public string Text { get; set; } = string.Empty;
     
     public DateTimeViewModel CreatedDate { get; set; }
     
-    public bool IsValid => Id > 0 && string.IsNullOrEmpty(Text) == false;
+    public bool IsValid => Id.Length > 0 && string.IsNullOrEmpty(Text) == false;
 }
 

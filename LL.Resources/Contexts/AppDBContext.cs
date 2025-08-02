@@ -25,6 +25,9 @@ public class AppDbContext : DbContext
     public DbSet<Language> Languages { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseWord> CourseWords { get; set; }
+    public DbSet<Module> Modules { get; set; }
+    public DbSet<ModuleLog> ModuleLogs { get; set; }
+    public DbSet<ModuleType> ModuleTypes { get; set; }
     public DbSet<ImportanceRating> ImportanceRatings { get; set; }
     public DbSet<Word> Words { get; set; }
     public DbSet<WordType> WordTypes { get; set; }
@@ -244,6 +247,23 @@ public class AppDbContext : DbContext
                 })
         );
         
+        modelBuilder.Entity<ImportanceRating>(entity =>
+        {
+            entity.Property(ut => ut.Value).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired();
+        });
+        
+        modelBuilder.Entity<ImportanceRating>().HasData(
+            Enum.GetValues(typeof(ImportanceRatingEnum))
+                .Cast<ImportanceRatingEnum>()
+                .Select(e => new ImportanceRating
+                {
+                    Id = (int)e,
+                    Value = e.ToString(),
+                    CreatedDate = DateTimeOffset.Now
+                })
+        );
+        
         modelBuilder.Entity<Word>(entity =>
         {
             entity.Property(ut => ut.Name).IsRequired();
@@ -260,6 +280,11 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(ut => ut.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasMany(t => t.WordMeanings)
+                .WithOne(d => d.Word)
+                .HasForeignKey(d => d.WordId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
         
         modelBuilder.Entity<WordMeaning>(entity =>
@@ -270,7 +295,7 @@ public class AppDbContext : DbContext
             entity.Property(p => p.CreatedDate).IsRequired();
 
             entity.HasOne(ut => ut.Word)
-                .WithMany()
+                .WithMany(ut => ut.WordMeanings)
                 .HasForeignKey(ut => ut.WordId)
                 .OnDelete(DeleteBehavior.Restrict);
             
@@ -349,33 +374,6 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
-        modelBuilder.Entity<Exercise>(entity =>
-        {
-            entity.Property(ut => ut.Original).IsRequired();
-            entity.Property(ut => ut.Translated).IsRequired();
-            entity.Property(ut => ut.CourseId).IsRequired();
-            entity.Property(ut => ut.IsActive).IsRequired();
-            entity.Property(ut => ut.CreatedById).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
-            entity.Property(ut => ut.UpdatedById).IsRequired(false);
-            entity.Property(ut => ut.UpdatedDate).IsRequired(false);
-            
-            entity.HasOne(ut => ut.Course)
-                .WithMany()
-                .HasForeignKey(ut => ut.CourseId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
-            entity.HasOne(ut => ut.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ut => ut.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-                        
-            entity.HasOne(ut => ut.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(ut => ut.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-        
         modelBuilder.Entity<Course>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
@@ -409,16 +407,16 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
-        modelBuilder.Entity<ImportanceRating>(entity =>
+        modelBuilder.Entity<ModuleType>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
             entity.Property(p => p.CreatedDate).IsRequired();
         });
         
-        modelBuilder.Entity<ImportanceRating>().HasData(
-            Enum.GetValues(typeof(ImportanceRatingEnum))
-                .Cast<ImportanceRatingEnum>()
-                .Select(e => new ImportanceRating
+        modelBuilder.Entity<ModuleType>().HasData(
+            Enum.GetValues(typeof(ModuleTypeEnum))
+                .Cast<ModuleTypeEnum>()
+                .Select(e => new ModuleType()
                 {
                     Id = (int)e,
                     Value = e.ToString(),
@@ -426,10 +424,72 @@ public class AppDbContext : DbContext
                 })
         );
         
+        modelBuilder.Entity<Module>(entity =>
+        {
+            entity.Property(ut => ut.CourseId).IsRequired();
+            entity.Property(ut => ut.Title).IsRequired();   
+            entity.Property(ut => ut.TypeId).IsRequired()
+                .HasDefaultValue(ModuleTypeEnum.Flashcards);
+            entity.Property(ut => ut.Unlocked).IsRequired();
+            entity.Property(ut => ut.Completed).IsRequired();
+            entity.Property(ut => ut.IsActive).IsRequired();
+            entity.Property(ut => ut.CreatedById).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired();     
+            
+            entity.HasOne(ut => ut.Course)
+                .WithMany()
+                .HasForeignKey(ut => ut.CourseId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.Type)
+                .WithMany()
+                .HasForeignKey(ut => ut.TypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.CreatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);            
+        });     
+        
+        modelBuilder.Entity<ModuleLog>(entity =>
+        {
+            entity.Property(ut => ut.ModuleId).IsRequired();
+            entity.Property(ut => ut.CourseId).IsRequired();
+            entity.Property(ut => ut.Title).IsRequired();       
+            entity.Property(ut => ut.TypeId).IsRequired()
+                .HasDefaultValue(ModuleTypeEnum.Flashcards);
+            entity.Property(ut => ut.Unlocked).IsRequired();
+            entity.Property(ut => ut.Completed).IsRequired();
+            entity.Property(ut => ut.IsActive).IsRequired();
+            entity.Property(ut => ut.CreatedById).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired();     
+                        
+            entity.HasOne(ut => ut.Module)
+                .WithMany()
+                .HasForeignKey(ut => ut.ModuleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.Course)
+                .WithMany()
+                .HasForeignKey(ut => ut.CourseId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.Type)
+                .WithMany()
+                .HasForeignKey(ut => ut.TypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.CreatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);            
+        });
+        
         modelBuilder.Entity<CourseWord>(entity =>
         {
             entity.Property(ut => ut.WordId).IsRequired();
-            entity.Property(ut => ut.CourseId).IsRequired();
+            entity.Property(ut => ut.ModuleId).IsRequired();
             entity.Property(ut => ut.ImportanceRatingId).IsRequired();
             entity.Property(ut => ut.IsActive).IsRequired();
             entity.Property(ut => ut.CreatedById).IsRequired();
@@ -442,9 +502,9 @@ public class AppDbContext : DbContext
                 .HasForeignKey(ut => ut.WordId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(ut => ut.Course)
+            entity.HasOne(ut => ut.Module)
                 .WithMany()
-                .HasForeignKey(ut => ut.CourseId)
+                .HasForeignKey(ut => ut.ModuleId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.HasOne(ut => ut.ImportanceRating)
@@ -457,6 +517,33 @@ public class AppDbContext : DbContext
                 .HasForeignKey(ut => ut.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);            
             
+            entity.HasOne(ut => ut.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<Exercise>(entity =>
+        {
+            entity.Property(ut => ut.Original).IsRequired();
+            entity.Property(ut => ut.Translated).IsRequired();
+            entity.Property(ut => ut.ModuleId).IsRequired();
+            entity.Property(ut => ut.IsActive).IsRequired();
+            entity.Property(ut => ut.CreatedById).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(ut => ut.UpdatedById).IsRequired(false);
+            entity.Property(ut => ut.UpdatedDate).IsRequired(false);
+            
+            entity.HasOne(ut => ut.Module)
+                .WithMany()
+                .HasForeignKey(ut => ut.ModuleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            entity.HasOne(ut => ut.CreatedBy)
+                .WithMany()
+                .HasForeignKey(ut => ut.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+                        
             entity.HasOne(ut => ut.UpdatedBy)
                 .WithMany()
                 .HasForeignKey(ut => ut.UpdatedById)

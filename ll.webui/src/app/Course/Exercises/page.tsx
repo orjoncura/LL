@@ -36,6 +36,8 @@ export default function Exercises() {
     });
 
     let hasFetchedData = false;
+
+    
     useEffect(() => {
 
       if(hasFetchedData == false){

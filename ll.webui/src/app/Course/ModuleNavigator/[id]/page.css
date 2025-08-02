@@ -1,0 +1,73 @@
+/* ModuleNavigator.css */
+
+.module-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.module-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #d6338466;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.module-card.locked {
+  background: #b9b9b9;
+  color: #eee;
+  cursor: not-allowed;
+}
+
+.module-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.module-icon {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.module-icon.icon-done {
+  background: #b7f5b1;
+}
+
+.module-text .module-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #eee;
+}
+
+.module-text .module-xp {
+  font-size: 14px;
+  color: #eee;
+}
+
+.module-btn {
+  background: #d6338466;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.module-done {
+  font-size: 14px;
+  font-weight: bold;
+  color: green;
+}

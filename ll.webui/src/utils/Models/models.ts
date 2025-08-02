@@ -47,8 +47,8 @@ export interface CourseRequestModel {
 }
 
 export interface DeleteCourseWordModel {
-  courseId?: number;
-  wordId?: number;
+  moduleId?: string;
+  wordId?: string;
 }
 
 export interface DefinitionRequestModel {
@@ -60,8 +60,16 @@ export interface DefinitionRequestModel {
   readonly isValid?: boolean;
 }
 
+export interface ModuleViewModel {
+  id: string;
+  title?: string;
+  type?: string;
+  unlocked?: boolean;  
+  completed?: boolean;
+}
+
 export interface ExerciseRequestModel {
-  courseId: number;
+  moduleId: string;
   text?: string;
   languageFromId?: number;
   languageToId?: number;  
@@ -79,13 +87,13 @@ export interface DateTimeViewModel {
 }
 
 export interface CourseViewModel {
-  id: number;
+  id: string;
   text: string;
   createdDate: DateTimeViewModel;
 }
 
 export interface WordViewModel {
-  id: number;
+  id: string;
   name: string;
   translation?: string;
   audio: Uint8Array;

@@ -1,13 +1,13 @@
+using LL.Core.Interfaces.Extensions;
 using LL.Resources.Contexts;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Models.ViewModels;
 using LL.Resources.Factories;
 using LL.Resources.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace LL.Resources.Repositories;
 
-public class CourseRepository(AppDbContext db) : ICourseRepository
+public class CourseRepository(AppDbContext db, IEncryptionService encryptionService) : ICourseRepository
 {
     public int Insert(string value, int fromId, int toId, int userId)
     {
@@ -31,10 +31,9 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
         
         return course.Id;
     }
-
-    public bool DeleteCourseWord(int courseId, int wordId, int userId)
+    public bool DeleteCourseWord(int moduleId, int wordId, int userId)
     {
-        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.CourseId == courseId && c.WordId == wordId && c.IsActive);
+        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.ModuleId == moduleId && c.WordId == wordId && c.IsActive);
         
         if(courseWord != null)
         {
@@ -50,9 +49,9 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
         
         return false;
     }
-    
-    public bool DeleteCourseById(int id, int userId)
+    public bool DeleteCourseById(string encryptedId, int userId)
     {
+        int id = encryptionService.Decrypt(encryptedId);
         Course? course = db.Courses.FirstOrDefault(c => c.Id == id && c.IsActive);
         
         if(course != null)
@@ -73,8 +72,8 @@ public class CourseRepository(AppDbContext db) : ICourseRepository
     {
          List<CourseViewModel> courseViewModels = db.Courses
             .Where(c => c.CreatedById == userId && c.IsActive)
-            .OrderByDescending(c => c.CreatedDate)
-            .Select(DataFactory.Convert).ToList();
+            .OrderByDescending(c => c.CreatedDate).ToList()
+            .Select(c => DataFactory.Convert(encryptionService.Encrypt(c.Id), c)).ToList();
 
          return courseViewModels;
     }

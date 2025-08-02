@@ -2,7 +2,6 @@
 
 import React, {useState, useRef, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
-import Flashcards from '@/components/Courses/Flashcards';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
@@ -10,17 +9,14 @@ import { useRouter } from 'next/navigation';
 import { GET } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { CourseViewModel, WordViewModel } from '@/utils/Models/models';
+import { CourseViewModel } from '@/utils/Models/models';
 import './page.css'; 
 
-export default function Profile() {
+export default function CourseList() {
 
+  const feedbackViewRef = useRef<any>(null); 
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<CourseViewModel[]>([]);
-  const [showCourse, setShowCourse] = useState(false);
-  const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]); 
-  const [selectedCourse, setSelectedCourse] = useState<CourseViewModel>(courses[0]);   
-  const feedbackViewRef = useRef<any>(null); 
   const [fbTitle, setfbhTitle] = useState('');
   const [fbBody, setfbhBody] = useState('');
   const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
@@ -56,7 +52,7 @@ export default function Profile() {
     
   }, []);
   
-  const DeleteCourse = async (id: number) => {
+  const DeleteCourse = async (id: string) => {
       setLoading(true);
 
       GET('/Course/DeleteCourseById?courseId=' + id)
@@ -73,11 +69,17 @@ export default function Profile() {
 
   };
 
+  const navigateToModule = async (course: CourseViewModel) => {
+
+    localStorage.setItem("SelectedCourse", course.text);
+    router.push(`/Course/ModuleNavigator/${course.id}`)
+  }
+
   return (      
     <div>      
       <Navbar /> 
       <br />
-      {showCourse == false && ( 
+      
       <div className="course-list ">
         {courses.map((course, index) => (
           <div key={index} className="position-relative" >
@@ -85,7 +87,7 @@ export default function Profile() {
               &times;
             </button>
 
-            <div className="course-card" onClick={() => router.push(`/Course/ModuleNavigator/${course.id}`)}>
+            <div className="course-card" onClick={() =>  navigateToModule(course)}>
               <div className="course-header">
                 <div className="course-title">
                   {course.text.substring(0, 25)}  
@@ -98,12 +100,8 @@ export default function Profile() {
             </div>
           </div>
           </div>
-
-
         ))}
-    </div>)}
-
-    {showCourse && (<Flashcards text={selectedCourse.text} words={wordViewModels} courseId={selectedCourse.id} onDone={() => setShowCourse(false)} />)}
+    </div>
 
     {loading && <SpinnerOverlay />}      
     <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
