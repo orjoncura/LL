@@ -21,3 +21,5 @@
 .env
 ll.webui/.env
 .env.dev
+.idea/.idea.LL/.idea/indexLayout.xml
+LL.sln.DotSettings.user
