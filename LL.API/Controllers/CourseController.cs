@@ -54,7 +54,7 @@ namespace LL.API.Controllers
         /// <param name="courseRequest">Contains text, LanguageIdFrom (Input language) and languageIdTo (the language the words will be translated to)</param>
         /// <response code="200">The new seminar</response>
         [HttpPost("Create")]
-        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] CourseRequestModel courseRequest)
         {
             try
@@ -79,34 +79,9 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
-        /// Pass a word and the course information to create exercises for the selected word.
-        /// </summary>
-        /// <param name="exerciseRequest">Contains Course & Word information</param>
-        /// <response code="200">The new exercises</response>
-        [HttpGet("CreateExercises")]
-        [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> CreateExercises([FromQuery] string courseId)
-        {
-            try
-            {
-                return Ok(await courseService.CreateExercises(courseId, UserId));
-            }
-            catch (Exception ex)
-            {
-                var exceptionData = new Dictionary<string, object>();
-
-                exceptionData["courseId"] = courseId;
-
-                appMonitoringService.ExportError(ex, exceptionData);
-                
-                return ErrorStatusCode;
-            }
-        }
-        
-        /// <summary>
         /// Pass the Id of a course to get exercises for the selected course.
         /// </summary>
-        /// <param name="courseId">The course id of the exercises</param>
+        /// <param name="moduleId">Id of the selected module</param>
         /// <response code="200">The new exercises</response>
         [HttpGet("GetExercisesByModuleId")]
         [ProducesResponseType(typeof(List<ExerciseViewModel>), StatusCodes.Status200OK)]
@@ -152,6 +127,7 @@ namespace LL.API.Controllers
         /// Get all the modules of a course by course id.
         /// </summary>
         /// <response code="200">The list of courses</response>
+        /// <param name="courseId">Id of the selected course</param>
         [HttpGet("GetModulesByCourseId")]
         [ProducesResponseType(typeof(List<ModuleViewModel>), StatusCodes.Status200OK)]
         public ActionResult GetModulesByCourseId(string courseId)
@@ -159,6 +135,27 @@ namespace LL.API.Controllers
             try
             {       
                 return Ok(moduleRepository.GetByCourseId(courseId));
+            }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Mark module as complete and activate next module.
+        /// </summary>
+        /// <param name="moduleId">Id of the selected module</param>
+        /// <response code="200">The list of courses</response>
+        [HttpGet("MarkModuleAsComplete")]
+        [ProducesResponseType(typeof(List<ModuleViewModel>), StatusCodes.Status200OK)]
+        public ActionResult MarkModuleAsComplete(string moduleId)
+        {
+            try
+            {       
+                return Ok(moduleRepository.MarkModuleAsComplete(moduleId));
             }
             catch (Exception ex)
             {

@@ -31,7 +31,7 @@ public static class DataFactory
         {
             Id = id,
             Title = module.Title,
-            Type = module.Type != null ? module.Type.Value : "",
+            TypeId = module.TypeId,
             Unlocked = module.Unlocked,
             Completed = module.Completed
         };

@@ -4,18 +4,17 @@ namespace LL.Core.Factories
 {
     public static class PromptFactory
     {
-        public static string CreateCoursePrompt(string word, int languageFromId, int languageToId, string text, int numberOfSentences = 3)
+        public static string CreateCoursePrompt(string text, int languageFromId, int languageToId, int numberOfSentences = 10)
         {
             string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
-            string prompt = string.Format(@"Create {4} sentences in {1} for the word:{0} 
+            string prompt = string.Format(@"Create {3} sentences in {1} for the word:{0} 
                 and return a JSON file that contains the new statement and its translation to {2}
                 If the word is in different language, explicit or isn't understandable, just ignore it.
                 Please make sure what you return is appropriate for kids.
-                Please make sure {0} in the new sentences has the same meaning, it has in the text,
-                also try to use only words that are included in the text.
-                The text is {3}
+                Please try to use the words below as much as possible.
+                The words are {0}
                 Also add extra words in the same language as the translated statement, 
                 if the translated statement is 'I want to drive' the extra words can be 'You can train'.
                 The extra words will be used in a multi select exercise to confuse the user
@@ -37,7 +36,7 @@ namespace LL.Core.Factories
                     ""Translated"": """",
                     ""Extra"": """"
                   }}
-                ]", word, languageFrom, languageTo, text, numberOfSentences);
+                ]", text, languageFrom, languageTo, numberOfSentences);
 
             return prompt;
         }

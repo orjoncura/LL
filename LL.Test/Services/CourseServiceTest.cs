@@ -60,12 +60,9 @@ namespace LL.Test.Services
                 LanguageToId = (int)LanguageEnum.English,
                 Text = "Creo en los milagros desde que te vi"
             };
-
-            // Act
-            List<WordViewModel> wordViewModels = await courseService.CreateCourse(courseRequest, 1);
-
+            
             // Assert
-            Assert.True(wordViewModels.Any());
+            Assert.True(await courseService.CreateCourse(courseRequest, 1));
         } 
           
     }   

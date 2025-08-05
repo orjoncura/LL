@@ -77,4 +77,12 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
 
          return courseViewModels;
     }
+    public CourseViewModel? GetById(string encryptedId)
+    {
+        var course = db.Courses.SingleOrDefault(c => c.Id == encryptionService.Decrypt(encryptedId) && c.IsActive);
+        
+        if(course == null) return null;
+        
+        return DataFactory.Convert(encryptedId, course);
+    }
 }

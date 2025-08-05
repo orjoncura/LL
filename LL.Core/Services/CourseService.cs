@@ -21,12 +21,10 @@ public class CourseService(
     ICourseWordRepository courseWordRepository,
     IAgentService agentService) : ICourseService
 {
-    public async Task<List<WordViewModel>> CreateCourse(CourseRequestModel courseRequest, int userId)
+    public async Task<bool> CreateCourse(CourseRequestModel courseRequest, int userId)
     {
-        List<WordViewModel> words = new List<WordViewModel>();
-        
         if(courseRequest.IsValid == false) 
-            return words;
+            return false;
         
         int courseId = courseRepository.Insert(courseRequest.Text, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
         
@@ -40,48 +38,17 @@ public class CourseService(
             {
                 // Safely extract the list of CourseWordsModel from JSON
                 var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
-                words.AddRange(extractedModels.Select(cwl => new WordViewModel(cwl)).ToList());
-
                 string moduleTitleSufix = ": Part " + index + 1;
                 int moduleId = moduleRepository.Insert(courseId, "Flashcards" + moduleTitleSufix, (int)ModuleTypeEnum.Flashcards, true, userId);
                 CreateDefinitions(moduleId, extractedModels, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
-                moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, false, userId);
+                int exercisesModuleId = moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, false, userId); CreateExercises(exercisesModuleId, extractedModels, courseRequest, userId);
             }
 
             index++;
         }
         
-        return words;
+        return true;
     }
-    public async Task<List<ExerciseViewModel>> CreateExercises(string moduleId, int userId)
-    {
-        List<ExerciseViewModel>? exercises = new List<ExerciseViewModel>();
-        
-        wordRepository.GetByModuleId(moduleId);
-
-        exercises = exerciseRepository.GetByModuleId(moduleId);
-
-        if (exercises.Any() == false)
-        {
-            /*string prompt = PromptFactory.CreateCoursePrompt(
-                exerciseRequest.WordName,
-                exerciseRequest.LanguageFromId,
-                exerciseRequest.LanguageToId,
-                exerciseRequest.Text);
-
-            exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));*/
-        
-            if (exercises != null && exercises.Any(s => s.IsValid))
-            {       
-                exercises = exercises.Where(e => e.IsValid).ToList();
-            
-                exerciseRepository.InsertRange(moduleId, exercises, userId);
-            }
-        }
-        
-        return exercises ?? [];
-    }
-    
     private List<string> SplitText(string input, int minWords = 100, int maxWords = 350)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -152,6 +119,19 @@ public class CourseService(
 
                 meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
             }
+        }
+    }
+    private async void CreateExercises(int moduleId, List<CourseWordsModel> extractedModels, CourseRequestModel courseRequest, int userId)
+    {
+        var formattedItems = string.Join(",", extractedModels.Select(item =>$"{item.Word}" ).ToList());
+        string prompt = PromptFactory.CreateCoursePrompt(formattedItems, courseRequest.LanguageFromId, courseRequest.LanguageToId);
+        var exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));
+        
+        if (exercises != null && exercises.Any(s => s.IsValid))
+        {       
+            exercises = exercises.Where(e => e.IsValid).ToList();
+            
+            exerciseRepository.InsertRange(moduleId, exercises, userId);
         }
     }
 }

@@ -1,23 +1,48 @@
 "use client"
  
-import { useState, useEffect } from 'react';
-import { GET } from '@/utils/Security/httpClient'
-import { WordViewModel } from '@/utils/Models/models';
-import { useParams } from 'next/navigation'
-import { useRouter } from 'next/navigation';
-
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import Flashcards from '@/components/Courses/Flashcards';
+import FeedbackView from '@/components/Feedback/FeedbackView';
+
+import { useState, useEffect, useRef } from 'react';
+import { GET } from '@/utils/Security/httpClient'
+import { WordViewModel } from '@/utils/Models/models';
+import { useRouter, useParams } from 'next/navigation';
 
 export default function FlashcardsPage()  {
-
+  
+    const feedbackViewRef = useRef<any>(null); 
     const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);  
     const [selectedCourse, setSelectedCourse] = useState<string>("");    
     const [showCourse, setShowCourse] = useState(false);
     const [loading, setLoading] = useState(false); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
+
     const params = useParams<{ id: string; }>()
     const router = useRouter();
+
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
+
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
+
+            feedbackViewRef.current.open();
+        }
+    };
+    
+    const OnComplete = async () => {
+        
+        setLoading(true);
+        GET('/Course/MarkModuleAsComplete?moduleId=' + params.id)
+        .catch(() => showFeedback("Error", "Something went wrong - Please try again later."))
+        .finally(() => {router.back(); setLoading(false); });
+
+    };
 
     let hasFetchedData = false;
     useEffect(() => {
@@ -42,8 +67,8 @@ export default function FlashcardsPage()  {
                 return array.indexOf(val) == id;  
                 });
 
-                setWordViewModels(unique)
-                setShowCourse(words.length > 0)
+                setWordViewModels(unique);
+                setShowCourse(true);
 
             }).finally(() => setLoading(false));
         }
@@ -52,8 +77,8 @@ export default function FlashcardsPage()  {
     return (
         <div>
             <Navbar /> 
-
-            {showCourse && (<Flashcards text={selectedCourse} words={wordViewModels} moduleId={params.id} onDone={() => router.back()}  />)}
+            {showCourse && (<Flashcards text={selectedCourse} words={wordViewModels} moduleId={params.id} onDone={() => OnComplete()}  />)}
+            <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
             {loading && <SpinnerOverlay />}
         </div>
     );

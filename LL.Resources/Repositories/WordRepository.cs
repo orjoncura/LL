@@ -20,7 +20,10 @@ public class WordRepository(AppDbContext db,
     {
         var words = db.WordLinks
             .Include(w => w.Word)
+            .Include(w => w.Word.WordMeanings)            
+            .ThenInclude(w => w.WordDefinitions)
             .Include(w => w.Word.WordMeanings)
+            .ThenInclude(w => w.Type)
             .Where(w => w.Word.LanguageId == languageId
                 && (w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.Medium 
                     || w.Word.ImportanceRatingId == (int)ImportanceRatingEnum.High)

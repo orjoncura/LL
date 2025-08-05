@@ -127,12 +127,14 @@ export default function CreateCourse() {
               "languageToId": languageToId
             };
 
-            var words: WordViewModel[] = await POST('/Course/Create', JSON.stringify(courseRequestModel));
-
-            if(words.length > 0)
-              SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-
-            setLoading(false);
+            POST('/Course/Create', JSON.stringify(courseRequestModel))
+            .then((isSuccessful: boolean) => {
+      
+              if(isSuccessful)
+                SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+      
+            }).finally(() => setLoading(false));
+          
           } catch (error) {
 
             setLoading(false);

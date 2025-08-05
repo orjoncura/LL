@@ -72,7 +72,7 @@ export default function CourseList() {
   const navigateToModule = async (course: CourseViewModel) => {
 
     localStorage.setItem("SelectedCourse", course.text);
-    router.push(`/Course/ModuleNavigator/${course.id}`)
+    router.push(`/Course/ModuleNavigator/${course.id}`);
   }
 
   return (      

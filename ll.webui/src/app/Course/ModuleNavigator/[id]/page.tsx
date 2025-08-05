@@ -43,6 +43,15 @@ export default function ModuleNavigator()  {
     }
   }, []);
 
+  const navigateToModule = async (mod: ModuleViewModel) => {
+      
+    if(mod.typeId == 1)
+      router.push(`/Course/Flashcards/${mod.id}`)
+
+    if(mod.typeId == 2)
+      router.push(`/Course/Exercises/${mod.id}`)
+  };
+
   return (
     <div>
       <Navbar /> 
@@ -72,7 +81,7 @@ export default function ModuleNavigator()  {
                 </div>
               </div>
               {isActive && !isCompleted && (
-                <button className="module-btn" onClick={() => router.push(`/Course/Flashcards/${mod.id}`)}>
+                <button className="module-btn" onClick={() => navigateToModule(mod)}>
                   Start
                 </button>
               )}

@@ -8,4 +8,5 @@ public interface ICourseRepository
     bool DeleteCourseWord(int courseId, int wordId, int userId);
     bool DeleteCourseById(string id, int userId);
     List<CourseViewModel> GetCoursesByUserId(int userId);
+    CourseViewModel? GetById(string encryptedId);
 }

@@ -17,7 +17,7 @@ public class ExerciseRepository(AppDbContext db, IEncryptionService encryptionSe
         return exerciseViewModels;
     }
     
-    public List<int> InsertRange(string moduleId, List<ExerciseViewModel> exerciseViewModels, int userId)
+    public List<int> InsertRange(int moduleId, List<ExerciseViewModel> exerciseViewModels, int userId)
     {
         var exercises = new List<Exercise>();
         
@@ -25,7 +25,7 @@ public class ExerciseRepository(AppDbContext db, IEncryptionService encryptionSe
         {
             var ex = new Exercise
             {
-                ModuleId = encryptionService.Decrypt(moduleId) ,
+                ModuleId = moduleId,
                 Original = exerciseViewModel.Original,
                 Translated = exerciseViewModel.Translated,
                 Extra = exerciseViewModel.Extra,

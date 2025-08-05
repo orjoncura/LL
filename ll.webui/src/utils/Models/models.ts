@@ -63,20 +63,9 @@ export interface DefinitionRequestModel {
 export interface ModuleViewModel {
   id: string;
   title?: string;
-  type?: string;
+  typeId?: number;
   unlocked?: boolean;  
   completed?: boolean;
-}
-
-export interface ExerciseRequestModel {
-  moduleId: string;
-  text?: string;
-  languageFromId?: number;
-  languageToId?: number;  
-  
-  wordId?: number;
-  wordName?: string;
-  rankId?: number;
 }
 
 export interface DateTimeViewModel {
