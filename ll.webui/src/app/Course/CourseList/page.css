@@ -15,10 +15,10 @@
 }
 
 .course-card {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
   padding: 16px;
   border-radius: 6px;
-  background-color: #fff;
+  background: transparent;
 }
 
 .course-title {

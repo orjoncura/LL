@@ -189,7 +189,7 @@ export default function Exercises() {
               {exercises.length > 0 && exercises[exerciseIndex] != null && (
                 <div>
                   <div className="text-center mb-4">
-                    <div className="p-4 bg-light border rounded shadow-sm">
+                    <div className="p-4 glow-frame">
                         <blockquote className="quote">
                           <p className="text-black">
                           {exercises[exerciseIndex].original}
@@ -244,14 +244,14 @@ export default function Exercises() {
           )}
 
           {showFeedback == false && (
-            <button className="feedback-button" onClick={checkAnswer}>
+            <button className="feedback-button mainBtn" onClick={checkAnswer}>
               <span className="chevron">›</span>
               Confirm
             </button>
           )}
 
           {showFeedback && (
-            <button className="feedback-button" onClick={() => nextStep(exerciseIndex + 1)}>
+            <button className="feedback-button mainBtn" onClick={() => nextStep(exerciseIndex + 1)}>
               <span className="chevron">›</span>
                 Next
             </button>

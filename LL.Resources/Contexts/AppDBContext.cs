@@ -430,6 +430,7 @@ public class AppDbContext : DbContext
             entity.Property(ut => ut.Title).IsRequired();   
             entity.Property(ut => ut.TypeId).IsRequired()
                 .HasDefaultValue(ModuleTypeEnum.Flashcards);
+            entity.Property(ut => ut.Sequence).IsRequired();
             entity.Property(ut => ut.Unlocked).IsRequired();
             entity.Property(ut => ut.Completed).IsRequired();
             entity.Property(ut => ut.IsActive).IsRequired();

@@ -4,7 +4,7 @@ namespace LL.Core.Factories
 {
     public static class PromptFactory
     {
-        public static string CreateCoursePrompt(string text, int languageFromId, int languageToId, int numberOfSentences = 10)
+        public static string CreateCoursePrompt(string text, int languageFromId, int languageToId, int numberOfSentences = 15)
         {
             string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;

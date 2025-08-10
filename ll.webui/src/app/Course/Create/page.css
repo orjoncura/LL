@@ -77,3 +77,51 @@
     margin-left: auto; /* Aligns button to the right */
   }
 }
+
+.mirror-textarea-container {
+  position: relative;
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  background: white;
+  overflow: hidden;
+  background: transparent;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 5px #ff00ff, 0 0 10px #00ffff;
+  max-height: 220px;
+  overflow-y: hidden;
+}
+
+/* Hidden div that determines height */
+.mirror-text {
+  visibility: hidden;
+  white-space: pre-wrap;   /* preserve newlines */
+  word-wrap: break-word;   /* wrap long words */
+  min-height: 1.4em;       /* at least one line */
+  background: transparent;
+}
+
+/* The actual textarea sits on top */
+.mirror-textarea-container textarea {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  font: inherit;
+  padding: 8px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  overflow-y: auto; 
+  color: inherit;
+  background: transparent;
+}
+

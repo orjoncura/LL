@@ -142,3 +142,22 @@ body {
   display: flex;
   justify-content: center; /* Center horizontally */
 }
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
+  }
+  50% {
+    box-shadow: 0 0 15px #d63384, 0 0 25px #d63384;
+  }
+  100% {
+    box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
+  }
+}
+
+.glow-frame {
+  border-radius: 12px;
+  padding: 10px;
+  border: 3px solid transparent;
+  animation: glow 2s infinite alternate;
+}

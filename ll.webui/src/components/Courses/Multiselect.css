@@ -1,0 +1,26 @@
+.keyWord-con {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 16px;
+   max-width: 400px;
+   margin: auto;
+   text-align: center;
+   padding: 16px
+}
+
+.keyWord {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
+}
+
+.keyWord-message {
+  grid-column: span 2;
+  margin-top: 16px;
+  padding: 8px;
+  color: #fff;
+  background-color: #333;
+  border-radius: 4px
+}

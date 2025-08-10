@@ -12,6 +12,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
 {
     public List<ModuleViewModel> GetByCourseId(string courseId) 
         => db.Modules.Where(m => m.CourseId == encryptionService.Decrypt(courseId))
+            .OrderBy(m => m.Sequence)
             .Select(c => DataFactory.Convert(encryptionService.Encrypt(c.Id), c)).ToList();
 
     public bool MarkModuleAsComplete(string encryptedId)
@@ -25,7 +26,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
         
         var nextModule = db.Modules
             .SingleOrDefault(m => 
-                m.Id == moduleId + 1
+                m.Sequence == module.Sequence + 1
                 && m.CourseId == module.CourseId
                 && m.Unlocked == false 
                 && m.IsActive);
@@ -41,7 +42,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
         
         return true;
     }
-    public int Insert(int courseId, string title, int typeId, bool unlocked, int loginId)
+    public int Insert(int courseId, string title, int typeId, int sequence, bool unlocked, int loginId)
     {
         using (var scope = new TransactionScope())
         {
@@ -52,6 +53,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
                 TypeId = typeId,
                 Unlocked = unlocked,
                 Completed = false,
+                Sequence = sequence,
                 IsActive = true,
                 CreatedById = loginId,
                 CreatedDate = DateTimeOffset.Now

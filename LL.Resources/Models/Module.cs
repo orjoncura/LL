@@ -10,6 +10,7 @@ public class Module
     public virtual ModuleType? Type { get; set; }
     public bool Unlocked { get; set; }
     public bool Completed { get; set; }    
+    public int Sequence { get; set; }
     public bool IsActive { get; set; }
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }

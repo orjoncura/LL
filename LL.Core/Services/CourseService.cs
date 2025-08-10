@@ -29,6 +29,7 @@ public class CourseService(
         int courseId = courseRepository.Insert(courseRequest.Text, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
         
         int index = 0;
+        int sequence = 1;
         foreach (var text in SplitText(courseRequest.Text))
         {
             var response = await agentService
@@ -38,10 +39,14 @@ public class CourseService(
             {
                 // Safely extract the list of CourseWordsModel from JSON
                 var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
-                string moduleTitleSufix = ": Part " + index + 1;
-                int moduleId = moduleRepository.Insert(courseId, "Flashcards" + moduleTitleSufix, (int)ModuleTypeEnum.Flashcards, true, userId);
+                string moduleTitleSufix = ": Part " + (index + 1);
+                int moduleId = moduleRepository.Insert(courseId, "Flashcards" + moduleTitleSufix, (int)ModuleTypeEnum.Flashcards, sequence, index == 0, userId);
+                sequence++;
+                
                 CreateDefinitions(moduleId, extractedModels, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
-                int exercisesModuleId = moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, false, userId); CreateExercises(exercisesModuleId, extractedModels, courseRequest, userId);
+                int exercisesModuleId = moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, sequence, false, userId); 
+                await CreateExercises(exercisesModuleId, extractedModels, courseRequest, userId);
+                sequence++;
             }
 
             index++;
@@ -121,7 +126,7 @@ public class CourseService(
             }
         }
     }
-    private async void CreateExercises(int moduleId, List<CourseWordsModel> extractedModels, CourseRequestModel courseRequest, int userId)
+    private async Task CreateExercises(int moduleId, List<CourseWordsModel> extractedModels, CourseRequestModel courseRequest, int userId)
     {
         var formattedItems = string.Join(",", extractedModels.Select(item =>$"{item.Word}" ).ToList());
         string prompt = PromptFactory.CreateCoursePrompt(formattedItems, courseRequest.LanguageFromId, courseRequest.LanguageToId);
