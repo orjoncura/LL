@@ -4,20 +4,21 @@ namespace LL.Core.Factories
 {
     public static class PromptFactory
     {
-        public static string CreateCoursePrompt(string text, int languageFromId, int languageToId, int numberOfSentences = 15)
+        public static string CreateExercisesPrompt(string text, int languageToId)
         {
-            string languageFrom = Enum.GetName(typeof(LanguageEnum), languageFromId) ?? string.Empty;
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
-            string prompt = string.Format(@"Create {3} sentences in {1} for the word:{0} 
-                and return a JSON file that contains the new statement and its translation to {2}
-                If the word is in different language, explicit or isn't understandable, just ignore it.
+            string prompt = string.Format(@"
+                Return a JSON file that contains the sentence and its translation to {1}
+                If the words are in different language, explicit or isn't understandable, just ignore this specific sentence.
                 Please make sure what you return is appropriate for kids.
-                Please try to use the words below as much as possible.
-                The words are {0}
                 Also add extra words in the same language as the translated statement, 
-                if the translated statement is 'I want to drive' the extra words can be 'You can train'.
+                if the statement is 'I want to drive' the extra words can be 'You can train'.
                 The extra words will be used in a multi select exercise to confuse the user
+                Ignore sentences that wouldn't be useful in a e-learning platform, like 'Hi, Mark'
+                Most of the sentences with two/three words should be ignored because they are not useful for learning.
+                All objects in the JSON need to contain all three items:   Original, Translated, Extra
+                Make sure none of is empty.
 
                 The JSON file should have the following format:
                 [
@@ -36,7 +37,9 @@ namespace LL.Core.Factories
                     ""Translated"": """",
                     ""Extra"": """"
                   }}
-                ]", text, languageFrom, languageTo, numberOfSentences);
+                ]
+
+                Create the JSON based on the following sentences :{0}", text, languageTo);
 
             return prompt;
         }
@@ -47,13 +50,12 @@ namespace LL.Core.Factories
             string languageTo = Enum.GetName(typeof(LanguageEnum), languageToId) ?? string.Empty;
 
             string prompt = string.Format
-            (@"Rank the following sentence's words by their importance to understand it in context. 
-               By 'importance,' I mean how essential each word is for conveying the sentence's meaning. Only include words in {1} if they are understandable and relevant.
-               Ignore any words that are unclear, explicit, or not in the given context. Do not include them in the JSON output.
-                
+            (@"Create a JSON file based on a list of words that contains the word, its translation to {1}, 
+               its definition and a raking based on how important is in a language.
+               Return only a JSON file with the ranking and translations.
+
                For Translation:
 
-               Return only a JSON file with the ranking and translations.
                Do not translate it if it is a name of a person or a name of organisations and do not include special characters.
                If a word is part of another language (e.g., 'su vida'), split it into individual words ('su' and 'vida') unless separating them changes meaning (e.g., 'otra vez' remains together).
                Provide translations to {2} for each ranked word in the context they appear.
@@ -64,11 +66,14 @@ namespace LL.Core.Factories
                Words critical to the mai n meaning of the sentence (e.g., nouns, verbs, key concepts) are ranked as '1'.
                Less important words (e.g., adverbs, prepositions) are ranked as '2'.
                Function words (e.g., articles, conjunctions) are ranked as '3'.
+
                Additionally:
 
-               Your response needs to always include a json even is empty and all the fields need to have a valid value.
-               At the end review the json and make sure the translation is correct and it is not a name of a person/organization.
+               Your response needs to always include a JSON even is empty and all the fields need to have a valid value.
+               At the end review the JSON and make sure the translation is correct and it is not a name of a person/organization.
                Also make sure that the 'Definition' and 'PartOfSpeech' are correct. If they are no included at all, please correct that
+               Make sure all of the items have a value, and none of them is missing 
+               The JSON must include all of them Word,Translation, Definition, PartOfSpeech and Importance
 
                The JSON file should have the following format:
 
@@ -77,7 +82,7 @@ namespace LL.Core.Factories
                    ""Word"": ""sentence"",
                    ""Translation"": ""oración"",
                    ""Definition"": ""The decision or judgement of a jury or court; a verdict."",
-                    ""PartOfSpeech"": ""noun"",
+                   ""PartOfSpeech"": ""noun"",
                    ""Importance"": 1
                  }},
                  {{
@@ -103,7 +108,7 @@ namespace LL.Core.Factories
                  }}
                ]
 
-               Rank the words of the sentence: {0}", text, languageFrom, languageTo);
+               Create the JSON file based on the following words: {0}", text, languageFrom, languageTo);
 
             return prompt;
         }

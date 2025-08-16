@@ -50,6 +50,9 @@ export default function ModuleNavigator()  {
 
     if(mod.typeId == 2)
       router.push(`/Course/Exercises/${mod.id}`)
+
+    if(mod.typeId == 3)
+      router.push(`/Course/Multiselect/${mod.id}`)
   };
 
   return (

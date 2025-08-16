@@ -122,3 +122,39 @@
   width: 85px
 }
 
+.highlight-word {
+  display: inline-block;
+  position: relative;
+}
+
+.tooltip-button {
+  text-decoration-line: underline;
+  cursor: pointer;
+  margin-right: 2px;
+  padding: 0px;
+  border: inherit;
+  background: inherit;
+  color: inherit;
+}
+
+.tooltip-content {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  padding: 4px 8px;
+  background-color: black;
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.tooltip-button:active + .tooltip-content,
+.tooltip-button:focus + .tooltip-content,
+.tooltip-button:hover + .tooltip-content {
+  display: block;
+}

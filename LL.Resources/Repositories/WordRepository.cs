@@ -16,6 +16,20 @@ public class WordRepository(AppDbContext db,
     ITextToSpeechService textToSpeechService,
     IEncryptionService encryptionService) : IWordRepository
 {
+    
+    public List<WordViewModel> GetRangeByText(List<string> names, int languageId)
+    {
+        var words = db.WordLinks
+            .Include(w => w.Word)
+            .Include(w => w.Word.WordMeanings)            
+            .ThenInclude(w => w.WordDefinitions)
+            .Include(w => w.Word.WordMeanings)
+            .ThenInclude(w => w.Type)
+            .Where(w => names.Contains(w.Value) && w.Word.LanguageId == languageId && w.IsActive).ToList()
+            .Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
+        
+        return words;
+    }
     public List<WordViewModel> GetKeyWords(int languageId)
     {
         var words = db.WordLinks

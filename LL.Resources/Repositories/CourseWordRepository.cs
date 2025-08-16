@@ -1,11 +1,15 @@
+using LL.Core.Interfaces.Extensions;
 using LL.Resources.Contexts;
 using LL.Core.Interfaces.Repositories;
 using LL.Resources.Models;
 
 namespace LL.Resources.Repositories;
 
-public class CourseWordRepository(AppDbContext db) : ICourseWordRepository
+public class CourseWordRepository(AppDbContext db, IEncryptionService encryptionService) : ICourseWordRepository
 {
+    public void Insert(string wordId, int moduleId, int importanceRatingId, int userId) =>
+        Insert(encryptionService.Decrypt(wordId), moduleId, importanceRatingId, userId);
+    
     public int Insert(int wordId, int moduleId, int importanceRatingId, int userId)
     {
         CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.WordId == wordId && c.ModuleId == moduleId && c.IsActive);
@@ -28,4 +32,6 @@ public class CourseWordRepository(AppDbContext db) : ICourseWordRepository
         
         return courseWord.Id;
     }
+    
+    
 }

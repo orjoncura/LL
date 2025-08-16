@@ -20,7 +20,6 @@ public static class DataFactory
     public static ExerciseViewModel Convert(string id, Exercise exercise) =>
         new()
         {
-            Id = id,
             Original = exercise.Original,
             Translated = exercise.Translated,
             Extra = exercise.Extra

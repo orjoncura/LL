@@ -1,4 +1,5 @@
-﻿using LL.Core.Enums;
+﻿using System.Text.RegularExpressions;
+using LL.Core.Enums;
 using LL.Core.Factories;
 using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
@@ -21,87 +22,171 @@ public class CourseService(
     ICourseWordRepository courseWordRepository,
     IAgentService agentService) : ICourseService
 {
+    
+    public class SentenceGroupResult
+    {
+        public List<string> Sentences { get; set; }
+        public List<string> Words { get; set; }  
+    }
+    
     public async Task<bool> CreateCourse(CourseRequestModel courseRequest, int userId)
     {
         if(courseRequest.IsValid == false) 
             return false;
         
+        //Strip HTML & create the course.
+        var sentenceGroupResults = ProcessText(courseRequest.Text);
         int courseId = courseRepository.Insert(courseRequest.Text, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
+
+        //Get words that already exists in the database.
+        var words = sentenceGroupResults.SelectMany(w => w.Words).ToList();
+        var dbWords = wordRepository.GetRangeByText(words, courseRequest.LanguageFromId);
         
-        int index = 0;
-        int sequence = 1;
-        foreach (var text in SplitText(courseRequest.Text))
-        {
-            var response = await agentService
-                .Run(PromptFactory.CreateCourseWordsPrompt(text, courseRequest.LanguageFromId, courseRequest.LanguageToId));
+        //Create the first module with the keywords.
+        CreateKeyWordModule(dbWords, courseId, userId);
+        
+        int index = 1;
+        int sequence = 2;
+        foreach (var sentenceGroupResult in sentenceGroupResults)
+        {            
+            string moduleTitleSuffix = ": Part " + index;
+            
+            await CreateFlashcardModule(courseId,
+                words,
+                dbWords,
+                moduleTitleSuffix,
+                sequence,
+                courseRequest.LanguageFromId,
+                courseRequest.LanguageToId,
+                userId);
+            sequence++;
 
-            if (!string.IsNullOrEmpty(response))
-            {
-                // Safely extract the list of CourseWordsModel from JSON
-                var extractedModels = JsonHelper.Extract<List<CourseWordsModel>>(response) ?? new List<CourseWordsModel>();
-                string moduleTitleSufix = ": Part " + (index + 1);
-                int moduleId = moduleRepository.Insert(courseId, "Flashcards" + moduleTitleSufix, (int)ModuleTypeEnum.Flashcards, sequence, index == 0, userId);
-                sequence++;
-                
-                CreateDefinitions(moduleId, extractedModels, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
-                int exercisesModuleId = moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, sequence, false, userId); 
-                await CreateExercises(exercisesModuleId, extractedModels, courseRequest, userId);
-                sequence++;
-            }
-
+            await CreateExerciseModule(courseId,
+                sentenceGroupResult.Sentences, 
+                moduleTitleSuffix, 
+                sequence, 
+                courseRequest,
+                userId);
+            sequence++;
+            
             index++;
         }
         
         return true;
     }
-    private List<string> SplitText(string input, int minWords = 100, int maxWords = 350)
+    
+    private List<SentenceGroupResult> ProcessText(string htmlText)
     {
-        if (string.IsNullOrWhiteSpace(input))
-            return new List<string>();
+        //Strip HTML
+        string plainText = Regex.Replace(htmlText, "<.*?>", string.Empty);
 
-        string[] words = input.Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-        int totalWords = words.Length;
+        //Extract all unique words in order of first appearance
+        var allWordsOrdered = Regex.Matches(plainText.ToLower(), @"\b[\w']+\b")
+                                   .Select(m => m.Value)
+                                   .ToList();
 
-        // Calculate the number of chunks needed
-        int chunkCount = (int)Math.Ceiling((double)totalWords / maxWords);
-        int baseChunkSize = totalWords / chunkCount;
-        int remainder = totalWords % chunkCount;
-
-        List<string> result = new List<string>();
-        int index = 0;
-
-        for (int i = 0; i < chunkCount; i++)
+        var allUniqueWords = new List<string>();
+        var seen = new HashSet<string>();
+        foreach (var w in allWordsOrdered)
         {
-            int currentChunkSize = baseChunkSize + (i < remainder ? 1 : 0);
-
-            // Ensure the chunk size respects the min/max bounds
-            if (currentChunkSize < minWords && i > 0)
+            if (!seen.Contains(w))
             {
-                // Merge with the previous chunk if too small
-                string last = result[result.Count - 1];
-                result.RemoveAt(result.Count - 1);
-                currentChunkSize += last.Split(' ').Length;
-                string merged = string.Join(" ", last, string.Join(" ", words.Skip(index).Take(currentChunkSize)));
-                result.Add(merged);
+                seen.Add(w);
+                allUniqueWords.Add(w);
             }
-            else
-            {
-                string chunk = string.Join(" ", words.Skip(index).Take(currentChunkSize));
-                result.Add(chunk);
-            }
+        }
+        
+        //Split into sentences
+        var sentences = Regex.Split(plainText, @"(?<=[\.!\?])\s+")
+                             .Where(s => !string.IsNullOrWhiteSpace(s))
+                             .ToList();
+        
+        //Create groups
+        var results = new List<SentenceGroupResult>();
+        var usedWords = new HashSet<string>();
+        var currentSentences = new List<string>();
+        var currentWords = new HashSet<string>();
 
-            index += currentChunkSize;
+        foreach (var sentence in sentences)
+        {
+            //Extract unique words from this sentence that are not already used globally
+            var sentenceWords = Regex.Matches(sentence.ToLower(), @"\b[\w']+\b")
+                                     .Select(m => m.Value)
+                                     .Where(w => !usedWords.Contains(w))
+                                     .ToList();
+
+            //Add sentence & words
+            currentSentences.Add(sentence);
+            foreach (var word in sentenceWords)
+                currentWords.Add(word);
+
+            //If we hit limits → save group
+            if (currentSentences.Count >= 35 || currentWords.Count >= 100)
+            {
+                if (currentWords.Count >= 30) // only store if we have minimum words
+                {
+                    results.Add(new SentenceGroupResult
+                    {
+                        Sentences = new List<string>(currentSentences),
+                        Words = currentWords.ToList()
+                    });
+
+                    // Mark words as used globally
+                    foreach (var w in currentWords)
+                        usedWords.Add(w);
+
+                    // Reset for next group
+                    currentSentences.Clear();
+                    currentWords.Clear();
+                }
+            }
         }
 
-        return result;
+        //Add remaining sentences if they meet minimum word count
+        if (currentSentences.Count > 0 && currentWords.Count >= 30)
+        {
+            results.Add(new SentenceGroupResult
+            {
+                Sentences = new List<string>(currentSentences),
+                Words = currentWords.ToList()
+            });
+
+            foreach (var w in currentWords)
+                usedWords.Add(w);
+        }
+
+        return results;
     }
-    private void CreateDefinitions(int moduleId, List<CourseWordsModel> courseWordsList, int fromId, int toId, int userId)
+    private void CreateKeyWordModule(List<WordViewModel> wordViewModels, int courseId, int userId)
     {
-        foreach (var courseWord in courseWordsList)
+        //Create a multiselect module based on the high priority words in the database.
+        var keywords = wordViewModels.Where(w => w.ImportanceRatingId == (int)ImportanceRatingEnum.High).ToList();
+
+        if (keywords.Count() > 5)
+        {
+            int multiselectModuleId = moduleRepository.Insert(courseId, "Key Words", (int)ModuleTypeEnum.Multiselect, 1, true, userId);   
+            keywords.ForEach(k => courseWordRepository.Insert(k.Id, multiselectModuleId, (int)ImportanceRatingEnum.High, userId)); 
+        }
+    }
+    private async Task CreateFlashcardModule(int courseId, List<string> words, List<WordViewModel> dbWords, string moduleTitleSuffix, int sequence, int fromId, int toId, int userId)
+    {     
+        //Get only the words that don't exist already in the database (the keywords have been already removed) and pass them to the agent.
+        var formattedItems = string.Join(",", words.Where(n => dbWords.Any(w => w.Name == n) == false).ToList()
+            .Select(item =>$"{item}" ).ToList());
+        
+        //Create the prompt and ask the agent to create a CourseWordsModel for the new words.
+        //Safely extract the list of CourseWordsModel from JSON, that is returned by the agent.
+        var prompt = PromptFactory.CreateCourseWordsPrompt(formattedItems, fromId, toId);
+        var response = await agentService.Run(prompt);
+        var extractedModels = !string.IsNullOrEmpty(response) ? JsonHelper.Extract<List<CourseWordsModel>>(response) ?? [] : [];
+        
+        int flashcardModuleId = moduleRepository.Insert(courseId, "Flashcards" + moduleTitleSuffix, (int)ModuleTypeEnum.Flashcards, sequence, sequence == 2, userId);
+
+        foreach (var courseWord in extractedModels)
         {
             WordShort wordShort = wordRepository.Insert(courseWord.Word, fromId, userId);
 
-            courseWordRepository.Insert(wordShort.Id, moduleId, courseWord.Importance, userId);
+            courseWordRepository.Insert(wordShort.Id, flashcardModuleId, courseWord.Importance, userId);
             wordLinkRepository.Insert(wordShort.Id, courseWord.Translation, fromId, toId, userId);
 
             MeaningShort meaning = new MeaningShort
@@ -125,19 +210,26 @@ public class CourseService(
                 meaning.Definitions.ForEach(d => wordDefinitionRepository.Insert(d, wordMeaningId, userId));
             }
         }
+        
+        //Create a course words model for the remaining words, we will skip the keywords because they were inserted earlier.
+        dbWords.Where(w => w.ImportanceRatingId != (int)ImportanceRatingEnum.High).ToList()
+            .ForEach(w => courseWordRepository.Insert(w.Id, flashcardModuleId, (int)ImportanceRatingEnum.Medium, userId));
     }
-    private async Task CreateExercises(int moduleId, List<CourseWordsModel> extractedModels, CourseRequestModel courseRequest, int userId)
-    {
-        var formattedItems = string.Join(",", extractedModels.Select(item =>$"{item.Word}" ).ToList());
-        string prompt = PromptFactory.CreateCoursePrompt(formattedItems, courseRequest.LanguageFromId, courseRequest.LanguageToId);
-        var exercises = JsonHelper.Extract<List<ExerciseViewModel>>(await agentService.Run(prompt));
+    private async Task CreateExerciseModule(int courseId, List<string> sentences, string moduleTitleSufix, int sequence, CourseRequestModel courseRequest, int userId)
+    {     
+        //Create a new module for the exercises.
+        int exercisesModuleId = moduleRepository.Insert(courseId, "Exercises" + moduleTitleSufix, (int)ModuleTypeEnum.Exercises, sequence, false, userId); 
+        
+        //Create the prompt and ask the agent to create a ExerciseViewModel for the new exercises.
+        //Safely extract the list of ExerciseViewModel from JSON, that is returned by the agent.
+        var formattedItems = string.Join("\n", sentences.Select(item =>$"{item}" ).ToList());
+        string prompt = PromptFactory.CreateExercisesPrompt(formattedItems, courseRequest.LanguageToId);
+        var response = await agentService.Run(prompt);
+        var exercises = !string.IsNullOrEmpty(response) ? JsonHelper.Extract<List<ExerciseViewModel>>(response) : [];
         
         if (exercises != null && exercises.Any(s => s.IsValid))
-        {       
-            exercises = exercises.Where(e => e.IsValid).ToList();
-            
-            exerciseRepository.InsertRange(moduleId, exercises, userId);
-        }
+            exerciseRepository.InsertRange(exercisesModuleId, exercises.Where(e => e.IsValid).ToList(), userId);
+        
     }
 }
 

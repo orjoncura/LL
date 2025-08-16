@@ -40,7 +40,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
       setCurrentFlashcard(sortedBasedOnAppearance[0]); 
     }, []);
     
-
     const navigateToFlashcardByIndex = (newIndex: number) => {
 
       if(newIndex >= flashcards.length){
@@ -85,26 +84,29 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         showFeedback("Warning", "Would you like to archive '" + word.name + "'", fun);
     }
     
-    function highlightWord(word:string, wordIndex: number): ReactElement {
+    function highlightWord(word:string): ReactElement {
 
       if(!word) return <p></p>;
 
-        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const wordKey = "pw_" + wordIndex;
+        const escapedWord = word.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]/g, '') ;
 
         if(escapedWord == flashcards[flashcardIndex].name)
-          return <b key={wordKey} style={{ marginRight: 2 }}>{word}</b>;
+          return <b style={{ marginRight: 2 }}>{word}</b>;
 
         // Check if any of the extracted words match the paragraphWords list
         if(flashcards.some(w => w.name == escapedWord)){
              
-          const index = flashcards.findIndex(p => p.name === word); 
-          return <span key={wordKey} style={{ textDecorationLine: 'underline', 
-            WebkitTextDecorationLine: 'underline', cursor:'pointer', marginRight: 2}} 
-                onClick={() => navigateToFlashcardByIndex(index)}>{word}</span>
+          const translation = flashcards.filter(w => w.name == escapedWord)[0].translation;
+          return <span  className="highlight-word"
+                        style={{ textDecorationLine: 'underline', 
+                        WebkitTextDecorationLine: 'underline',
+                        cursor:'pointer', marginRight: 2}}>
+                    <button className="tooltip-button">{word}</button>
+                    <div className="tooltip-content">{translation}</div>
+                </span>
         }
 
-        return <p key={wordKey} style={{ marginRight: 2 }}>{word}</p>;
+        return <p style={{ marginRight: 2 }}>{word}</p>;
     }
 
     function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
@@ -136,6 +138,38 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
 
         return sorted;
     };
+
+    function stripHtml(html: string): string {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      return doc.body.textContent || "";
+    }
+
+    function findSentencesByWord(html: string): ReactElement[] {
+
+      const word = flashcards[flashcardIndex].name;
+      const plainText = stripHtml(html);
+
+      //Split into sentences
+      const sentences = plainText
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      //Find sentences containing the word
+      const regex = new RegExp(`\\b${word}\\b`, "i");
+      const matchingSentences = sentences.filter(s => regex.test(s));
+
+      //Join with blank line
+      const tx = matchingSentences.join("\n\n");
+
+      //Highlight every word in the final text
+      return tx.split(/\s+/).map((w, i) => (
+        <span key={i}>
+          {highlightWord(w)}{" "}
+        </span>))
+    }
+  
 
   return (
     <div>
@@ -181,7 +215,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
             <br></br>
  
             {showMeaning == false && <div style={{marginBottom: "40%", display: 'inline-flex', flexWrap: 'wrap'}}>
-              {text.trim().split(' ').map((word, index) => highlightWord(word, index))}
+              {findSentencesByWord(text)}
             </div>}
 
             {showMeaning && (currentFlashcard.meanings && currentFlashcard.meanings.length > 0 ? (

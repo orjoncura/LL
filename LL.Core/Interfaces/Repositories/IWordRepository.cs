@@ -1,10 +1,10 @@
 ﻿using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
-using LL.Core.Models.Arguments;
 
 namespace LL.Core.Interfaces.Repositories;
 public interface IWordRepository
 {
+    List<WordViewModel> GetRangeByText(List<string> names, int languageId);
     List<WordViewModel> GetKeyWords(int languageId);
     MemoryStream? GetFileStreamById(string wordId);
     WordShort Insert(string name, int languageId, int userId);
