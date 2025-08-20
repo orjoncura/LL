@@ -174,6 +174,26 @@ namespace LL.API.Controllers
         }
         
         /// <summary>
+        /// Will return the profile details for the current user.
+        /// </summary>
+        /// <response code="200">Success status</response>
+        [HttpGet("GetProfileDetails")]
+        [ProducesResponseType(typeof(DateTimeViewModel), StatusCodes.Status200OK)]
+        public ActionResult GetProfileDetails()
+        {
+            try
+            {
+                return Ok(securityService.GetProfileDetails(UserId));
+            }
+            catch (Exception ex)
+            {
+                appMonitoringService.ExportError(ex);
+                
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
         /// Will delete the token of the Authorization header.
         /// </summary>
         /// <response code="200">Success message</response>

@@ -68,7 +68,7 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
         if (user != null) 
             return user.Id;
 
-    HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
+        HashPasswordModel hashPasswordModel = encryptionService.HashPassword(password);
 
         user = new User()
         {

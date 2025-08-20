@@ -25,7 +25,7 @@ public class WordRepository(AppDbContext db,
             .ThenInclude(w => w.WordDefinitions)
             .Include(w => w.Word.WordMeanings)
             .ThenInclude(w => w.Type)
-            .Where(w => names.Contains(w.Value) && w.Word.LanguageId == languageId && w.IsActive).ToList()
+            .Where(w => names.Contains(w.Word.Name) && w.Word.LanguageId == languageId && w.IsActive).ToList()
             .Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
         
         return words;

@@ -2,111 +2,111 @@
 
 import React, {useState, useRef, useEffect} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
-import Flashcards from '@/components/Courses/Flashcards';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
-import { useRouter } from 'next/navigation';
-import { GET } from '@/utils/Security/httpClient'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { CourseViewModel, WordViewModel } from '@/utils/Models/models';
+import { GET, POST } from '@/utils/Security/httpClient'
+import { ProfileViewModel } from '@/utils/Models/models';
+import { IsValidEmail } from "@/utils/Security/Validators";
+
 import './page.css'; 
 
 export default function Profile() {
 
-  const [loading, setLoading] = useState(true);
-  const [courses, setCourses] = useState<CourseViewModel[]>([]);
-  const [showCourse, setShowCourse] = useState(false);
-  const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]); 
-  const [selectedCourse, setSelectedCourse] = useState<CourseViewModel>(courses[0]);   
-  const feedbackViewRef = useRef<any>(null); 
-  const [fbTitle, setfbhTitle] = useState('');
-  const [fbBody, setfbhBody] = useState('');
-  const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
+    const [profile, setProfile] = useState<ProfileViewModel | null>(null);  
+    const [loading, setLoading] = useState(false);
+    const feedbackViewRef = useRef<any>(null); 
+    const [fbTitle, setfbhTitle] = useState('');
+    const [fbBody, setfbhBody] = useState('');
+    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
 
-  const router = useRouter();
+    const showFeedback = (title: string, body:string, onClick?: Function) => {
+        if (feedbackViewRef.current) {
 
-  const showFeedback = (title: string, body:string, onClick?: Function) => {
-      if (feedbackViewRef.current) {
+            setfbhTitle(title);
+            setfbhBody(body);
+            setOnFeedBackViewClick(() => onClick); 
 
-          setfbhTitle(title);
-          setfbhBody(body);
-          setOnFeedBackViewClick(() => onClick); 
+            feedbackViewRef.current.open();
+        }
+    };
 
-          feedbackViewRef.current.open();
-      }
-  };
-
-  let hasFetchedData = false;
-  useEffect(() => {
+    let hasFetchedData = false;
+    useEffect(() => {
 
       if(hasFetchedData == false){
         hasFetchedData = true;
 
-        GET('/Course/GetCourses')
-        .then((courseViewModels: CourseViewModel[]) => {
-
-          if(courseViewModels == null || courseViewModels == undefined)
+        setLoading(true);
+        GET('/Security/GetProfileDetails')
+        .then((profileViewModel: ProfileViewModel) => {
+  
+          if(profileViewModel == null || profileViewModel == undefined)
             return;
-
-          setCourses(courseViewModels);
+  
+          setProfile(profileViewModel);
         }).finally(() => {setLoading(false)});
       }
+    }, []);
+
+        const handleSubmit = (event:any) => {
+            event.preventDefault();
     
-  }, []);
-  
-  const DeleteCourse = async (id: number) => {
-      setLoading(true);
+            if(profile == null)  return;
 
-      GET('/Course/DeleteCourseById?courseId=' + id)
-      .then((hasBeenDeleted: boolean) => {
-
-        if(hasBeenDeleted)
-          setCourses(courses.filter(c => c.id != id));
+            try {
+                if(IsValidEmail(profile?.email)) {
+    
+                    setLoading(true);
+                    POST('/Security/ResetPassword', JSON.stringify(profile?.email))
+                        .then(isSuccessfull => { 
+    
+                            if(isSuccessfull) {
+    
+                                showFeedback("Success", "You will receive an email to confirm your request");
+                                
+                            }else{
+                                showFeedback("Error", "Something went wrong the request cannot be completed at this time");
+                            }
+                            
+                            setLoading(false);
+                        }).catch(e => { 
+                            setLoading(false); 
+                            showFeedback("Error", "The server was unable to complete your request. Please try again later.");
+                        });
+                }else {
+                    showFeedback("Invalid Email", "Please pass a valid email"); 
+                }
+            } catch (error) {
+                console.error('Error making API call:', error);
+            }
+        };
         
-        if(hasBeenDeleted == false)
-          showFeedback("Error", "Please try again later.");
 
-      }).catch(() => showFeedback("Error", "Something went wrong - Please try again later."))
-      .finally(() => setLoading(false));
+    return (
+      <div>
 
-  };
+        <Navbar /> 
 
-  return (      
-    <div>      
-      <Navbar /> 
-      <br />
-      {showCourse == false && ( 
-      <div className="course-list ">
-        {courses.map((course, index) => (
-          <div key={index} className="position-relative" >
-            <button className="close-button" onClick={() => DeleteCourse(course.id)}>
-              &times;
-            </button>
-
-            <div className="course-card" onClick={() => router.push(`/Course/ModuleNavigator/${course.id}`)}>
-              <div className="course-header">
-                <div className="course-title">
-                  {course.text.substring(0, 25)}  
-                </div>
-                <div className="course-date"><FontAwesomeIcon icon={faCalendar} className="icon" /> <span>{course.createdDate.asString}</span></div>
+        <div className="container-flex">
+          <div className="container" style={{ width: "350px" }} >
+            <div className='glow-frame' style={{ marginBottom: "25%" }}>
+                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                  <b className='mainTxt'>{profile?.email}</b>
+                  <br></br>
+                  <br></br>
+                  <b className='mainTxt'>Joined: {profile?.dateCreated.asString}</b>
+                  <br></br>
+                  <br></br>
+                </div> 
+                <button className="mainBtn w-100" onClick={handleSubmit}>Reset Password</button>
               </div>
-            <hr className="course-divider" />
-            <div className="course-detail">
-              {<span>{course.text.substring(0, 300)}</span> }
             </div>
-          </div>
-          </div>
+        </div>
 
-
-        ))}
-    </div>)}
-
-    {showCourse && (<Flashcards text={selectedCourse.text} words={wordViewModels} courseId={selectedCourse.id} onDone={() => setShowCourse(false)} />)}
-
-    {loading && <SpinnerOverlay />}      
-    <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
-    </div>
-  );
-};
+        <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
+        {loading && <SpinnerOverlay />}
+        
+      </div>
+    );
+  };

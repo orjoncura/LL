@@ -64,7 +64,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
             // Ensure the request was successful
             response.EnsureSuccessStatusCode();
 
-            Candidate? candidate = JsonHelper.Extract<JsonData>(response.Content.ReadAsStringAsync().Result)?.Candidates?.FirstOrDefault();
+            Candidate? candidate = JsonHelper.Extract<GeminiApiResponse>(response.Content.ReadAsStringAsync().Result)?.Candidates?.FirstOrDefault();
             string output = candidate?.Content?.Parts?.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
 
             // Read the response

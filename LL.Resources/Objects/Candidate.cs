@@ -12,7 +12,4 @@ public class Candidate
 
     [JsonPropertyName("index")]
     public int Index { get; set; }
-
-    [JsonPropertyName("safetyRatings")]
-    public SafetyRating[]? SafetyRatings { get; set; }
 }

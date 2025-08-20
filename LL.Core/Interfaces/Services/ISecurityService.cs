@@ -9,5 +9,6 @@ public interface ISecurityService
     bool CompleteUserRegistration(ConfirmationModel model);
     bool ResetPassword(string email, string ip, string url);
     bool CompletePasswordReset(ConfirmationModel model);
+    ProfileViewModel GetProfileDetails(int userId);
 }
 

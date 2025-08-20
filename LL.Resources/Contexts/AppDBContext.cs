@@ -84,7 +84,9 @@ public class AppDbContext : DbContext
             entity.Property(p => p.Email).IsRequired();
             entity.Property(p => p.PasswordHash).IsRequired();
             entity.Property(u => u.IsActive).IsRequired();
-
+            entity.Property(u => u.CreatedDate).IsRequired()  
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
             entity.HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
@@ -95,7 +97,7 @@ public class AppDbContext : DbContext
                 .HasForeignKey(p => p.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         });
-
+        
         modelBuilder.Entity<UserToken>(entity =>
         {
             entity.Property(ut => ut.Token).IsRequired();
@@ -190,7 +192,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<MessageStatus>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<MessageStatus>().HasData(
@@ -199,8 +202,7 @@ public class AppDbContext : DbContext
                 .Select(e => new MessageStatus
                 {
                     Id = (int)e,
-                    Value = e.ToString(),
-                    CreatedDate = DateTimeOffset.Now
+                    Value = e.ToString()
                 })
         );
         
@@ -233,7 +235,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Language>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<Language>().HasData(
@@ -242,15 +245,15 @@ public class AppDbContext : DbContext
                 .Select(e => new Language
                 {
                     Id = (int)e,
-                    Value = e.ToString(),
-                    CreatedDate = DateTimeOffset.Now
+                    Value = e.ToString()
                 })
         );
         
         modelBuilder.Entity<ImportanceRating>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<ImportanceRating>().HasData(
@@ -259,8 +262,7 @@ public class AppDbContext : DbContext
                 .Select(e => new ImportanceRating
                 {
                     Id = (int)e,
-                    Value = e.ToString(),
-                    CreatedDate = DateTimeOffset.Now
+                    Value = e.ToString()
                 })
         );
         
@@ -340,7 +342,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<WordType>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<WordType>().HasData(
@@ -349,8 +352,7 @@ public class AppDbContext : DbContext
                 .Select(e => new WordType
                 {
                     Id = (int)e,
-                    Value = e.ToString(),
-                    CreatedDate = DateTimeOffset.Now
+                    Value = e.ToString()
                 })
         );
         
@@ -410,7 +412,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ModuleType>(entity =>
         {
             entity.Property(ut => ut.Value).IsRequired();
-            entity.Property(p => p.CreatedDate).IsRequired();
+            entity.Property(p => p.CreatedDate).IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<ModuleType>().HasData(
@@ -419,8 +422,7 @@ public class AppDbContext : DbContext
                 .Select(e => new ModuleType()
                 {
                     Id = (int)e,
-                    Value = e.ToString(),
-                    CreatedDate = DateTimeOffset.Now
+                    Value = e.ToString()
                 })
         );
         

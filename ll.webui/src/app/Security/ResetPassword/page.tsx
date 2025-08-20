@@ -35,8 +35,6 @@ export default function ResetPassword() {
     const handleSubmit = (event:any) => {
         event.preventDefault();
 
-        console.log("Creating new account...");
-
         try {
             if(IsValidEmail(email)) {
 

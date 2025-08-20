@@ -6,6 +6,7 @@ using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
 using LL.Core.Enums;
+using LL.Core.Models.ViewModels;
 
 namespace LL.Core.Services;
 
@@ -100,6 +101,16 @@ public class SecurityService(
             return false;
         
         return userRepository.UpdatePassword(userId, model.Password, userId);
+    }
+
+    public ProfileViewModel GetProfileDetails(int userId)
+    {
+        var user = userRepository.GetById(userId);
+        
+        if (user is null) 
+            return new ProfileViewModel();
+        
+        return new ProfileViewModel(user.Email, DateTime.Now);
     }
 }
 

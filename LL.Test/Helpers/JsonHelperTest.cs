@@ -12,7 +12,7 @@ public class JsonHelperTest
     {
         string content = File.ReadAllText(@"../../../Files/CandidateExample.txt");
 
-        Candidate? candidate = JsonHelper.Extract<JsonData>(content)?.Candidates?.FirstOrDefault();
+        Candidate? candidate = JsonHelper.Extract<GeminiApiResponse>(content)?.Candidates?.FirstOrDefault();
         
         Assert.True(candidate != null);
     }
@@ -22,7 +22,7 @@ public class JsonHelperTest
     {
         string content = File.ReadAllText(@"../../../Files/ExerciseViewModelJSON.txt");
 
-        Candidate? candidate = JsonHelper.Extract<JsonData>(content)?.Candidates?.FirstOrDefault();
+        Candidate? candidate = JsonHelper.Extract<GeminiApiResponse>(content)?.Candidates?.FirstOrDefault();
         string output = candidate?.Content?.Parts?.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
 
         List<ExerciseViewModel>? exercises = JsonHelper.Extract<List<ExerciseViewModel>>(output)?.ToList();

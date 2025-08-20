@@ -17,20 +17,12 @@ export default function Exercises() {
     const [exerciseIndex, setExercisesIndex] = useState<number>(0);  
     const [exercises, setExercises] = useState<ExerciseViewModel[]>([]);
     const [correctOrder, setCorrectOrder] = useState<string[]>([]);
-
     const [options, setOptions] = useState<string[]>([]);
     const [showFeedback, setShowFeedback] = useState(false);
     const [feedback, setFeedback] = useState("");
     const [loading, setLoading] = useState(false);
-
     const [selectedWords, setSelectedWords] = useState<string[]>([]);  
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-    const [onModalClick, setOnModalClick] = useState<(() => void) | undefined>(undefined);
-
-    const feedbackViewRef = useRef<any>(null); 
-    const [fbTitle, setfbhTitle] = useState('');
-    const [fbBody, setfbhBody] = useState('');
-
     const params = useParams<{ id: string; }>()
     const router = useRouter();
 
@@ -259,7 +251,6 @@ export default function Exercises() {
         </div>
 
         {loading && <SpinnerOverlay />}
-        <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onModalClick} />
       </div>
     );
   };

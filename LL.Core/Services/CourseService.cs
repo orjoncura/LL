@@ -52,8 +52,8 @@ public class CourseService(
             string moduleTitleSuffix = ": Part " + index;
             
             await CreateFlashcardModule(courseId,
-                words,
-                dbWords,
+                sentenceGroupResult.Words,
+                dbWords.Where(w => sentenceGroupResult.Words.Contains(w.Name)).ToList(),
                 moduleTitleSuffix,
                 sequence,
                 courseRequest.LanguageFromId,
@@ -169,8 +169,7 @@ public class CourseService(
         }
     }
     private async Task CreateFlashcardModule(int courseId, List<string> words, List<WordViewModel> dbWords, string moduleTitleSuffix, int sequence, int fromId, int toId, int userId)
-    {     
-        //Get only the words that don't exist already in the database (the keywords have been already removed) and pass them to the agent.
+    {
         var formattedItems = string.Join(",", words.Where(n => dbWords.Any(w => w.Name == n) == false).ToList()
             .Select(item =>$"{item}" ).ToList());
         
@@ -229,7 +228,6 @@ public class CourseService(
         
         if (exercises != null && exercises.Any(s => s.IsValid))
             exerciseRepository.InsertRange(exercisesModuleId, exercises.Where(e => e.IsValid).ToList(), userId);
-        
     }
 }
 

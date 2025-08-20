@@ -114,7 +114,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
               />
               <br/>
-              <Button type="submit" className="mainBtn w-100" onClick={handleSubmit}> Login </Button>
+              <Button type="submit" className="mainBtn w-100" style={{height: "38px"}} onClick={handleSubmit}> Login </Button>
 
               <hr/>
               <div className="center">

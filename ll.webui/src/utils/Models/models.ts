@@ -104,3 +104,7 @@ export interface ExerciseViewModel {
   readonly isValid?: boolean;
 }
 
+export interface ProfileViewModel {
+  email: string;
+  dateCreated: DateTimeViewModel;
+}
