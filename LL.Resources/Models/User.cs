@@ -7,6 +7,7 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public string Salt { get; set; } = string.Empty;
     public bool IsActive { get; set; }
+    public DateTime CreatedDate { get; set; }
 }
 
 

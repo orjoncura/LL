@@ -9,6 +9,7 @@ public class WordViewModel
     public string Id {  get; set; }
     public string Name { get; set; } = string.Empty;
     public string Translation { get; set; } = string.Empty;
+    public string Audio { get; set; } = string.Empty;
     public int ImportanceRatingId { get; set; }
     public List<MeaningShort> Meanings { get; set; } 
 

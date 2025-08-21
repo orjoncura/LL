@@ -76,20 +76,15 @@ export default function ModuleNavigator()  {
             >
               <div className="module-info">
                 <div className={`module-icon ${isCompleted ? 'icon-done' : ''}`}>
-                  {/* {isActive ? <Icon size={24} /> : <Lock size={24} />} */}
                 </div>
                 <div className="module-text">
                   <div className="module-title">{mod.title}</div>
-                  {/* <div className="module-xp">+{mod.xp} XP</div> */}
                 </div>
               </div>
-              {isActive && !isCompleted && (
+              {isActive && (
                 <button className="module-btn" onClick={() => navigateToModule(mod)}>
                   Start
                 </button>
-              )}
-              {isCompleted && (
-                <div className="module-done">✔ Done</div>
               )}
             </motion.div>
           );

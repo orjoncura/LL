@@ -53,7 +53,7 @@ public class CourseService(
             
             await CreateFlashcardModule(courseId,
                 sentenceGroupResult.Words,
-                dbWords.Where(w => sentenceGroupResult.Words.Contains(w.Name)).ToList(),
+                dbWords,
                 moduleTitleSuffix,
                 sequence,
                 courseRequest.LanguageFromId,
@@ -159,8 +159,11 @@ public class CourseService(
     }
     private void CreateKeyWordModule(List<WordViewModel> wordViewModels, int courseId, int userId)
     {
+        if (moduleRepository.ModuleCreated(courseId, (int)ModuleTypeEnum.Multiselect)) return;
+        
         //Create a multiselect module based on the high priority words in the database.
-        var keywords = wordViewModels.Where(w => w.ImportanceRatingId == (int)ImportanceRatingEnum.High).ToList();
+        var keywords = wordViewModels
+            .Where(w => w.ImportanceRatingId == (int)ImportanceRatingEnum.High).ToList();
 
         if (keywords.Count() > 5)
         {
@@ -211,7 +214,7 @@ public class CourseService(
         }
         
         //Create a course words model for the remaining words, we will skip the keywords because they were inserted earlier.
-        dbWords.Where(w => w.ImportanceRatingId != (int)ImportanceRatingEnum.High).ToList()
+        dbWords.Where(w => words.Contains(w.Name) && w.ImportanceRatingId != (int)ImportanceRatingEnum.High).ToList()
             .ForEach(w => courseWordRepository.Insert(w.Id, flashcardModuleId, (int)ImportanceRatingEnum.Medium, userId));
     }
     private async Task CreateExerciseModule(int courseId, List<string> sentences, string moduleTitleSufix, int sequence, CourseRequestModel courseRequest, int userId)

@@ -64,6 +64,8 @@ public class AppDbContext : DbContext
             entity.Property(p => p.PasswordHash).IsRequired();
             entity.Property(p => p.Salt).IsRequired();
             entity.Property(u => u.IsActive).IsRequired();
+            entity.Property(u => u.CreatedDate).IsRequired()  
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
         
         modelBuilder.Entity<User>().HasData(

@@ -11,10 +11,13 @@ namespace LL.Resources.Repositories;
 public class ModuleRepository(AppDbContext db, IEncryptionService encryptionService)  : IModuleRepository
 {
     public List<ModuleViewModel> GetByCourseId(string courseId) 
-        => db.Modules.Where(m => m.CourseId == encryptionService.Decrypt(courseId))
+        => db.Modules.Where(m => m.CourseId == encryptionService.Decrypt(courseId) && m.IsActive)
             .OrderBy(m => m.Sequence)
             .Select(c => DataFactory.Convert(encryptionService.Encrypt(c.Id), c)).ToList();
 
+    public bool ModuleCreated(int courseId, int typeId) 
+        => db.Modules.Any(m => m.CourseId == courseId && m.TypeId == typeId && m.IsActive);
+    
     public bool MarkModuleAsComplete(string encryptedId)
     {
         int moduleId = encryptionService.Decrypt(encryptedId);

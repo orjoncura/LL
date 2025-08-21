@@ -96,14 +96,17 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         // Check if any of the extracted words match the paragraphWords list
         if(flashcards.some(w => w.name == escapedWord)){
              
-          const translation = flashcards.filter(w => w.name == escapedWord)[0].translation;
-          return <span  className="highlight-word"
-                        style={{ textDecorationLine: 'underline', 
-                        WebkitTextDecorationLine: 'underline',
-                        cursor:'pointer', marginRight: 2}}>
-                    <button className="tooltip-button">{word}</button>
-                    <div className="tooltip-content">{translation}</div>
-                </span>
+          const flashcard = flashcards.filter(w => w.name == escapedWord)[0];
+
+          if(word.length > 1 && flashcard.translation != null && flashcard.translation?.length > 1 && flashcard.translation != word)
+            return <span  className="highlight-word"
+                          style={{ textDecorationLine: 'underline', 
+                          WebkitTextDecorationLine: 'underline',
+                          cursor:'pointer', marginRight: 2}}
+                          onClick={() => CreateAudio(flashcard.id)}>
+                      <button className="tooltip-button">{word}</button>
+                      <div className="tooltip-content">{flashcard.translation}</div>
+                  </span>
         }
 
         return <p style={{ marginRight: 2 }}>{word}</p>;
@@ -170,7 +173,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         </span>))
     }
   
-
   return (
     <div>
       {currentFlashcard != null &&
@@ -214,7 +216,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
 
             <br></br>
  
-            {showMeaning == false && <div style={{marginBottom: "40%", display: 'inline-flex', flexWrap: 'wrap'}}>
+            {showMeaning == false && <div className='sen'>
               {findSentencesByWord(text)}
             </div>}
 

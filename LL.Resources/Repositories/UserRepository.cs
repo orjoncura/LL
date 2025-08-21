@@ -6,20 +6,20 @@ using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 using LL.Resources.Models;
 using LL.Resources.Contexts;
+using LL.Resources.Factories;
 
 namespace LL.Resources.Repositories;
 
 public class UserRepository(AppDbContext db, IEncryptionService encryptionService) : IUserRepository
 {
     public UserShort? GetById(int id) =>
-        db.Users
-            .Where(u => u.Id == id && u.IsActive)
-            .Select(u => new UserShort(u.Id, u.Email, u.PasswordHash))
-            .FirstOrDefault();
+       db.Users.FirstOrDefault(x => x.Id == id && x.IsActive) is var u && u != null        
+           ? DataFactory.Convert(u)
+           : null;
     
     public UserShort? GetByEmail(string email) =>
         Get(email) is var u && u != null 
-            ? new UserShort(u.Id, u.Email, u.PasswordHash)
+            ? DataFactory.Convert(u)
             : null;
 
     public TokenViewModel GetAuthenticationToken(LoginModel loginModel, TokenConfigModel tokenConfigModel)

@@ -110,7 +110,7 @@ public class SecurityService(
         if (user is null) 
             return new ProfileViewModel();
         
-        return new ProfileViewModel(user.Email, DateTime.Now);
+        return new ProfileViewModel(user.Email, user.CreatedDate);
     }
 }
 

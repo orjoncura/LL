@@ -159,3 +159,10 @@
 .tooltip-button:hover + .tooltip-content {
   display: block;
 }
+
+.sen {
+    margin-bottom: 40%;
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-top: 2%;
+}

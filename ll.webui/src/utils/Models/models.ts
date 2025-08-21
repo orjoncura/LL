@@ -85,7 +85,6 @@ export interface WordViewModel {
   id: string;
   name: string;
   translation?: string;
-  audio: Uint8Array;
   language?: string;
   meanings?: meaningShort[];
   importanceRatingId: number

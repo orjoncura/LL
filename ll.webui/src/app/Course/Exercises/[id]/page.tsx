@@ -63,6 +63,11 @@ export default function Exercises() {
       let exerciseInCorrectOrder: string[] = [];
       let options: string[] = [];
 
+      if(newIndex >= exercises.length){
+        GET('/Course/MarkModuleAsComplete?moduleId=' + params.id)
+        .finally(() => {router.back();});
+      }
+
       if(exercise == null){
 
         router.back();

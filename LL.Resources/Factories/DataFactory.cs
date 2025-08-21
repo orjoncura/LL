@@ -35,6 +35,14 @@ public static class DataFactory
             Completed = module.Completed
         };
     
+    public static UserShort Convert(User user) =>
+        new()
+        {
+            Id = user.Id,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            CreatedDate = user.CreatedDate
+        };
     public static WordShort Convert(Word word) =>
         new()
         {
