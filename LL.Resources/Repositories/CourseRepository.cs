@@ -31,9 +31,10 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
         
         return course.Id;
     }
-    public bool DeleteCourseWord(int moduleId, int wordId, int userId)
+    public bool DeleteCourseWord(string moduleId, string wordId, int userId)
     {
-        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => c.ModuleId == moduleId && c.WordId == wordId && c.IsActive);
+        CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => 
+            c.ModuleId == encryptionService.Decrypt(moduleId) && c.WordId == encryptionService.Decrypt(wordId) && c.IsActive);
         
         if(courseWord != null)
         {

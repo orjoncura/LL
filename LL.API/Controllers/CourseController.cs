@@ -190,7 +190,7 @@ namespace LL.API.Controllers
         /// </summary>
         /// <response code="200">Success/fail</response>
         [HttpPost("DeleteCourseWord")]
-        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult DeleteCourseWord([FromBody] DeleteCourseWordModel model)
         {
             try

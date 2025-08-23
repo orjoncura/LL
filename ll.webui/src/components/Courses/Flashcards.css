@@ -41,10 +41,12 @@
   transition: transform 0.6s;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d; /* iOS fix */
+  will-change: transform; /* GPU hint */
 }
 
 .card-inner.flipped {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 .flip-card.main {
@@ -56,6 +58,8 @@
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* iOS fix */
+  transform: translateZ(0); /* ✅ forces GPU layer, prevents crash */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +70,8 @@
 }
 
 .card-back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px); 
+  -webkit-transform: rotateY(180deg) translateZ(1px); /* ✅ iOS fix */
   background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
   color: white;
 }

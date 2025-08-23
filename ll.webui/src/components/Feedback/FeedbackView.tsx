@@ -22,11 +22,12 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
 
     const open = () => {
 
-      new Audio('../Sounds/warning-message.mp3').play();
+      new Audio('/Sounds/warning-message.mp3').play();
 
       setShowFeedback(true)
     };
 
+    const confirm = () => { if(onClick) onClick(); close()};
     const close = () => setShowFeedback(false);
 
     useImperativeHandle(ref, () => ({
@@ -42,10 +43,10 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
                 {body}
               </div>
             </div>
-            {onClick && <button className="feedback-button mainBtn" onClick={onClick}>
+            {onClick && <button className="mainBtn feedback-button" onClick={confirm}>
               {text}
             </button>}
-            {showCloseBtn && <button className="feedback-button mainBtn" onClick={close}>
+            {showCloseBtn && <button className="mainBtn feedback-button" onClick={close}>
               Close
             </button>}
         </div>

@@ -2,7 +2,7 @@ namespace LL.Core.Models.Arguments;
 
 public class DeleteCourseWordModel
 {
-    public int ModuleId { get; set; }
+    public string ModuleId { get; set; }
     
-    public int WordId { get; set; }
+    public string WordId { get; set; }
 }

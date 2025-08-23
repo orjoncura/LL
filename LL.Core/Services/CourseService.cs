@@ -121,9 +121,9 @@ public class CourseService(
                 currentWords.Add(word);
 
             //If we hit limits → save group
-            if (currentSentences.Count >= 35 || currentWords.Count >= 100)
+            if (currentSentences.Count >= 20 || currentWords.Count >= 50)
             {
-                if (currentWords.Count >= 30) // only store if we have minimum words
+                if (currentWords.Count >= 20) // only store if we have minimum words
                 {
                     results.Add(new SentenceGroupResult
                     {

@@ -35,6 +35,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
     };
 
     useEffect(() => {
+     
       var sortedBasedOnAppearance:any = sortBasedOnAppearance(text, words);
       setFlashcards(sortedBasedOnAppearance)
       setCurrentFlashcard(sortedBasedOnAppearance[0]); 
@@ -63,10 +64,10 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
             setLoading(true); 
             
             const data: DeleteCourseWordModel = {
-                "moduleId": moduleId,
+                "moduleId": decodeURIComponent(moduleId || "" ),
                 "wordId": word.id
             };
-
+            
             POST('/Course/DeleteCourseWord', JSON.stringify(data))                
             .then(isSuccessfull => { 
 
@@ -78,7 +79,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                       setCurrentFlashcard(wordsList[index]) 
                 }
                 
-            }).finally(() => {setLoading(false)});
+            }).finally(() => setLoading(false));
           };
 
         showFeedback("Warning", "Would you like to archive '" + word.name + "'", fun);
@@ -116,7 +117,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
 
       if(text == null || wordsList.length == 0) return [];
 
-      wordsList = wordsList.filter(w => text.includes(w.name));
+      wordsList = wordsList.filter(w => text.includes(w.name) && w.name.length > 0 && w.translation && w.translation.length > 0);
 
       // Normalize the sample text: split into words and convert to lowercase without punctuation
       const normalizedText = text.split(/\s+/).map(word => word.trim().toLowerCase()).filter(word => word.length > 0);
@@ -272,7 +273,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         </div> }
 
       {loading && <SpinnerOverlay />}    
-      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} showCloseBtn={true} />
+      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} text={'OK'}  />
     </div>
   );
 };
