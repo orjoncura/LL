@@ -54,11 +54,16 @@ namespace LL.Core.Factories
                its definition and a raking based on how important is in a language.
                Return only a JSON file with the ranking and translations.
 
+               For Word:
+               Make sure the word is always in {1}
+
                For Translation:
 
                Do not translate it if it is a name of a person or a name of organisations and do not include special characters.
                If a word is part of another language (e.g., 'su vida'), split it into individual words ('su' and 'vida') unless separating them changes meaning (e.g., 'otra vez' remains together).
                Provide translations to {2} for each ranked word in the context they appear.
+               Make sure the translation is always in {2}
+
                Example:
 
                For ranking:

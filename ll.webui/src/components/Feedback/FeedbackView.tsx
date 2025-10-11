@@ -44,7 +44,7 @@ const FeedbackView = forwardRef<FeedbackViewRef, FeedbackViewProps>(
               </div>
             </div>
             {onClick && <button className="mainBtn feedback-button" onClick={confirm}>
-              {text}
+              {text || "OK"}
             </button>}
             {showCloseBtn && <button className="mainBtn feedback-button" onClick={close}>
               Close

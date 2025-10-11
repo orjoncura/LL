@@ -2,11 +2,7 @@ using LL.Core.Enums;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
-using LL.Core.Models.DataTransferObjects;
 using LL.Core.Models.Short;
-using LL.Core.Models.ViewModels;
-using LL.Core.Services;
-using LL.Extensions.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -26,9 +22,6 @@ namespace LL.Test.Services
             var mockTextToSpeechService = new Mock<ITextToSpeechService>();
             mockTextToSpeechService.Setup(service => service.CreateAudio(It.IsAny<string>(), LanguageEnum.English)).Returns([]);
             
-            var mockStorageService = new Mock<IStorageService>();
-            mockStorageService.Setup(service => service.SaveFile(It.IsAny<StorageModel>(), It.IsAny<byte[]>())).ReturnsAsync(string.Empty);
-            
             var mockDictionaryService = new Mock<IDictionaryService>();
             List<MeaningShort> meaningShorts = new List<MeaningShort>()
             {
@@ -45,7 +38,6 @@ namespace LL.Test.Services
             
             services.AddTransient<IAgentService>(_ => mockAgentService.Object);
             services.AddTransient<ITextToSpeechService>(_ => mockTextToSpeechService.Object);
-            services.AddTransient<IStorageService>(_ => mockStorageService.Object);
             services.AddTransient<IDictionaryService>(_ => mockDictionaryService.Object);
 
             courseService = services.BuildServiceProvider().GetRequiredService<ICourseService>();

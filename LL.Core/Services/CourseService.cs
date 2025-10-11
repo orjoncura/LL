@@ -5,6 +5,7 @@ using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
+using LL.Core.Model.DataTransferObjects;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
@@ -22,28 +23,27 @@ public class CourseService(
     ICourseWordRepository courseWordRepository,
     IAgentService agentService) : ICourseService
 {
-    
-    public class SentenceGroupResult
-    {
-        public List<string> Sentences { get; set; }
-        public List<string> Words { get; set; }  
-    }
-    
     public async Task<bool> CreateCourse(CourseRequestModel courseRequest, int userId)
     {
-        if(courseRequest.IsValid == false) 
+        if(!courseRequest.IsValid) 
             return false;
-        
+
         //Strip HTML & create the course.
-        var sentenceGroupResults = ProcessText(courseRequest.Text);
-        int courseId = courseRepository.Insert(courseRequest.Text, courseRequest.LanguageFromId, courseRequest.LanguageToId, userId);
+        List<SentenceGroupResult> sentenceGroupResults = ProcessText(courseRequest.Text);
+        
+        int courseId = courseRepository.Insert(
+            courseRequest.Title, 
+            courseRequest.Text,
+            courseRequest.LanguageFromId, 
+            courseRequest.LanguageToId, 
+            userId);
 
         //Get words that already exists in the database.
         var words = sentenceGroupResults.SelectMany(w => w.Words).ToList();
         var dbWords = wordRepository.GetRangeByText(words, courseRequest.LanguageFromId);
         
         //Create the first module with the keywords.
-        CreateKeyWordModule(dbWords, courseId, userId);
+        CreateKeyWordModule(dbWords, courseId, userId); 
         
         int index = 1;
         int sequence = 2;
@@ -202,8 +202,8 @@ public class CourseService(
 
             if (wordMeaningRepository.GetByWordId(wordShort.Id) == null)
             {
-                if (!Enum.TryParse(meaning.Type, true,
-                        out WordTypeEnum parsedValue)) // `true` for case-insensitive parsing
+                // `true` for case-insensitive parsing
+                if (!Enum.TryParse(meaning.Type, true, out WordTypeEnum parsedValue)) 
                     continue;
 
                 int wordMeaningId = wordMeaningRepository

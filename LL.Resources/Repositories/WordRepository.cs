@@ -2,7 +2,6 @@
 using LL.Core.Interfaces.Extensions;
 using LL.Resources.Contexts;
 using LL.Core.Interfaces.Repositories;
-using LL.Core.Models.DataTransferObjects;
 using LL.Core.Models.Short;
 using LL.Core.Models.ViewModels;
 using LL.Resources.Factories;
@@ -11,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LL.Resources.Repositories;
 public class WordRepository(AppDbContext db,
-    StorageModel storageModel, 
-    IStorageService storageService, 
     ITextToSpeechService textToSpeechService,
     IEncryptionService encryptionService) : IWordRepository
 {
@@ -48,16 +45,16 @@ public class WordRepository(AppDbContext db,
     }
     public MemoryStream? GetFileStreamById(string wordId)
     {
-        var word = db.Words.FirstOrDefault(w => w.Id == encryptionService.Decrypt(wordId));
+        var word = db.Words
+            .Include(word => word.Document)
+            .FirstOrDefault(w => w.Id == encryptionService.Decrypt(wordId));
 
         if (word == null)
             return null;
         
-        string audioPath = word.AudioPath;
-        
         var memoryStream = new MemoryStream();
         // Write audio data to memoryStream (replace with actual logic)
-        memoryStream.Write(storageService.GetFile(storageModel, audioPath).Result);
+        memoryStream.Write(word.Document?.Content);
         memoryStream.Seek(0, SeekOrigin.Begin);
 
         // Return memory stream as content
@@ -70,11 +67,18 @@ public class WordRepository(AppDbContext db,
         
         if (word == null)
         {
+            var document = new Document()
+            {
+                Content = textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)
+            };
+            
+            db.Add(document);
+            db.SaveChanges();
+            
             word = new Word
             { 
                 Name = name.Trim().ToLower(),
-                AudioPath = storageService
-                    .SaveFile(storageModel, textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)).Result,
+                DocumentId = document.Id,
                 LanguageId = languageId,
                 ImportanceRatingId = (int)ImportanceRatingEnum.Medium,
                 IsActive = true,

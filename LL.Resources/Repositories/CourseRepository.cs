@@ -9,7 +9,7 @@ namespace LL.Resources.Repositories;
 
 public class CourseRepository(AppDbContext db, IEncryptionService encryptionService) : ICourseRepository
 {
-    public int Insert(string value, int fromId, int toId, int userId)
+    public int Insert(string title, string value, int fromId, int toId, int userId)
     {
         Course? course = db.Courses.FirstOrDefault(c => c.Value == value && c.LanguageFromId == fromId && c.LanguageToId == toId && c.IsActive);
 
@@ -17,6 +17,7 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
         {
             course = new Course()
             {
+                Title = title,
                 Value = value,
                 LanguageFromId = fromId,
                 LanguageToId = toId,

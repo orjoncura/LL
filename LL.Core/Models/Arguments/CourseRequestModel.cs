@@ -4,6 +4,7 @@ namespace LL.Core.Models.Arguments;
 
 public class CourseRequestModel
 {
+    public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public int LanguageFromId { get; set; }
     public int LanguageToId { get; set; }

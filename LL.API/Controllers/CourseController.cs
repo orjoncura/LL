@@ -236,30 +236,5 @@ namespace LL.API.Controllers
                 return ErrorStatusCode;
             }
         }
-        
-        /// <summary>
-        /// Pass a wordId to get an audio for the selected word.
-        /// </summary>
-        /// <param name="wordId">The ID of the selected word</param>
-        /// <response code="200">A FileStreamResult that represents an audio file</response>
-        [HttpPost("StreamAudio")]
-        [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
-        public ActionResult StreamAudio(string wordId)
-        {
-            try
-            {
-                return new FileStreamResult(wordRepository.GetFileStreamById(wordId), "audio/wav");
-            }
-            catch (Exception ex)
-            {
-                var exceptionData = new Dictionary<string, object>();
-
-                exceptionData["wordId"] = wordId;
-
-                appMonitoringService.ExportError(ex, exceptionData);
-                
-                return ErrorStatusCode;
-            }
-        }
     }
 }

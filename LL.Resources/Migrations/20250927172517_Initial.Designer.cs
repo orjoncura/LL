@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LL.Resources.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250821121037_AddedUserDateCreated")]
-    partial class AddedUserDateCreated
+    [Migration("20250927172517_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,10 @@ namespace LL.Resources.Migrations
 
                     b.Property<int>("LanguageToId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("integer");
@@ -116,6 +120,23 @@ namespace LL.Resources.Migrations
                     b.HasIndex("WordId");
 
                     b.ToTable("CourseWords");
+                });
+
+            modelBuilder.Entity("LL.Resources.Models.Document", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("LL.Resources.Models.Exercise", b =>
@@ -779,15 +800,14 @@ namespace LL.Resources.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AudioPath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("CreatedById")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ImportanceRatingId")
                         .ValueGeneratedOnAdd()
@@ -807,6 +827,8 @@ namespace LL.Resources.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("DocumentId");
 
                     b.HasIndex("ImportanceRatingId");
 
@@ -1293,6 +1315,12 @@ namespace LL.Resources.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("LL.Resources.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("LL.Resources.Models.ImportanceRating", "ImportanceRating")
                         .WithMany()
                         .HasForeignKey("ImportanceRatingId")
@@ -1306,6 +1334,8 @@ namespace LL.Resources.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Document");
 
                     b.Navigation("ImportanceRating");
 

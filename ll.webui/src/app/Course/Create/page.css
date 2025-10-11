@@ -1,127 +1,70 @@
-:root {
-    --ring-offset-shadow: 0 0 #0000; /* Default offset shadow */
-    --ring-shadow: 0 0 #0000; /* Default ring shadow */
-    --tw-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06); /* Button shadow */
-  }
-  
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9; /* Light background for contrast */
-  }
-  
-  .center-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-.feedback-text {
+/* Center the box on the page */
+.center-container {
+  width: 100%;
   display: flex;
-  align-items: flex-start; /* Align text to the top */
-  gap: 12px; /* Add spacing between icon and text */
-  flex-grow: 1; /* Make the text section grow to fill available space */
-}
-
-.feedback-details {
-  line-height: 1.5; /* Proper line spacing for better readability */
-}
-
-.feedback-title {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 0;
-}
-
-.feedback-detail {
-  font-size: 0.875rem;
-  margin: 4px 0 0 0;
-  color: #a61d55; /* Slightly lighter pink for detail text */
-}
-
-.feedback-button {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  gap: 8px; /* Spacing between text and chevron */
-  padding: 12px 16px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  width: 100%; /* Button takes full width by default */
+  align-items: center;
 }
 
-.feedback-button:hover {
-  background-color: #e64980; /* Darker pink on hover */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+/* Outer bar */
+.search-bar {
+  color: inherit;
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  padding: 6px 10px;
+  margin: 15px;
 }
 
-.feedback-button:active {
-  background-color: #d63384; /* Even darker pink when active */
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Stronger shadow */
-}
-
-.chevron {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-@media (min-width: 640px) {
-  .feedback-button {
-    width: auto; /* Button shrinks to fit content on larger screens */
-    margin-left: auto; /* Aligns button to the right */
-  }
-}
-
-.mirror-textarea-container {
-  position: relative;
-  width: 100%;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px;
-  background: white;
-  overflow: hidden;
-  background: transparent;
-  margin-top: 30px;
-  margin-bottom: 10px;
-  box-shadow: 0 0 5px #ff00ff, 0 0 10px #00ffff;
-  max-height: 220px;
-  overflow-y: hidden;
-}
-
-/* Hidden div that determines height */
-.mirror-text {
-  visibility: hidden;
-  white-space: pre-wrap;   /* preserve newlines */
-  word-wrap: break-word;   /* wrap long words */
-  min-height: 1.4em;       /* at least one line */
-  background: transparent;
-}
-
-/* The actual textarea sits on top */
-.mirror-textarea-container textarea {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  resize: none;
-  overflow: hidden;
-  border: none;
-  outline: none;
-  font: inherit;
-  padding: 8px;
-  line-height: 1.4;
-  box-sizing: border-box;
-  overflow-y: auto; 
+/* Input text area */
+.search-input {
+  flex-grow: 1;
   color: inherit;
   background: transparent;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  padding: 10px 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
+/* Buttons (both + and ↑) */
+.search-button {
+  border: none;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  background-color: #d63384;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Upload button (left) */
+.plus-button {
+  font-weight: bold;
+}
+
+/* Submit button (right) */
+.submit-button {
+  background-color: #d63384;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #d63384;
+}
+
+.hidden-file-input {
+  display: none;
+}

@@ -1,33 +1,52 @@
 "use client";
-
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useRef, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import Flashcards from '@/components/Courses/Flashcards';
-import Multiselect from '@/components/Courses/Multiselect';
 import FeedbackView from '@/components/Feedback/FeedbackView';
-import { GET, POST, CreateAudio } from '@/utils/Security/httpClient'
+import { GET, POST } from '@/utils/Security/httpClient'
 import {CourseRequestModel, WordViewModel} from '@/utils/Models/models';
 import { SendLocalNotifications } from '@/utils/System/Notification'
-
+import { useToast } from '@/components/Toast/Toast'; 
+import '@/components/Feedback/FeedbackView.css'; 
 import './page.css'; 
 
-export default function CreateCourse() {
+const CreateCourse: React.FC = () => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [showKeyWords, setShowKeyWords] = useState(false);
+  const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
+  const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
+  const feedbackViewRef = useRef<any>(null); 
+  const [loading, setLoading] = useState(false);
+  const [fbTitle, setfbhTitle] = useState('');
+  const [fbBody, setfbhBody] = useState('');
+  const [showCourse, setShowCourse] = useState(false);
+  const [url, setURL] = useState<string>('');   
+  const [courseText, setCourseText] = useState<string>('');   
+  const { showToast, ToastContainer } = useToast();
 
-    const [showKeyWords, setShowKeyWords] = useState(false);
-    const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
-    const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
-    const [loading, setLoading] = useState(false);
-    const feedbackViewRef = useRef<any>(null); 
-    const [fbTitle, setfbhTitle] = useState('');
-    const [fbBody, setfbhBody] = useState('');
-    const [showCourse, setShowCourse] = useState(false);
-    const [courseText, setCourseText] = useState<string>('');   
+  const showFeedback = (title: string, body:string, onClick?: Function) => {
+      if (feedbackViewRef.current) {
 
-    const showFeedback = (title: string, body:string) => {
-            setfbhTitle(title);
-            setfbhBody(body);
-    };
+          setfbhTitle(title);
+          setfbhBody(body);
+
+          feedbackViewRef.current.open();
+      }
+  };
+
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'text/plain') {
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const fileText = event.target?.result as string;
+        setCourseText(fileText);
+      };
+      reader.readAsText(file);
+    } else {
+      showFeedback("Error", 'Please select a valid .txt file');
+    }
+  };
 
     const languageFromId = 2;
     const languageToId = 1;
@@ -62,29 +81,67 @@ export default function CreateCourse() {
 
         try {
 
-            setLoading(true);
-            if(courseText.length == 0)
+            if(courseText.length == 0 && url.length == 0)
             {
               showFeedback("Error", "Text can not be empty.");
               return;
             }
 
+            setLoading(true);
+
+            if(courseText == "" && url.length > 1){
+              const responseText = await GET('/Speech/SpeechToText?url=' + encodeURIComponent(url));
+              setCourseText(responseText);
+            }
+
             var textCleaned = courseText.replaceAll(/[\r\n]+/g, " ");
             startCourse(textCleaned);
 
-            const courseRequestModel: CourseRequestModel = {
-              "text": textCleaned,
-              "languageFromId": languageFromId,
-              "languageToId": languageToId
-            };
+            const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+            fetch(oembedUrl)
+            .then((res) => {
+              
+              if (!res.ok) {
+                showFeedback("Error", "Failed to fetch video info.");
+                setLoading(false);
+                return;
+              }
 
-            POST('/Course/Create', JSON.stringify(courseRequestModel))
-            .then((isSuccessful: boolean) => {
-      
-              if(isSuccessful)
-                SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-      
-            }).finally(() => setLoading(false));
+              return res.json()
+            })
+            .then((data: any) => {
+
+              if(courseText.length == 0) {
+                showFeedback("Error", "Please try again later.");
+                setLoading(false);
+                return;
+              }
+
+              const courseRequestModel: CourseRequestModel = {
+                "title": data.title,
+                "text": courseText,
+                "languageFromId": languageFromId,
+                "languageToId": languageToId
+              };
+
+              POST('/Course/Create', JSON.stringify(courseRequestModel))
+              .then((isSuccessful: boolean) => {
+        
+                if(isSuccessful)
+                  SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+        
+              });
+
+              showToast("Something exciting is coming… a brand new course for " + data.title + " is on the way!");
+            })
+            .catch((err) => {
+                showFeedback("Error", err.message);
+                setLoading(false);
+                return;
+            });
+
+            setCourseText("");
+            setLoading(false);
           
           } catch (error) {
 
@@ -112,53 +169,104 @@ export default function CreateCourse() {
       setLoading(kw.length == 0);
     }
       
-    return (
-      <div>
+    function getYouTubeEmbedUrl() : string {
+      try {
+        const urlObj = new URL(courseText);
 
-        <Navbar /> 
+        // Case 1: normal YouTube link
+        if (urlObj.hostname.includes("youtube.com")) {
+          return `https://www.youtube.com/embed/${urlObj.searchParams.get("v")}`;
+        }
 
-        <div className="container-flex">
-          <div className="container mt-4" style={{ marginBottom: "25%" }}>
-  
-            {showCourse == false && showKeyWords == false && ( 
-            <div className='glow-frame '>
-                <div  style={{textAlign: 'center'}}>
-                  <b className='mainTxt'>Transform your ideas into a unique and impactful learning experience</b>
-                  <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
-                        with your specific goals and needs.</label>
-                </div> 
+        // Case 2: short link (youtu.be)
+        if (urlObj.hostname.includes("youtu.be")) {
+          return `https://www.youtube.com/embed${urlObj.pathname}`;
+        }
 
-            <div className="mirror-textarea-container">
-                <div className="mirror-text">
-                  {courseText}
-                </div>
+        return ""; // not a YouTube URL
+      } catch {
+        return "";
+      }
+    }
 
-                <textarea 
-                  id='txtBar'
-                  value={courseText}
-                  placeholder='Enter your new idea here'
-                  onChange={e => setCourseText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                        handleSubmit();
-                    }}}
-
-                  className='mainTxt auto-textarea'
-                /> 
-            </div>
-
-            <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} text={"Confirm"} onClick={handleSubmit} isVisible={true} showCloseBtn={false} />
-            </div>
-            )}
-
-            {showKeyWords && (<Multiselect words={keyWords} onDone={() => {setShowKeyWords(false); setShowCourse(wordViewModels[0] != null); setLoading(false); }}/>)}
-            {showCourse && (<Flashcards text={courseText} words={wordViewModels} onDone={() => setShowCourse(false)}  />)}
-          </div>
-        </div>
-
-        {loading && <SpinnerOverlay />}
-        
-      </div>
-    );
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
+
+  return (
+    <div>
+
+      <Navbar /> 
+
+      <div className="center-container">
+        <div  style={{textAlign: 'center'}}>
+           <div >
+              <b className='mainTxt'>Transform your ideas into a unique and impactful learning experience</b>
+              <br></br>
+              <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
+                    with your specific goals and needs.</label>
+           </div> 
+          <br></br>
+          <div className="search-bar glow-frame">
+            <button
+              type="button"
+              className="search-button plus-button"
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload text file"
+            >
+              +
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt"
+              className="hidden-file-input mainTxt glow-frame"
+              onChange={handleFileSelect}
+            />
+
+            <input
+              type="text"
+              value={url}
+              onChange={e => setURL(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="www.youtube.com/watch?v=example"
+              className="search-input mainTxt"
+            />
+
+            <button
+              type="button"
+              className="search-button submit-button"
+              onClick={handleSubmit}
+              title="Submit"
+            >
+              ↑
+            </button>
+          </div>
+
+          {getYouTubeEmbedUrl() &&
+            <div className="flex justify-center p-4" style={{display: 'flex', justifyContent: 'center'}}>
+                <iframe
+                  className="rounded-2xl shadow-lg"
+                  width="560"
+                  height="315"
+                  src={getYouTubeEmbedUrl()}
+                  title="YouTube video preview"
+                allowFullScreen
+              ></iframe>
+            </div> }
+        </div>
+      </div>
+
+        <ToastContainer />
+        {loading && <SpinnerOverlay />}
+        <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody}/>
+
+    </div>
+  );
+};
+
+export default CreateCourse;

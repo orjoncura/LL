@@ -2,7 +2,6 @@ using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Model.DataTransferObjects;
-using LL.Core.Models.DataTransferObjects;
 using LL.Core.Services;
 using LL.Resources.Contexts;
 using LL.Resources.Repositories;
@@ -40,14 +39,12 @@ public static class Provider
         //Extensions
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<IAppMonitoringService, AppMonitoringService>();
-        services.AddScoped<IStorageService, StorageService>();
         services.AddScoped<ITextToSpeechService, TextToSpeechService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
 
         //Singletons
         services.AddSingleton(new TokenConfigModel(string.Empty,string.Empty,string.Empty,string.Empty));
         services.AddSingleton(new AgentModel(string.Empty, string.Empty));
-        services.AddSingleton(new StorageModel(string.Empty, string.Empty, string.Empty));
         
         //Database
         services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("LL_Local"));

@@ -15,13 +15,26 @@ namespace LL.Resources.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Content = table.Column<byte[]>(type: "bytea", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ImportanceRatings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Value = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -35,7 +48,7 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Value = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -49,7 +62,7 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Value = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -63,11 +76,25 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Value = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MessageStatuses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModuleTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModuleTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,7 +107,7 @@ namespace LL.Resources.Migrations
                     StackTrace = table.Column<string>(type: "text", nullable: false),
                     InternetProtocol = table.Column<string>(type: "text", nullable: false),
                     Data = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,7 +123,8 @@ namespace LL.Resources.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
                     Salt = table.Column<string>(type: "text", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -110,7 +138,7 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Value = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -123,12 +151,15 @@ namespace LL.Resources.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: false),
                     LanguageFromId = table.Column<int>(type: "integer", nullable: false),
                     LanguageToId = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    UpdatedById = table.Column<int>(type: "integer", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -151,6 +182,12 @@ namespace LL.Resources.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Courses_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -161,7 +198,7 @@ namespace LL.Resources.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IP = table.Column<string>(type: "text", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -185,7 +222,7 @@ namespace LL.Resources.Migrations
                     Subject = table.Column<string>(type: "text", nullable: false),
                     StatusId = table.Column<int>(type: "integer", nullable: false),
                     MessageContentId = table.Column<int>(type: "integer", nullable: false),
-                    DateSend = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    DateSend = table.Column<DateTime>(type: "timestamp", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -220,7 +257,7 @@ namespace LL.Resources.Migrations
                     IP = table.Column<string>(type: "text", nullable: false),
                     Token = table.Column<string>(type: "text", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -242,7 +279,7 @@ namespace LL.Resources.Migrations
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     IP = table.Column<string>(type: "text", nullable: false),
                     Token = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,7 +304,7 @@ namespace LL.Resources.Migrations
                     Salt = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -293,7 +330,7 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Token = table.Column<string>(type: "text", nullable: false),
-                    Expiration = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "timestamp", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -314,16 +351,22 @@ namespace LL.Resources.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    AudioPath = table.Column<string>(type: "text", nullable: false),
+                    DocumentId = table.Column<int>(type: "integer", nullable: false),
                     LanguageId = table.Column<int>(type: "integer", nullable: false),
                     ImportanceRatingId = table.Column<int>(type: "integer", nullable: false, defaultValue: 3),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Words", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Words_Documents_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Words_ImportanceRatings_ImportanceRatingId",
                         column: x => x.ImportanceRatingId,
@@ -345,6 +388,45 @@ namespace LL.Resources.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Modules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    TypeId = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
+                    Unlocked = table.Column<bool>(type: "boolean", nullable: false),
+                    Completed = table.Column<bool>(type: "boolean", nullable: false),
+                    Sequence = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedById = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Modules_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Modules_ModuleTypes_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "ModuleTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Modules_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MessageLogs",
                 columns: table => new
                 {
@@ -356,9 +438,9 @@ namespace LL.Resources.Migrations
                     Subject = table.Column<string>(type: "text", nullable: false),
                     StatusId = table.Column<int>(type: "integer", nullable: false),
                     MessageContentId = table.Column<int>(type: "integer", nullable: false),
-                    DateSend = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DateSend = table.Column<DateTime>(type: "timestamp", nullable: true),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -396,48 +478,6 @@ namespace LL.Resources.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CourseWords",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    WordId = table.Column<int>(type: "integer", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
-                    ImportanceRatingId = table.Column<int>(type: "integer", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CourseWords", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CourseWords_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CourseWords_ImportanceRatings_ImportanceRatingId",
-                        column: x => x.ImportanceRatingId,
-                        principalTable: "ImportanceRatings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CourseWords_Users_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CourseWords_Words_WordId",
-                        column: x => x.WordId,
-                        principalTable: "Words",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WordLinks",
                 columns: table => new
                 {
@@ -448,7 +488,7 @@ namespace LL.Resources.Migrations
                     LanguageId = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -477,7 +517,7 @@ namespace LL.Resources.Migrations
                     TypeId = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -503,30 +543,133 @@ namespace LL.Resources.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CourseWords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ModuleId = table.Column<int>(type: "integer", nullable: false),
+                    WordId = table.Column<int>(type: "integer", nullable: false),
+                    ImportanceRatingId = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedById = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    UpdatedById = table.Column<int>(type: "integer", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseWords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CourseWords_ImportanceRatings_ImportanceRatingId",
+                        column: x => x.ImportanceRatingId,
+                        principalTable: "ImportanceRatings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CourseWords_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CourseWords_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CourseWords_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CourseWords_Words_WordId",
+                        column: x => x.WordId,
+                        principalTable: "Words",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Exercises",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CourseWordId = table.Column<int>(type: "integer", nullable: false),
+                    ModuleId = table.Column<int>(type: "integer", nullable: false),
                     Original = table.Column<string>(type: "text", nullable: false),
                     Translated = table.Column<string>(type: "text", nullable: false),
                     Extra = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false),
+                    UpdatedById = table.Column<int>(type: "integer", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Exercises", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Exercises_CourseWords_CourseWordId",
-                        column: x => x.CourseWordId,
-                        principalTable: "CourseWords",
+                        name: "FK_Exercises_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Exercises_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Exercises_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModuleLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ModuleId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    TypeId = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
+                    Unlocked = table.Column<bool>(type: "boolean", nullable: false),
+                    Completed = table.Column<bool>(type: "boolean", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedById = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModuleLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModuleLogs_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ModuleLogs_ModuleTypes_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "ModuleTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ModuleLogs_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ModuleLogs_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -543,7 +686,7 @@ namespace LL.Resources.Migrations
                     WordMeaningId = table.Column<int>(type: "integer", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -564,31 +707,41 @@ namespace LL.Resources.Migrations
 
             migrationBuilder.InsertData(
                 table: "ImportanceRatings",
-                columns: new[] { "Id", "CreatedDate", "Value" },
+                columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 980, DateTimeKind.Unspecified).AddTicks(8466), new TimeSpan(0, 1, 0, 0, 0)), "High" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 980, DateTimeKind.Unspecified).AddTicks(8621), new TimeSpan(0, 1, 0, 0, 0)), "Medium" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 980, DateTimeKind.Unspecified).AddTicks(8647), new TimeSpan(0, 1, 0, 0, 0)), "Low" }
+                    { 1, "High" },
+                    { 2, "Medium" },
+                    { 3, "Low" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Languages",
-                columns: new[] { "Id", "CreatedDate", "Value" },
+                columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 974, DateTimeKind.Unspecified).AddTicks(4675), new TimeSpan(0, 1, 0, 0, 0)), "English" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 974, DateTimeKind.Unspecified).AddTicks(4868), new TimeSpan(0, 1, 0, 0, 0)), "Spanish" }
+                    { 1, "English" },
+                    { 2, "Spanish" }
                 });
 
             migrationBuilder.InsertData(
                 table: "MessageStatuses",
-                columns: new[] { "Id", "CreatedDate", "Value" },
+                columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 967, DateTimeKind.Unspecified).AddTicks(2027), new TimeSpan(0, 1, 0, 0, 0)), "Queued" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 973, DateTimeKind.Unspecified).AddTicks(2409), new TimeSpan(0, 1, 0, 0, 0)), "Sent" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 973, DateTimeKind.Unspecified).AddTicks(2600), new TimeSpan(0, 1, 0, 0, 0)), "Failed" }
+                    { 1, "Queued" },
+                    { 2, "Sent" },
+                    { 3, "Failed" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ModuleTypes",
+                columns: new[] { "Id", "Value" },
+                values: new object[,]
+                {
+                    { 1, "Flashcards" },
+                    { 2, "Exercises" },
+                    { 3, "Multiselect" }
                 });
 
             migrationBuilder.InsertData(
@@ -598,17 +751,17 @@ namespace LL.Resources.Migrations
 
             migrationBuilder.InsertData(
                 table: "WordTypes",
-                columns: new[] { "Id", "CreatedDate", "Value" },
+                columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { 1, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(5935), new TimeSpan(0, 1, 0, 0, 0)), "Noun" },
-                    { 2, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6098), new TimeSpan(0, 1, 0, 0, 0)), "Verb" },
-                    { 3, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6123), new TimeSpan(0, 1, 0, 0, 0)), "Adjective" },
-                    { 4, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6125), new TimeSpan(0, 1, 0, 0, 0)), "Adverb" },
-                    { 5, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6127), new TimeSpan(0, 1, 0, 0, 0)), "Interjection" },
-                    { 6, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6131), new TimeSpan(0, 1, 0, 0, 0)), "Preposition" },
-                    { 7, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6133), new TimeSpan(0, 1, 0, 0, 0)), "Pronoun" },
-                    { 8, new DateTimeOffset(new DateTime(2025, 6, 1, 11, 32, 29, 978, DateTimeKind.Unspecified).AddTicks(6135), new TimeSpan(0, 1, 0, 0, 0)), "Determiner" }
+                    { 1, "Noun" },
+                    { 2, "Verb" },
+                    { 3, "Adjective" },
+                    { 4, "Adverb" },
+                    { 5, "Interjection" },
+                    { 6, "Preposition" },
+                    { 7, "Pronoun" },
+                    { 8, "Determiner" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -627,9 +780,9 @@ namespace LL.Resources.Migrations
                 column: "LanguageToId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseWords_CourseId",
-                table: "CourseWords",
-                column: "CourseId");
+                name: "IX_Courses_UpdatedById",
+                table: "Courses",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseWords_CreatedById",
@@ -642,19 +795,34 @@ namespace LL.Resources.Migrations
                 column: "ImportanceRatingId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseWords_ModuleId",
+                table: "CourseWords",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseWords_UpdatedById",
+                table: "CourseWords",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CourseWords_WordId",
                 table: "CourseWords",
                 column: "WordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Exercises_CourseWordId",
-                table: "Exercises",
-                column: "CourseWordId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Exercises_CreatedById",
                 table: "Exercises",
                 column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_ModuleId",
+                table: "Exercises",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_UpdatedById",
+                table: "Exercises",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LoginHistory_CreatedById",
@@ -700,6 +868,41 @@ namespace LL.Resources.Migrations
                 name: "IX_Messages_StatusId",
                 table: "Messages",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModuleLogs_CourseId",
+                table: "ModuleLogs",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModuleLogs_CreatedById",
+                table: "ModuleLogs",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModuleLogs_ModuleId",
+                table: "ModuleLogs",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModuleLogs_TypeId",
+                table: "ModuleLogs",
+                column: "TypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_CourseId",
+                table: "Modules",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_CreatedById",
+                table: "Modules",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_TypeId",
+                table: "Modules",
+                column: "TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NewUserRequests_CreatedById",
@@ -767,6 +970,11 @@ namespace LL.Resources.Migrations
                 column: "CreatedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Words_DocumentId",
+                table: "Words",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Words_ImportanceRatingId",
                 table: "Words",
                 column: "ImportanceRatingId");
@@ -781,6 +989,9 @@ namespace LL.Resources.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CourseWords");
+
+            migrationBuilder.DropTable(
                 name: "Exercises");
 
             migrationBuilder.DropTable(
@@ -788,6 +999,9 @@ namespace LL.Resources.Migrations
 
             migrationBuilder.DropTable(
                 name: "MessageLogs");
+
+            migrationBuilder.DropTable(
+                name: "ModuleLogs");
 
             migrationBuilder.DropTable(
                 name: "NewUserRequests");
@@ -811,16 +1025,13 @@ namespace LL.Resources.Migrations
                 name: "WordLinks");
 
             migrationBuilder.DropTable(
-                name: "CourseWords");
-
-            migrationBuilder.DropTable(
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "WordMeanings");
+                name: "Modules");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "WordMeanings");
 
             migrationBuilder.DropTable(
                 name: "MessageContents");
@@ -829,10 +1040,19 @@ namespace LL.Resources.Migrations
                 name: "MessageStatuses");
 
             migrationBuilder.DropTable(
+                name: "Courses");
+
+            migrationBuilder.DropTable(
+                name: "ModuleTypes");
+
+            migrationBuilder.DropTable(
                 name: "WordTypes");
 
             migrationBuilder.DropTable(
                 name: "Words");
+
+            migrationBuilder.DropTable(
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "ImportanceRatings");

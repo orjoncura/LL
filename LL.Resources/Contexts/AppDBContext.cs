@@ -34,6 +34,7 @@ public class AppDbContext : DbContext
     public DbSet<WordMeaning> WordMeanings { get; set; }
     public DbSet<WordDefinition> WordDefinitions { get; set; }
     public DbSet<WordLink> WordLinks { get; set; }
+    public DbSet<Document> Documents { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
     
     public class DateTimeOffsetToUtcConverter : ValueConverter<DateTimeOffset, DateTime>
@@ -271,7 +272,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Word>(entity =>
         {
             entity.Property(ut => ut.Name).IsRequired();
-            entity.Property(ut => ut.AudioPath).IsRequired();
+            entity.Property(ut => ut.DocumentId).IsRequired();
             entity.Property(ut => ut.ImportanceRatingId).IsRequired()
                 .HasDefaultValue(ImportanceRatingEnum.Low);
             
@@ -280,6 +281,11 @@ public class AppDbContext : DbContext
             
             entity.Property(ut => ut.CreatedById).IsRequired();
 
+            entity.HasOne(ut => ut.Document)
+                .WithMany()
+                .HasForeignKey(ut => ut.DocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
             entity.HasOne(ut => ut.CreatedBy)
                 .WithMany()
                 .HasForeignKey(ut => ut.CreatedById)
@@ -376,6 +382,12 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(ut => ut.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.Property(ut => ut.Id).IsRequired();
+            entity.Property(ut => ut.Content).IsRequired();
         });
         
         modelBuilder.Entity<Course>(entity =>

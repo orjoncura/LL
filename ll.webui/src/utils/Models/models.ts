@@ -39,6 +39,7 @@ export interface ProblemDetails {
 }
 
 export interface CourseRequestModel {
+  title?: string;
   text?: string;
   languageFromId?: number;
   languageToId?: number;

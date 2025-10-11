@@ -24,7 +24,7 @@ export async function GET(url: string): Promise<any> {
 }
 
 export async function CreateAudio(id: string | undefined) {
-    return fetch(api + '/Course/StreamAudio?wordId=' + id, {
+    return fetch(api + '/Speech/TextToSpeech?wordId=' + id, {
         method: 'POST',
         headers: GetHeader()
     })
