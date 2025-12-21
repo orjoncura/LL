@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import { GET, POST } from '@/utils/Security/httpClient'
-import {CourseRequestModel, WordViewModel} from '@/utils/Models/models';
+import {CourseRequestModel, WordViewModel, VideoInfo} from '@/utils/Models/models';
 import { SendLocalNotifications } from '@/utils/System/Notification'
 import { useToast } from '@/components/Toast/Toast'; 
 import '@/components/Feedback/FeedbackView.css'; 
@@ -12,14 +12,11 @@ import './page.css';
 
 const CreateCourse: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [showKeyWords, setShowKeyWords] = useState(false);
   const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
-  const [wordViewModels, setWordViewModels] = useState<WordViewModel[]>([]);    
   const feedbackViewRef = useRef<any>(null); 
   const [loading, setLoading] = useState(false);
   const [fbTitle, setfbhTitle] = useState('');
   const [fbBody, setfbhBody] = useState('');
-  const [showCourse, setShowCourse] = useState(false);
   const [url, setURL] = useState<string>('');   
   const [courseText, setCourseText] = useState<string>('');   
   const { showToast, ToastContainer } = useToast();
@@ -51,15 +48,6 @@ const CreateCourse: React.FC = () => {
     const languageFromId = 2;
     const languageToId = 1;
 
-    useEffect(() => {
-
-      if(showKeyWords == false && loading == true && wordViewModels.length > 0){
-
-        setLoading(false);
-        setShowCourse(true)
-      }
-    }, [loading, showKeyWords, wordViewModels]);
-
     let hasFetchedData = false;
     useEffect(() => {
 
@@ -78,100 +66,65 @@ const CreateCourse: React.FC = () => {
     }, []);
 
     const handleSubmit = async () => {
+        setLoading(true);
 
         try {
+            if (courseText.length === 0 && url.length === 0) 
+                throw new Error("Text can not be empty.");
 
-            if(courseText.length == 0 && url.length == 0)
-            {
-              showFeedback("Error", "Text can not be empty.");
-              return;
-            }
+            var courseTitle: string = courseText.substring(0, 50);
+            
+            if (courseText.length === 0 && url.length > 0) {
 
-            setLoading(true);
+              const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
 
-            if(courseText == "" && url.length > 1){
-              const responseText = await GET('/Speech/SpeechToText?url=' + encodeURIComponent(url));
-              setCourseText(responseText);
-            }
-
-            var textCleaned = courseText.replaceAll(/[\r\n]+/g, " ");
-            startCourse(textCleaned);
-
-            const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-            fetch(oembedUrl)
-            .then((res) => {
-              
-              if (!res.ok) {
-                showFeedback("Error", "Failed to fetch video info.");
-                setLoading(false);
-                return;
+              // Check the status of the response
+              if (!response.ok) {
+                  throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
               }
 
-              return res.json()
-            })
-            .then((data: any) => {
+              const data: VideoInfo = await response.json();
 
-              if(courseText.length == 0) {
-                showFeedback("Error", "Please try again later.");
-                setLoading(false);
-                return;
-              }
+              courseTitle = data.title;
+            }
 
-              const courseRequestModel: CourseRequestModel = {
-                "title": data.title,
-                "text": courseText,
-                "languageFromId": languageFromId,
-                "languageToId": languageToId
-              };
+            const courseRequestModel: CourseRequestModel = {
+                title: courseTitle,
+                url: url,
+                text: courseText,
+                languageFromId: languageFromId,
+                languageToId: languageToId
+            };
 
-              POST('/Course/Create', JSON.stringify(courseRequestModel))
-              .then((isSuccessful: boolean) => {
-        
-                if(isSuccessful)
-                  SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-        
-              });
+            if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
+                throw new Error("Missing required field in course creation request");
 
-              showToast("Something exciting is coming… a brand new course for " + data.title + " is on the way!");
-            })
-            .catch((err) => {
-                showFeedback("Error", err.message);
-                setLoading(false);
-                return;
+            POST('/Course/Create', JSON.stringify(courseRequestModel))
+            .then((isSuccessful: boolean) => {
+      
+              if(isSuccessful)
+                SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+      
             });
 
-            setCourseText("");
-            setLoading(false);
-          
-          } catch (error) {
+            showToast("Something exciting is coming… a brand new course for " + courseTitle + " is on the way!");
 
-            setLoading(false);
-            console.error('Error making API call:', error);
+            setCourseText("");
+            setURL("");
+
+            //let wordList = text.split(" ");
+            //let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
+
+        } catch (error: any) {  
+            showFeedback("Error", error.message.substring(0, 100));
         }
+
+        setLoading(false);
     };
 
-    const startCourse = (text: string) => {
-
-      if(showCourse || showKeyWords)
-        return;
-
-      let wordList = text.split(" ");
-      let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
-
-
-      if(wordViewModels.length == 0){
-
-          const words = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 2);
-          setWordViewModels(prev => [...prev, ...words]);
-      }
-
-      setShowKeyWords(kw.length > 0);
-      setLoading(kw.length == 0);
-    }
-      
     function getYouTubeEmbedUrl() : string {
       try {
-        const urlObj = new URL(courseText);
+        const urlObj = new URL(url);
 
         // Case 1: normal YouTube link
         if (urlObj.hostname.includes("youtube.com")) {
@@ -223,7 +176,7 @@ const CreateCourse: React.FC = () => {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt"
+              accept=".txt, .tt"
               className="hidden-file-input mainTxt glow-frame"
               onChange={handleFileSelect}
             />

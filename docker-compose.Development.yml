@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   ll_data:
     image: postgres:15
@@ -9,20 +10,20 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - .docker/volumes/sql_data:/var/lib/postgresql/data    
+      - .docker/volumes/sql_data:/var/lib/postgresql/data
     networks:
       - bridge_net
 
   ll_api:
-      image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_api:1.0.0.0
-      container_name: ll_api
-      networks:
-        - bridge_net
-      depends_on:
-        - ll_data
-      env_file:
-        - .env.dev
-      ports:
+    image: orjoncura/ll_api:1.0.0.0
+    container_name: ll_api
+    networks:
+      - bridge_net
+    depends_on:
+      - ll_data
+    env_file:
+      - .env.dev
+    ports:
       - "5197:5000"
 
   deepseek:
@@ -30,11 +31,6 @@ services:
     container_name: deepseek
     ports:
       - "11434:11434"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
     runtime: nvidia
     environment:
       NVIDIA_VISIBLE_DEVICES: all
@@ -42,17 +38,23 @@ services:
       - ~/.docker/volumes/ollama_data:/root/.ollama
     networks:
       - bridge_net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
     restart: unless-stopped
 
-  ll_webui :
-    image: 677276107921.dkr.ecr.eu-west-2.amazonaws.com/ll_webui 
+  ll_webui:
+    image: orjoncura/ll_webui:1.0.0.0
     container_name: ll_webui
     networks:
       - bridge_net
     depends_on:
-      - ll_api 
+      - ll_api
     ports:
-      - "3000:3000" 
+      - "3000:3000"
 
 networks:
   bridge_net:

@@ -14,6 +14,7 @@ public static class DataFactory
         {
             Id = id,
             Text = course.Value,
+            IsCompleted = course.IsCompleted,
             CreatedDate = new DateTimeViewModel(course.CreatedDate) 
         };
     

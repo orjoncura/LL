@@ -12,6 +12,7 @@ public class Course
     public int LanguageToId { get; set; }
     public virtual Language? LanguageTo { get; set; }
     
+    public bool IsCompleted { get; set; }
     public bool IsActive { get; set; }
 
     public int CreatedById { get; set; }

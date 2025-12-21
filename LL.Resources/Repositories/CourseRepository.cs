@@ -32,6 +32,22 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
         
         return course.Id;
     }
+
+    public bool MarkCourseAsCompleted(int courseId)
+    {
+        Course? course = db.Courses.FirstOrDefault(c => c.Id == courseId && c.IsActive);
+
+        if (course != null)
+        {
+            course.IsCompleted = true;
+            db.Courses.Update(course);
+            db.SaveChanges();
+            
+            return true;
+        }
+        
+        return false;
+    }
     public bool DeleteCourseWord(string moduleId, string wordId, int userId)
     {
         CourseWord? courseWord = db.CourseWords.FirstOrDefault(c => 

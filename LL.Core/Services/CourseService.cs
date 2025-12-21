@@ -72,7 +72,7 @@ public class CourseService(
             index++;
         }
         
-        return true;
+        return courseRepository.MarkCourseAsCompleted(courseId);;
     }
     
     private List<SentenceGroupResult> ProcessText(string htmlText)

@@ -1,11 +1,13 @@
 # Step 1: Build the application
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_Version
-ENV NEXT_PUBLIC_Version=$NEXT_PUBLIC_Version
-ENV NEXT_PUBLIC_API_URL=https://api.fluente.dynv6.net
+ARG Version
+ARG API_URL
+
+ENV NEXT_PUBLIC_Version=$Version
+ENV NEXT_PUBLIC_API_URL=$API_URL
 
 # Install dependencies first (using a separate copy to take advantage of Docker cache)
 COPY package.json package-lock.json* yarn.lock* ./
@@ -18,7 +20,7 @@ COPY . .
 RUN yarn build || npm run build
 
 # Step 2: Run the application using a minimal image
-FROM node:18-alpine AS runner
+FROM node:18-slim AS runner
 
 # Set working directory
 WORKDIR /app
@@ -37,4 +39,5 @@ EXPOSE 3000
 
 # Start the app
 CMD ["node_modules/.bin/next", "start"]
+
 
