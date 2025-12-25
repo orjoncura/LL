@@ -56,6 +56,14 @@ services:
     ports:
       - "3000:3000"
 
+  whisper-api:
+    image: orjoncura/whisper-api:latest
+    container_name: whisper-api
+    networks:
+      - bridge_net
+    ports:
+      - "8000:8000"
+
 networks:
   bridge_net:
     driver: bridge

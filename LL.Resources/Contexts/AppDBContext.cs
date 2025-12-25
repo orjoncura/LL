@@ -33,26 +33,12 @@ public class AppDbContext : DbContext
     public DbSet<WordType> WordTypes { get; set; }
     public DbSet<WordMeaning> WordMeanings { get; set; }
     public DbSet<WordDefinition> WordDefinitions { get; set; }
+    public DbSet<WordDifficulty> WordDifficulties { get; set; }
+    public DbSet<WordDifficultyLog> WordDifficultyLogs { get; set; }
     public DbSet<WordLink> WordLinks { get; set; }
-    public DbSet<Document> Documents { get; set; }
+    public DbSet<ContentEntry> ContentEntries { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
     
-    public class DateTimeOffsetToUtcConverter : ValueConverter<DateTimeOffset, DateTime>
-    {
-        public DateTimeOffsetToUtcConverter()
-            : base(
-                v => DateTime.SpecifyKind(v.UtcDateTime, DateTimeKind.Unspecified),
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) 
-        { }
-    }
-
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-    {
-        configurationBuilder
-            .Properties<DateTimeOffset>()
-            .HaveConversion<DateTimeOffsetToUtcConverter>()
-            .HaveColumnType("timestamp"); // PostgreSQL: stores as UTC
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -384,7 +370,7 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
-        modelBuilder.Entity<Document>(entity =>
+        modelBuilder.Entity<ContentEntry>(entity =>
         {
             entity.Property(ut => ut.Id).IsRequired();
             entity.Property(ut => ut.Content).IsRequired();

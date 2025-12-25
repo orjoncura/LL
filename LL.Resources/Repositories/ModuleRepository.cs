@@ -38,6 +38,22 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
         {
             nextModule.Unlocked = true;
             db.Modules.Update(nextModule);
+            
+            var moduleLog = new ModuleLog()
+            {
+                ModuleId = nextModule.Id,
+                CourseId = nextModule.CourseId,
+                Title = nextModule.Title,
+                TypeId = nextModule.TypeId,
+                Unlocked = nextModule.Unlocked,
+                Completed = nextModule.Completed,
+                IsActive = nextModule.IsActive,
+                CreatedById = nextModule.CreatedById,
+                CreatedDate = DateTime.Now
+            };
+
+            db.Add(moduleLog);
+            db.SaveChanges();
         }
         
         db.Modules.Update(module);
@@ -59,7 +75,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
                 Sequence = sequence,
                 IsActive = true,
                 CreatedById = loginId,
-                CreatedDate = DateTimeOffset.Now
+                CreatedDate = DateTime.Now
             };
 
             db.Add(module);
@@ -75,7 +91,7 @@ public class ModuleRepository(AppDbContext db, IEncryptionService encryptionServ
                 Completed = false,
                 IsActive = true,
                 CreatedById = loginId,
-                CreatedDate = DateTimeOffset.Now
+                CreatedDate = DateTime.Now
             };
 
             db.Add(moduleLog);

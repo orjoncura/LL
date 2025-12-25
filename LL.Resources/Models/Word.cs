@@ -6,7 +6,7 @@ public class Word
     public string Name { get; set; } = string.Empty;
     
     public int DocumentId { get; set; }
-    public virtual Document? Document { get; set; }
+    public virtual ContentEntry? Document { get; set; }
     public int LanguageId { get; set; }
     public virtual Language? Language { get; set; }
     public int ImportanceRatingId { get; set; }
@@ -14,7 +14,7 @@ public class Word
     public bool IsActive { get; set; }
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
     
     public virtual List<WordMeaning> WordMeanings { get; set; }
 }

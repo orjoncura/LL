@@ -21,6 +21,7 @@ public class CourseService(
     IWordLinkRepository wordLinkRepository,
     IExerciseRepository exerciseRepository,
     ICourseWordRepository courseWordRepository,
+    ITranscriptionService transcriptionService,
     IAgentService agentService) : ICourseService
 {
     public async Task<bool> CreateCourse(CourseRequestModel courseRequest, int userId)
@@ -28,12 +29,19 @@ public class CourseService(
         if(!courseRequest.IsValid) 
             return false;
 
+        string htmlText = courseRequest.Text.Length > 0 
+            ? courseRequest.Text 
+            : await transcriptionService.TranscribeFromUrl(courseRequest.URL);
+        
+        //Strip HTML
+        string plainText = Regex.Replace(htmlText, "<.*?>", string.Empty);
+        
         //Strip HTML & create the course.
-        List<SentenceGroupResult> sentenceGroupResults = ProcessText(courseRequest.Text);
+        List<SentenceGroupResult> sentenceGroupResults = ProcessText(plainText);
         
         int courseId = courseRepository.Insert(
             courseRequest.Title, 
-            courseRequest.Text,
+            plainText,
             courseRequest.LanguageFromId, 
             courseRequest.LanguageToId, 
             userId);
@@ -75,11 +83,8 @@ public class CourseService(
         return courseRepository.MarkCourseAsCompleted(courseId);;
     }
     
-    private List<SentenceGroupResult> ProcessText(string htmlText)
+    private List<SentenceGroupResult> ProcessText(string plainText)
     {
-        //Strip HTML
-        string plainText = Regex.Replace(htmlText, "<.*?>", string.Empty);
-
         //Extract all unique words in order of first appearance
         var allWordsOrdered = Regex.Matches(plainText.ToLower(), @"\b[\w']+\b")
                                    .Select(m => m.Value)
@@ -154,7 +159,7 @@ public class CourseService(
             foreach (var w in currentWords)
                 usedWords.Add(w);
         }
-
+        
         return results;
     }
     private void CreateKeyWordModule(List<WordViewModel> wordViewModels, int courseId, int userId)

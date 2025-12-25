@@ -7,5 +7,5 @@ public class ServerError
     public string StackTrace { get; set; } = string.Empty;
     public string InternetProtocol { get; set; } = string.Empty;
     public string Data { get; set; } = string.Empty;
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 }

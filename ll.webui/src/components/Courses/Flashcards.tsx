@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, ReactNode, ReactElement } from 'react';
+import { useState, useRef, useEffect, ReactElement } from 'react';
 import { WordViewModel } from '@/utils/Models/models';
 import { POST, CreateAudio } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faBoxArchive } from '@fortawesome/free-solid-svg-icons';
-import { DeleteCourseWordModel } from '@/utils/Models/models';
+import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faBoxArchive, faSmile, faSadCry, faSadTear } from '@fortawesome/free-solid-svg-icons';
+import { DeleteCourseWordModel, SetWordDifficultyModel } from '@/utils/Models/models';
+import { ImportanceRatingEnum } from '@/utils/Models/Enums';
 
 import { motion } from "framer-motion";
 import FeedbackView from '@/components/Feedback/FeedbackView';
@@ -12,6 +13,7 @@ import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
 interface FlashcardsProps { text:string, words: WordViewModel[], moduleId?:string; onDone: (result: boolean) => void;}
+
 
 export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
@@ -24,6 +26,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
     const [fbTitle, setfbhTitle] = useState('');
     const [fbBody, setfbhBody] = useState('');
     const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
+    const [isRatingMode, setIsRatingMode] = useState<boolean>(false);
 
     const showFeedback = (title: string, body:string, onClick?: Function) => {
         if (feedbackViewRef.current) {
@@ -174,6 +177,25 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         </span>))
     }
   
+    const handleNextClick = (): void => {
+      setIsRatingMode(true);   
+    };
+
+    const handleFeedback = (importanceRating: ImportanceRatingEnum): void => {
+      setIsRatingMode(false);
+      navigateToFlashcardByIndex(flashcardIndex + 1);
+
+      if(currentFlashcard == null)
+        return;
+
+      const data: SetWordDifficultyModel = {
+          "difficultyId": importanceRating,
+          "wordId": currentFlashcard.id
+      };
+      
+      POST('/Course/SetWordDifficulty', JSON.stringify(data));
+    };
+
   return (
     <div>
       {currentFlashcard != null &&
@@ -238,8 +260,11 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
             ))
           ) : (<p>No meanings available</p> ))}
           
-          <div className="flashcardCon fixed-bottom" style={{justifyContent:"flex-end"}}>
-            <div className="row" style={{marginTop: "-5px"}} >
+        <div className="flashcardCon fixed-bottom" style={{ justifyContent: "flex-end" }}>
+          <div className="row" style={{ marginTop: "-5px" }}>
+
+            {!isRatingMode ? (
+              <>
                 <div className='buttonDiv'>
                   <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex - 1)}>
                     <FontAwesomeIcon icon={faSquareCaretLeft} />
@@ -247,13 +272,14 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                   <div className="button-label">Back</div>
                 </div>
 
-                {moduleId != null && 
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => archive(flashcardIndex)}>
-                    <FontAwesomeIcon icon={faBoxArchive} />
-                  </button>
-                  <div className="button-label">Archive</div>
-                </div>}
+                {moduleId != null &&
+                  <div className='buttonDiv'>
+                    <button className="icon-button mb-1" onClick={() => archive(flashcardIndex)}>
+                      <FontAwesomeIcon icon={faBoxArchive} />
+                    </button>
+                    <div className="button-label">Archive</div>
+                  </div>
+                }
 
                 <div className='buttonDiv'>
                   <button className="icon-button mb-1" onClick={() => CreateAudio(currentFlashcard.id)}>
@@ -263,13 +289,40 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                 </div>
 
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex + 1)}>
+                  <button className="icon-button mb-1" onClick={handleNextClick}>
                     <FontAwesomeIcon icon={faSquareCaretRight} />
                   </button>
                   <div className="button-label">Next</div>
                 </div>
-            </div>
+              </>
+            ) : (
+              <>
+                <div className='buttonDiv'>
+                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.Low)}>
+                    <FontAwesomeIcon icon={faSmile} />
+                  </button>
+                  <div className="button-label">Easy</div>
+                </div>
+                
+                <div className='buttonDiv'>
+                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.Medium)}>
+                    <FontAwesomeIcon icon={faSadTear} />
+                  </button>
+                  <div className="button-label">Medium</div>
+                </div>
+                
+                <div className='buttonDiv'>
+                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.High)}>
+                    <FontAwesomeIcon icon={faSadCry} />
+                  </button>
+                  <div className="button-label">Hard</div>
+                </div>
+              </>
+            )}
+
           </div>
+        </div>
+
         </div> }
 
       {loading && <SpinnerOverlay />}    

@@ -7,7 +7,7 @@ namespace LL.Resources.Repositories;
 
 public class NewUserRequestRepository(AppDbContext db, IEncryptionService encryptionService) : INewUserRequestRepository
 {
-    public bool HasReachedLimit(string email, DateTimeOffset date, int attemptsLimit) => 
+    public bool HasReachedLimit(string email, DateTime date, int attemptsLimit) => 
         db.NewUserRequests.Count(u => 
             u.Email == email 
             && u.CreatedDate.Date.Year == date.Year
@@ -28,7 +28,7 @@ public class NewUserRequestRepository(AppDbContext db, IEncryptionService encryp
             IP = ip,
             Token = encryptionService.GenerateSecureToken(),
             CreatedById = loginId,
-            CreatedDate = DateTimeOffset.Now,
+            CreatedDate = DateTime.Now,
         };
 
         db.Add(newUserRequest);

@@ -19,9 +19,9 @@ public class MessageLog
     public int MessageContentId { get; set; }
     public virtual MessageContent? MessageContent { get; set; }
     
-    public DateTimeOffset? DateSend { get; set; }
+    public DateTime? DateSend { get; set; }
     
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 }

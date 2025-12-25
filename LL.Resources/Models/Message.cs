@@ -16,5 +16,5 @@ public class Message
     public int MessageContentId { get; set; }
     public virtual MessageContent? MessageContent { get; set; }
     
-    public DateTimeOffset? DateSend { get; set; }
+    public DateTime? DateSend { get; set; }
 }

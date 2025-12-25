@@ -5,7 +5,7 @@ using LL.Resources.Models;
 
 public class ResetPasswordRequestRepository(AppDbContext db, IEncryptionService encryptionService) : IResetPasswordRequestRepository
 {
-    public bool HasReachedLimit(int userId, DateTimeOffset date, int attemptsLimit) => 
+    public bool HasReachedLimit(int userId, DateTime date, int attemptsLimit) => 
         db.ResetPasswordRequests.Count(u => 
             u.UserId == userId 
             && u.CreatedDate.Date.Year == date.Year

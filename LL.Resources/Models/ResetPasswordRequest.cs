@@ -9,5 +9,5 @@ public class ResetPasswordRequest
     
     public string IP { get; set; }
     public string Token { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }     
+    public DateTime CreatedDate { get; set; }     
 }

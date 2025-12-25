@@ -171,3 +171,8 @@
     flex-wrap: wrap;
     margin-top: 2%;
 }
+
+.feedback-buttons .icon-button:hover {
+  transform: scale(1.08);
+  transition: 0.15s ease-in-out;
+}

@@ -35,6 +35,7 @@ public static class Provider
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INewUserRequestRepository, NewUserRequestRepository>();
         services.AddScoped<IResetPasswordRequestRepository, ResetPasswordRequestRepository>();
+        services.AddScoped<IWordDifficultyRepository, WordDifficultyRepository>();
             
         //Extensions
         services.AddScoped<IAgentService, AgentService>();

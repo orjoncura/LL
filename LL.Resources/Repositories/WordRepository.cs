@@ -67,7 +67,7 @@ public class WordRepository(AppDbContext db,
         
         if (word == null)
         {
-            var document = new Document()
+            var document = new ContentEntry()
             {
                 Content = textToSpeechService.CreateAudio(name, (LanguageEnum)languageId)
             };

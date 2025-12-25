@@ -4,7 +4,8 @@ import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import { GET, POST } from '@/utils/Security/httpClient'
-import {CourseRequestModel, WordViewModel, VideoInfo} from '@/utils/Models/models';
+import { CourseRequestModel, WordViewModel, VideoInfo } from '@/utils/Models/models';
+import { LanguageEnum } from '@/utils/Models/Enums';
 import { SendLocalNotifications } from '@/utils/System/Notification'
 import { useToast } from '@/components/Toast/Toast'; 
 import '@/components/Feedback/FeedbackView.css'; 
@@ -45,16 +46,13 @@ const CreateCourse: React.FC = () => {
     }
   };
 
-    const languageFromId = 2;
-    const languageToId = 1;
-
     let hasFetchedData = false;
     useEffect(() => {
 
       if(hasFetchedData == false){
         hasFetchedData = true;
 
-        GET('/Course/GetKeyWords?languageId=' + languageFromId)
+        GET('/Course/GetKeyWords?languageId=' +  LanguageEnum.Spanish)
         .then((words: WordViewModel[]) => {
   
           if(words == null || words == undefined)
@@ -92,8 +90,8 @@ const CreateCourse: React.FC = () => {
                 title: courseTitle,
                 url: url,
                 text: courseText,
-                languageFromId: languageFromId,
-                languageToId: languageToId
+                languageFromId:  LanguageEnum.Spanish,
+                languageToId:  LanguageEnum.English
             };
 
             if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 

@@ -7,7 +7,7 @@ public class DateTimeViewModel
     public int Month { get; set; }
     
     public string AsString { get; set; }
-    public DateTimeViewModel(DateTimeOffset dateTime)
+    public DateTimeViewModel(DateTime dateTime)
     {
         Minute = dateTime.Minute;
         Day = dateTime.Day;

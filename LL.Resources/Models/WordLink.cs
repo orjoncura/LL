@@ -14,5 +14,5 @@ public class WordLink
 
     public int CreatedById { get; set; }
     public virtual User? CreatedBy { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 }

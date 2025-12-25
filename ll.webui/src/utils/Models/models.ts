@@ -1,4 +1,3 @@
-
 export interface ConfirmationModel {
   password: string;
   confirmPassword: string;
@@ -124,4 +123,10 @@ export interface VideoInfo {
     thumbnail_width: number;
     thumbnail_url: string;
     html: string;
+}
+
+export interface SetWordDifficultyModel {
+
+    wordId: string;
+    difficultyId: number;
 }

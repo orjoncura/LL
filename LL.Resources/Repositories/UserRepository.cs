@@ -89,7 +89,7 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
             Salt = hashPasswordModel.Salt,
             IsActive = true,
             CreatedById = loginId,
-            CreatedDate = DateTimeOffset.Now
+            CreatedDate = DateTime.Now
         };
 
         db.Add(userLog);
@@ -119,7 +119,7 @@ public class UserRepository(AppDbContext db, IEncryptionService encryptionServic
             PasswordHash = user.PasswordHash,
             IsActive = user.IsActive,
             CreatedById = loginId,
-            CreatedDate = DateTimeOffset.Now
+            CreatedDate = DateTime.Now
         };
 
         db.Add(userLog);

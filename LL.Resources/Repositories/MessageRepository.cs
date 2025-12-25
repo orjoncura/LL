@@ -14,7 +14,7 @@ public class MessageRepository(AppDbContext db)  : IMessageRepository
             var messageContent = new MessageContent()
             {
                 Value = content,
-                CreatedDate = DateTimeOffset.Now
+                CreatedDate = DateTime.Now
             };
 
             db.Add(messageContent);
@@ -43,7 +43,7 @@ public class MessageRepository(AppDbContext db)  : IMessageRepository
                 MessageContentId = messageContent.Id,
                 DateSend = null,
                 CreatedById = loginId,
-                CreatedDate = DateTimeOffset.Now
+                CreatedDate = DateTime.Now
             };
 
             db.Add(messageLog);

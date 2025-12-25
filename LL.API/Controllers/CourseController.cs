@@ -20,6 +20,7 @@ namespace LL.API.Controllers
         IModuleRepository  moduleRepository,
         IWordRepository wordRepository,
         IExerciseRepository exerciseRepository,
+        IWordDifficultyRepository wordDifficultyRepository,
         IAppMonitoringService appMonitoringService) : BaseController
     {
         /// <summary>
@@ -207,7 +208,7 @@ namespace LL.API.Controllers
                     exceptionData["wordId"] = model.WordId;
                 }
 
-                appMonitoringService.ExportError(ex);
+                appMonitoringService.ExportError(ex, exceptionData);
 
                 return ErrorStatusCode;
             }
@@ -218,7 +219,7 @@ namespace LL.API.Controllers
         /// </summary>
         /// <response code="200">Success/fail</response>
         [HttpGet("DeleteCourseById")]
-        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public ActionResult DeleteCourseById([FromQuery] string courseId)
         {
             try
@@ -231,8 +232,62 @@ namespace LL.API.Controllers
                 
                 exceptionData["courseId"] = courseId;
                 
-                appMonitoringService.ExportError(ex);
+                appMonitoringService.ExportError(ex, exceptionData);
 
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Set word difficulty for selected word by wordId.
+        /// It will create a record against the UserId.
+        /// </summary>
+        /// <response code="200">Success/fail</response>
+        [HttpPost("SetWordDifficulty")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public ActionResult SetWordDifficulty([FromBody] SetWordDifficultyModel model)
+        {
+            try
+            {       
+                return Ok(wordDifficultyRepository.SetWordDifficulty(model.DifficultyId, model.WordId, UserId));
+            }
+            catch (Exception ex)
+            {               
+                var exceptionData = new Dictionary<string, object>();
+
+                if (model != null)
+                {
+                    exceptionData["WordId"] = model.WordId;
+                    exceptionData["DifficultyId"] = model.DifficultyId;
+                }
+                
+                appMonitoringService.ExportError(ex, exceptionData);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Pass a wordId to get an audio for the selected word.
+        /// </summary>
+        /// <param name="wordId">The ID of the selected word</param>
+        /// <response code="200">A FileStreamResult that represents an audio file</response>
+        [HttpPost("StreamAudio")]
+        [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+        public ActionResult StreamAudio(string wordId)
+        {
+            try
+            {
+                return new FileStreamResult(wordRepository.GetFileStreamById(wordId), "audio/wav");
+            }
+            catch (Exception ex)
+            {
+                var exceptionData = new Dictionary<string, object>();
+
+                exceptionData["wordId"] = wordId;
+
+                appMonitoringService.ExportError(ex, exceptionData);
+                
                 return ErrorStatusCode;
             }
         }
