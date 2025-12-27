@@ -225,7 +225,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                     onDragStart={() => setIsDragging(true)}
                     onDragEnd={() => {
                       setIsDragging(false);
-                      navigateToFlashcardByIndex(flashcardIndex + 1);
+                      handleNextClick();
                     }}
                     whileTap={{ scale: 1.1 }}
                   >

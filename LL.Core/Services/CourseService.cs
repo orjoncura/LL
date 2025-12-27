@@ -48,7 +48,7 @@ public class CourseService(
 
         //Get words that already exists in the database.
         var words = sentenceGroupResults.SelectMany(w => w.Words).ToList();
-        var dbWords = wordRepository.GetRangeByText(words, courseRequest.LanguageFromId);
+        var dbWords = wordRepository.GetRangeByText(words, courseRequest.LanguageFromId, userId);
         
         //Create the first module with the keywords.
         CreateKeyWordModule(dbWords, courseId, userId); 

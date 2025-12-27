@@ -14,15 +14,27 @@ public class WordRepository(AppDbContext db,
     IEncryptionService encryptionService) : IWordRepository
 {
     
-    public List<WordViewModel> GetRangeByText(List<string> names, int languageId)
-    {
+    public List<WordViewModel> GetRangeByText(List<string> names, int languageId, int userId)
+    {        
+        //Exclude words that have been marked as "Easy" by the user
+        var wordDifficulties = 
+            db.WordDifficulties
+                .Where(w => 
+                    w.UserId == userId 
+                    && w.DifficultyId == (int)ImportanceRatingEnum.Low 
+                    && w.IsActive).Select(w => w.WordId).ToList();
+        
         var words = db.WordLinks
             .Include(w => w.Word)
             .Include(w => w.Word.WordMeanings)            
             .ThenInclude(w => w.WordDefinitions)
             .Include(w => w.Word.WordMeanings)
             .ThenInclude(w => w.Type)
-            .Where(w => names.Contains(w.Word.Name) && w.Word.LanguageId == languageId && w.IsActive).ToList()
+            .Where(w => 
+                names.Contains(w.Word.Name) 
+                && w.Word.LanguageId == languageId 
+                && !wordDifficulties.Contains(w.WordId)
+                && w.IsActive).ToList()
             .Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
         
         return words;
