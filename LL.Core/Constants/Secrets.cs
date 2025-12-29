@@ -22,7 +22,7 @@ public class Secrets
     
     public const string StorageName = "Storage:Name";
     
-    public const string GoogleCredentialsPath = "GoogleCredentialsPath";
+    public const string GoogleCredentialsJson = "GoogleCredentialsJson";
     
     public const string Version = "Version";
         
@@ -30,4 +30,5 @@ public class Secrets
     
     public const string EncryptionKey = "EncryptionKey";
     
+    public const string TranscriptionApi = "TranscriptionAPI";
 }

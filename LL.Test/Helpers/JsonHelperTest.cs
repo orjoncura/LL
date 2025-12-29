@@ -1,7 +1,9 @@
+using Google.GenAI.Types;
 using LL.Core.Helpers;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.ViewModels;
 using LL.Extensions.Models;
+using File = System.IO.File;
 
 namespace LL.Test.Helpers;
 
@@ -12,7 +14,7 @@ public class JsonHelperTest
     {
         string content = File.ReadAllText(@"../../../Files/CandidateExample.txt");
 
-        Candidate? candidate = JsonHelper.Extract<GeminiApiResponse>(content)?.Candidates?.FirstOrDefault();
+        Candidate? candidate = JsonHelper.Extract<GenerateContentResponse>(content)?.Candidates?.FirstOrDefault();
         
         Assert.True(candidate != null);
     }
@@ -22,7 +24,7 @@ public class JsonHelperTest
     {
         string content = File.ReadAllText(@"../../../Files/ExerciseViewModelJSON.txt");
 
-        Candidate? candidate = JsonHelper.Extract<GeminiApiResponse>(content)?.Candidates?.FirstOrDefault();
+        Candidate? candidate = JsonHelper.Extract<GenerateContentResponse>(content)?.Candidates?.FirstOrDefault();
         string output = candidate?.Content?.Parts?.Select(x => x.Text).Aggregate((x, y) => x + " " + y) ?? string.Empty;
 
         List<ExerciseViewModel>? exercises = JsonHelper.Extract<List<ExerciseViewModel>>(output)?.ToList();

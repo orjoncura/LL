@@ -1,7 +1,8 @@
-using System.Diagnostics;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.TextToSpeech.V1;
 using LL.Core.Constants;
 using LL.Core.Enums;
+using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using Microsoft.Extensions.Configuration;
 
@@ -11,10 +12,11 @@ public class TextToSpeechService(IConfiguration configuration) : ITextToSpeechSe
 {
     public byte[] CreateAudio(string text, LanguageEnum lang)
     {
-        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", configuration[Secrets.GoogleCredentialsPath]);
-
-        var client = TextToSpeechClient.Create();
-
+        var rawJson = configuration[Secrets.GoogleCredentialsJson] ?? string.Empty;
+        
+        var credentials = GoogleCredential.FromJson(rawJson);
+        var client = new TextToSpeechClientBuilder { Credential = credentials }.Build();
+        
         var input = new SynthesisInput
         {
             Text = text
