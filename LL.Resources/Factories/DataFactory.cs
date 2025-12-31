@@ -53,7 +53,7 @@ public static class DataFactory
             ImportanceRatingId = word.ImportanceRatingId
         };
     
-    public static MeaningShort Convert(WordMeaning wordMeaning) =>
+    private static MeaningShort Convert(WordMeaning wordMeaning) =>
         new()
         {
             Type = wordMeaning.Type.Value,
@@ -67,6 +67,6 @@ public static class DataFactory
             Name = wl.Word.Name, 
             Translation = wl.Value, 
             ImportanceRatingId = wl.Word.ImportanceRatingId,
-            Meanings = wl.Word.WordMeanings.Select(Convert).ToList()
+            Meanings = wl.Word.WordMeanings != null ? wl.Word.WordMeanings.Select(Convert).ToList() : null
         };
 }

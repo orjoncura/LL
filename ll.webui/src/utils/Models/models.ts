@@ -130,3 +130,9 @@ export interface SetWordDifficultyModel {
     wordId: string;
     difficultyId: number;
 }
+
+export interface GetWordsByDifficultyModel {
+
+    languageId: number;
+    difficultyId: number;
+}

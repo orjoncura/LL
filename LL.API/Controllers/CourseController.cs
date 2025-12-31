@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
-using LL.Core.Constants;
-using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
@@ -261,6 +259,62 @@ namespace LL.API.Controllers
                 if (model != null)
                 {
                     exceptionData["WordId"] = model.WordId;
+                    exceptionData["DifficultyId"] = model.DifficultyId;
+                }
+                
+                appMonitoringService.ExportError(ex, exceptionData);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Get a list of words by rating level for specific user
+        /// </summary>
+        /// <response code="200">Success/fail</response>
+        [HttpPost("GetWordsByDifficulty")]
+        [ProducesResponseType(typeof(List<WordViewModel>), StatusCodes.Status200OK)]
+        public ActionResult GetWordsByDifficulty([FromBody] GetWordsByDifficultyModel model)
+        {
+            try
+            {       
+                return Ok(wordDifficultyRepository.GetWordsByDifficulty(model.DifficultyId, model.LanguageId, UserId));
+            }
+            catch (Exception ex)
+            {               
+                var exceptionData = new Dictionary<string, object>();
+                
+                if (model != null)
+                {
+                    exceptionData["LanguageId"] = model.LanguageId;
+                    exceptionData["DifficultyId"] = model.DifficultyId;
+                }
+                
+                appMonitoringService.ExportError(ex, exceptionData);
+
+                return ErrorStatusCode;
+            }
+        }
+        
+        /// <summary>
+        /// Get a count of words by rating level for specific user
+        /// </summary>
+        /// <response code="200">Success/fail</response>
+        [HttpPost("GetWordCountByDifficulty")]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public ActionResult GetWordCountByDifficulty([FromBody] GetWordsByDifficultyModel model)
+        {
+            try
+            {       
+                return Ok(wordDifficultyRepository.GetWordCountByDifficulty(model.DifficultyId, model.LanguageId, UserId));
+            }
+            catch (Exception ex)
+            {               
+                var exceptionData = new Dictionary<string, object>();
+                
+                if (model != null)
+                {
+                    exceptionData["LanguageId"] = model.LanguageId;
                     exceptionData["DifficultyId"] = model.DifficultyId;
                 }
                 

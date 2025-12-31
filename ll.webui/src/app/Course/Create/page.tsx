@@ -19,6 +19,7 @@ const CreateCourse: React.FC = () => {
   const [fbTitle, setfbhTitle] = useState('');
   const [fbBody, setfbhBody] = useState('');
   const [url, setURL] = useState<string>('');   
+  const [courseTitle, setCourseTitle] = useState<string>('');   
   const [courseText, setCourseText] = useState<string>('');   
   const { showToast, ToastContainer } = useToast();
 
@@ -39,106 +40,107 @@ const CreateCourse: React.FC = () => {
       reader.onload = (event: ProgressEvent<FileReader>) => {
         const fileText = event.target?.result as string;
         setCourseText(fileText);
+        setURL(file.name);
+        setCourseTitle(file.name);
       };
       reader.readAsText(file);
     } else {
       showFeedback("Error", 'Please select a valid .txt file');
     }
+
+    e.target.value = "";
   };
 
-    let hasFetchedData = false;
-    useEffect(() => {
+  let hasFetchedData = false;
+  useEffect(() => {
 
-      if(hasFetchedData == false){
-        hasFetchedData = true;
+    if(hasFetchedData == false){
+      hasFetchedData = true;
 
-        GET('/Course/GetKeyWords?languageId=' +  LanguageEnum.Spanish)
-        .then((words: WordViewModel[]) => {
-  
-          if(words == null || words == undefined)
-            return;
-  
-          setKeyWords(words.filter(w => w.importanceRatingId == 1));
-        });
-      }
-    }, []);
+      GET('/Course/GetKeyWords?languageId=' +  LanguageEnum.Spanish)
+      .then((words: WordViewModel[]) => {
 
-    const handleSubmit = async () => {
-        setLoading(true);
+        if(words == null || words == undefined)
+          return;
 
-        try {
-            if (courseText.length === 0 && url.length === 0) 
-                throw new Error("Text can not be empty.");
+        setKeyWords(words.filter(w => w.importanceRatingId == 1));
+      });
+    }
+  }, []);
 
-            var courseTitle: string = courseText.substring(0, 50);
-            
-            if (courseText.length === 0 && url.length > 0) {
+  const handleSubmit = async () => {
+      setLoading(true);
 
-              const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+      try {
+          if (courseText.length === 0 && url.length === 0) 
+              throw new Error("Text can not be empty.");
+          
+          if (courseText.length === 0 && url.length > 0) {
 
-              // Check the status of the response
-              if (!response.ok) {
-                  throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
-              }
+            const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
 
-              const data: VideoInfo = await response.json();
-
-              courseTitle = data.title;
+            // Check the status of the response
+            if (!response.ok) {
+                throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
             }
 
-            const courseRequestModel: CourseRequestModel = {
-                title: courseTitle,
-                url: url,
-                text: courseText,
-                languageFromId:  LanguageEnum.Spanish,
-                languageToId:  LanguageEnum.English
-            };
+            const data: VideoInfo = await response.json();
+            setCourseTitle(data.title);
+          }
 
-            if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
-                throw new Error("Missing required field in course creation request");
+          const courseRequestModel: CourseRequestModel = {
+              title: courseTitle,
+              url: url,
+              text: courseText,
+              languageFromId:  LanguageEnum.Spanish,
+              languageToId:  LanguageEnum.English
+          };
 
-            POST('/Course/Create', JSON.stringify(courseRequestModel))
-            .then((isSuccessful: boolean) => {
-      
-              if(isSuccessful)
-                SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-      
-            });
+          if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
+              throw new Error("Missing required field in course creation request");
 
-            showToast("Something exciting is coming… a brand new course for " + courseTitle + " is on the way!");
+          POST('/Course/Create', JSON.stringify(courseRequestModel))
+          .then((isSuccessful: boolean) => {
+    
+            if(isSuccessful)
+              SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+    
+          });
 
-            setCourseText("");
-            setURL("");
+          showToast("Something exciting is coming… a brand new course for " + courseTitle + " is on the way!");
 
-            //let wordList = text.split(" ");
-            //let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
+          setCourseText("");
+          setURL("");
 
-        } catch (error: any) {  
-            showFeedback("Error", error.message.substring(0, 100));
-        }
+          //let wordList = text.split(" ");
+          //let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
 
-        setLoading(false);
-    };
-
-    function getYouTubeEmbedUrl() : string {
-      try {
-        const urlObj = new URL(url);
-
-        // Case 1: normal YouTube link
-        if (urlObj.hostname.includes("youtube.com")) {
-          return `https://www.youtube.com/embed/${urlObj.searchParams.get("v")}`;
-        }
-
-        // Case 2: short link (youtu.be)
-        if (urlObj.hostname.includes("youtu.be")) {
-          return `https://www.youtube.com/embed${urlObj.pathname}`;
-        }
-
-        return ""; // not a YouTube URL
-      } catch {
-        return "";
+      } catch (error: any) {  
+          showFeedback("Error", error.message.substring(0, 100));
       }
+
+      setLoading(false);
+  };
+
+  function getYouTubeEmbedUrl() : string {
+    try {
+      const urlObj = new URL(url);
+
+      // Case 1: normal YouTube link
+      if (urlObj.hostname.includes("youtube.com")) {
+        return `https://www.youtube.com/embed/${urlObj.searchParams.get("v")}`;
+      }
+
+      // Case 2: short link (youtu.be)
+      if (urlObj.hostname.includes("youtu.be")) {
+        return `https://www.youtube.com/embed${urlObj.pathname}`;
+      }
+
+      return ""; // not a YouTube URL
+    } catch {
+      return "";
     }
+  }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {

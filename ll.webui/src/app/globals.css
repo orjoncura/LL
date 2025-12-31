@@ -161,3 +161,8 @@ body {
   border: 3px solid transparent;
   animation: glow 2s infinite alternate;
 }
+
+.frame {
+  box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
+  border-radius: 6px;
+}

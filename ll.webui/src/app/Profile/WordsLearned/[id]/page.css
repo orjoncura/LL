@@ -1,0 +1,39 @@
+
+.word-page {
+  max-width: 600px;
+  margin: 40px auto;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-weight: bold;
+  padding: 10px 0;
+}
+
+.grid-header div {
+  padding-left: 12px;
+}
+
+.word-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: none;
+  overflow: hidden; /* ensures inner cells don’t overflow the rounded corners */
+}
+
+.cell {
+  padding: 10px 12px;
+}
+
+.cell:nth-child(2n) {
+  border-right: none;
+}
+
+

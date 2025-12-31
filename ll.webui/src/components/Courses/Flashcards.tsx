@@ -56,38 +56,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         setShowMeaning(false);
       }
     }
-    
-    const archive = (index:number) => {
-          
-          if(moduleId === null) return;
-
-          const word: WordViewModel = flashcards[index]
-
-          let fun = () => {
-            setLoading(true); 
-            
-            const data: DeleteCourseWordModel = {
-                "moduleId": decodeURIComponent(moduleId || "" ),
-                "wordId": word.id
-            };
-            
-            POST('/Course/DeleteCourseWord', JSON.stringify(data))                
-            .then(isSuccessfull => { 
-
-                if(isSuccessfull) {
-                    var wordsList = flashcards.filter(p => p.id !== word.id);
-                    setFlashcards(wordsList);
-
-                    if(wordsList[index] != null) 
-                      setCurrentFlashcard(wordsList[index]) 
-                }
-                
-            }).finally(() => setLoading(false));
-          };
-
-        showFeedback("Warning", "Would you like to archive '" + word.name + "'", fun);
-    }
-    
+        
     function highlightWord(word:string): ReactElement {
 
       if(!word) return <p></p>;
@@ -182,16 +151,38 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
     };
 
     const handleFeedback = (importanceRating: ImportanceRatingEnum): void => {
+
+      if(importanceRating == ImportanceRatingEnum.Low){
+
+        const word: WordViewModel = flashcards[flashcardIndex]
+
+        const data: DeleteCourseWordModel = {
+            "moduleId": decodeURIComponent(moduleId || "" ),
+            "wordId": word.id
+        };
+        
+        POST('/Course/DeleteCourseWord', JSON.stringify(data))                
+        .then(isSuccessfull => { 
+
+            if(isSuccessfull) {
+                var wordsList = flashcards.filter(p => p.id !== word.id);
+                setFlashcards(wordsList);
+
+                if(wordsList[flashcardIndex] != null) 
+                  setCurrentFlashcard(wordsList[flashcardIndex]) 
+            }
+            
+        }).finally(() => setLoading(false));
+
+      }
+
       setIsRatingMode(false);
       navigateToFlashcardByIndex(flashcardIndex + 1);
 
       if(currentFlashcard == null)
         return;
 
-      const data: SetWordDifficultyModel = {
-          "difficultyId": importanceRating,
-          "wordId": currentFlashcard.id
-      };
+      const data: SetWordDifficultyModel = {"difficultyId": importanceRating, "wordId": currentFlashcard.id};
       
       POST('/Course/SetWordDifficulty', JSON.stringify(data));
     };
@@ -226,6 +217,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                     onDragEnd={() => {
                       setIsDragging(false);
                       handleNextClick();
+                      navigateToFlashcardByIndex(flashcardIndex);
                     }}
                     whileTap={{ scale: 1.1 }}
                   >
@@ -271,15 +263,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                   </button>
                   <div className="button-label">Back</div>
                 </div>
-
-                {moduleId != null &&
-                  <div className='buttonDiv'>
-                    <button className="icon-button mb-1" onClick={() => archive(flashcardIndex)}>
-                      <FontAwesomeIcon icon={faBoxArchive} />
-                    </button>
-                    <div className="button-label">Archive</div>
-                  </div>
-                }
 
                 <div className='buttonDiv'>
                   <button className="icon-button mb-1" onClick={() => CreateAudio(currentFlashcard.id)}>

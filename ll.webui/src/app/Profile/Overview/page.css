@@ -125,3 +125,16 @@
   background: transparent;
 }
 
+.words-learned {
+  box-shadow: 0 0 5px #d63384, 0 0 10px #d63384;
+  padding: 16px;
+  border-radius: 6px;
+  background: transparent;
+  margin-bottom: 15px;
+}
+
+.words-learned a {
+  text-decoration: none;
+  color: inherit;
+}
+

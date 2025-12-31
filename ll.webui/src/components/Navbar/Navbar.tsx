@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
           <Link className='mainTxt' href="/Course/CourseList" prefetch={true}>Courses</Link>
         </li>
         <li>
-          <Link className='mainTxt' href="/Profile">Profile</Link>
+          <Link className='mainTxt' href="/Profile/Overview">Profile</Link>
         </li>
         <li>
           <button type="button" onClick={logout} className={`${styles.linkButton} mainTxt`}>Logout</button>
