@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { GET } from '@/utils/Security/httpClient'
+import { GetModulesByCourseId } from '@/utils/Controllers/CourseController'
 import { ModuleViewModel} from '@/utils/Models/models';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ export default function ModuleNavigator()  {
 
       setLoading(true);
 
-      GET('/Course/GetModulesByCourseId?courseId=' + params.id)
+      GetModulesByCourseId(params.id)
       .then((moduleViewModel: ModuleViewModel[]) => {
 
         if(moduleViewModel == null || moduleViewModel.length == 0)

@@ -3,7 +3,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import styles from './Navbar.module.css';
-import { POST } from '@/utils/Security/httpClient'
+import { LogOut } from '@/utils/Controllers/SecurityController'
 import { RemoveToken } from '@/utils/Security/AuthManager'
 
 const Navbar: React.FC = () => {
@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
         event.preventDefault();
 
         try {
-            POST('/Security/Logout', "")
+            LogOut()
                 .then(isSuccessfull => {
 
                     if (isSuccessfull) {

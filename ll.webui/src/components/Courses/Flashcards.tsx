@@ -1,41 +1,22 @@
-import { useState, useRef, useEffect, ReactElement } from 'react';
+import { useState, useEffect, ReactElement } from 'react';
 import { WordViewModel } from '@/utils/Models/models';
-import { POST, CreateAudio } from '@/utils/Security/httpClient'
+import { DeleteCourseWord, SetWordDifficulty, StreamAudio} from '@/utils/Controllers/CourseController'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faBoxArchive, faSmile, faSadCry, faSadTear } from '@fortawesome/free-solid-svg-icons';
-import { DeleteCourseWordModel, SetWordDifficultyModel } from '@/utils/Models/models';
+import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faSmile, faSadCry, faSadTear } from '@fortawesome/free-solid-svg-icons';
 import { ImportanceRatingEnum } from '@/utils/Models/Enums';
 
 import { motion } from "framer-motion";
-import FeedbackView from '@/components/Feedback/FeedbackView';
-import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import '@/components/Feedback/FeedbackView.css';
 import './Flashcards.css'; 
 
 interface FlashcardsProps { text:string, words: WordViewModel[], moduleId?:string; onDone: (result: boolean) => void;}
-
 
 export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
     const [flashcardIndex, setFlashcardIndex] = useState<number>(0);
     const [currentFlashcard, setCurrentFlashcard] = useState<WordViewModel>();
     const [isDragging, setIsDragging] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [showMeaning, setShowMeaning] = useState(false);
-    const feedbackViewRef = useRef<any>(null); 
-    const [fbTitle, setfbhTitle] = useState('');
-    const [fbBody, setfbhBody] = useState('');
-    const [onFeedBackViewClick, setOnFeedBackViewClick] = useState<(() => void) | undefined>(undefined);
-    const [isRatingMode, setIsRatingMode] = useState<boolean>(false);
-
-    const showFeedback = (title: string, body:string, onClick?: Function) => {
-        if (feedbackViewRef.current) {
-            setfbhTitle(title);
-            setfbhBody(body);
-            setOnFeedBackViewClick(() => onClick); 
-            feedbackViewRef.current.open();
-        }
-    };
 
     useEffect(() => {
      
@@ -76,7 +57,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                           style={{ textDecorationLine: 'underline', 
                           WebkitTextDecorationLine: 'underline',
                           cursor:'pointer', marginRight: 2}}
-                          onClick={() => CreateAudio(flashcard.id)}>
+                          onClick={() => StreamAudio(flashcard.id)}>
                       <button className="tooltip-button">{word}</button>
                       <div className="tooltip-content">{flashcard.translation}</div>
                   </span>
@@ -146,22 +127,13 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         </span>))
     }
   
-    const handleNextClick = (): void => {
-      setIsRatingMode(true);   
-    };
-
     const handleFeedback = (importanceRating: ImportanceRatingEnum): void => {
 
-      if(importanceRating == ImportanceRatingEnum.Low){
+        if(importanceRating == ImportanceRatingEnum.Low){
 
         const word: WordViewModel = flashcards[flashcardIndex]
 
-        const data: DeleteCourseWordModel = {
-            "moduleId": decodeURIComponent(moduleId || "" ),
-            "wordId": word.id
-        };
-        
-        POST('/Course/DeleteCourseWord', JSON.stringify(data))                
+        DeleteCourseWord(decodeURIComponent(moduleId || "" ), word.id)                
         .then(isSuccessfull => { 
 
             if(isSuccessfull) {
@@ -169,22 +141,20 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                 setFlashcards(wordsList);
 
                 if(wordsList[flashcardIndex] != null) 
-                  setCurrentFlashcard(wordsList[flashcardIndex]) 
+                  navigateToFlashcardByIndex(flashcardIndex);
+                else onDone(true);
             }
-            
-        }).finally(() => setLoading(false));
+        });
 
+      }else{
+
+        navigateToFlashcardByIndex(flashcardIndex + 1);
       }
-
-      setIsRatingMode(false);
-      navigateToFlashcardByIndex(flashcardIndex + 1);
 
       if(currentFlashcard == null)
         return;
 
-      const data: SetWordDifficultyModel = {"difficultyId": importanceRating, "wordId": currentFlashcard.id};
-      
-      POST('/Course/SetWordDifficulty', JSON.stringify(data));
+      SetWordDifficulty(importanceRating, currentFlashcard.id);
     };
 
   return (
@@ -216,12 +186,11 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                     onDragStart={() => setIsDragging(true)}
                     onDragEnd={() => {
                       setIsDragging(false);
-                      handleNextClick();
-                      navigateToFlashcardByIndex(flashcardIndex);
+                      navigateToFlashcardByIndex(flashcardIndex + 1);
                     }}
                     whileTap={{ scale: 1.1 }}
                   >
-                  <div className={`card-inner mainTxt ${showMeaning ? "flipped" : ""}`}>
+                  <div className={`card-inner mainTxt ${showMeaning && index == flashcardIndex ? "flipped" : ""}`}>
                     <div className="card-face">{card.name}</div>
                     <div className="card-face card-back">{card.translation}</div>
                   </div>
@@ -255,7 +224,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         <div className="flashcardCon fixed-bottom" style={{ justifyContent: "flex-end" }}>
           <div className="row" style={{ marginTop: "-5px" }}>
 
-            {!isRatingMode ? (
+            {!showMeaning ? (
               <>
                 <div className='buttonDiv'>
                   <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex - 1)}>
@@ -265,14 +234,14 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                 </div>
 
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => CreateAudio(currentFlashcard.id)}>
+                  <button className="icon-button mb-1" onClick={() => StreamAudio(currentFlashcard.id)}>
                     <FontAwesomeIcon icon={faVolumeUp} />
                   </button>
                   <div className="button-label">Audio</div>
                 </div>
 
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={handleNextClick}>
+                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex + 1)}>
                     <FontAwesomeIcon icon={faSquareCaretRight} />
                   </button>
                   <div className="button-label">Next</div>
@@ -307,9 +276,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         </div>
 
         </div> }
-
-      {loading && <SpinnerOverlay />}    
-      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} text={'OK'}  />
     </div>
   );
 };

@@ -6,7 +6,7 @@ import Multiselect from '@/components/Courses/Multiselect';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import { useState, useEffect, useRef } from 'react';
-import { GET } from '@/utils/Security/httpClient'
+import { MarkModuleAsComplete, GetCourseWords } from '@/utils/Controllers/CourseController'
 import { WordViewModel } from '@/utils/Models/models';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -37,7 +37,7 @@ export default function MultiselectPage()  {
     const OnComplete = async () => {
         
         setLoading(true);
-        GET('/Course/MarkModuleAsComplete?moduleId=' + params.id)
+        MarkModuleAsComplete(params.id)
         .catch(() => showFeedback("Error", "Something went wrong - Please try again later."))
         .finally(() => {router.back(); setLoading(false); });
 
@@ -51,7 +51,7 @@ export default function MultiselectPage()  {
 
             setLoading(true);
 
-            GET('/Course/GetCourseWords?moduleId=' + params.id)
+            GetCourseWords(params.id)
             .then((words: WordViewModel[]) => {
 
                 if(words == null || words.length == 0)

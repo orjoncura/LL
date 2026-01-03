@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import {POST} from "@/utils/Security/httpClient";
+import { CompleteUserRegistration as CompleteRegistration } from '@/utils/Controllers/SecurityController'
 import {IsValidPassword, IsValidEmail} from "@/utils/Security/Validators";
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
@@ -71,7 +71,7 @@ export default function CompleteUserRegistration() {
               };
               
               setLoading(true);
-              POST('/Security/CompleteUserRegistration', JSON.stringify(data))
+              CompleteRegistration(data)
                 .then(isSuccessfull => { 
 
                   if(isSuccessfull) {

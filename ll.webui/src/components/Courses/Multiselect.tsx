@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect} from 'react';
 import { WordViewModel } from '@/utils/Models/models';
-import { CreateAudio } from '@/utils/Security/httpClient'
+import { StreamAudio} from '@/utils/Controllers/CourseController'
 
 import './Multiselect.css'; 
 
@@ -86,7 +86,7 @@ export const Multiselect = ({ words, onDone }: MultiselectProps)  => {
         if (column === 1) {
 
         let keyWordId: string = words.filter(k => k.name == word)[0].id
-        CreateAudio(keyWordId)
+        StreamAudio(keyWordId)
         setActiveWord(word);
         setMessage(null);
         } else if (column === 2 && activeWord) {

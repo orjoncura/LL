@@ -4,9 +4,8 @@ import Button from 'react-bootstrap/Button';
 import React, {useState, useEffect, useRef, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import FeedbackView from '@/components/Feedback/FeedbackView';
+import { GetExercisesByModuleId, MarkModuleAsComplete } from '@/utils/Controllers/CourseController'
 
-import { GET } from '@/utils/Security/httpClient'
 import {ExerciseViewModel} from '@/utils/Models/models';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -40,7 +39,7 @@ export default function Exercises() {
 
         setLoading(true);
 
-        GET('/Course/GetExercisesByModuleId?moduleId=' + params.id)
+        GetExercisesByModuleId(params.id)
         .then((exerciseViewModels: ExerciseViewModel[]) => {
 
           if(exerciseViewModels == null || exerciseViewModels.length == 0)
@@ -64,7 +63,7 @@ export default function Exercises() {
       let options: string[] = [];
 
       if(newIndex >= exercises.length){
-        GET('/Course/MarkModuleAsComplete?moduleId=' + params.id)
+        MarkModuleAsComplete(params.id)
         .finally(() => {router.back();});
       }
 

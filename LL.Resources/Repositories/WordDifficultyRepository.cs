@@ -12,13 +12,13 @@ namespace LL.Resources.Repositories;
 
 public class WordDifficultyRepository(AppDbContext db, IEncryptionService encryptionService) : IWordDifficultyRepository
 {
-    public List<WordViewModel> GetWordsByDifficulty(int importanceRatingId, int languageId, int userId)
+    public List<WordViewModel> GetWordsByDifficulty(int difficultyId, int languageId, int userId)
     {
         var wordIds = 
             db.WordDifficultyLogs
                 .Where(w =>
                     w.CreatedById == userId
-                    && w.Word.ImportanceRatingId == importanceRatingId 
+                    && w.DifficultyId == difficultyId 
                     && w.Word.LanguageId == languageId
                     && w.IsActive
                     && w.Word.IsActive)
@@ -30,11 +30,11 @@ public class WordDifficultyRepository(AppDbContext db, IEncryptionService encryp
             .Where(w => wordIds.Contains(w.WordId)).ToList()
             .Select(wl => DataFactory.Convert(encryptionService.Encrypt(wl.WordId), wl)).ToList();
     }
-    public int GetWordCountByDifficulty(int importanceRatingId, int languageId, int userId)
+    public int GetWordCountByDifficulty(int difficultyId, int languageId, int userId)
     {
         return db.WordDifficultyLogs.Where(w =>
                 w.CreatedById == userId
-                && w.Word.ImportanceRatingId == importanceRatingId 
+                && w.DifficultyId == difficultyId 
                 && w.Word.LanguageId == languageId
                 && w.IsActive
                 && w.Word.IsActive)

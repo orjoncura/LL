@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import {POST} from "@/utils/Security/httpClient";
+import { CompletePasswordReset } from '@/utils/Controllers/SecurityController'
 import {IsValidPassword, IsValidEmail} from "@/utils/Security/Validators";
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
@@ -71,7 +71,7 @@ export default function CompleteResetPassword() {
               };
               
               setLoading(true);
-              POST('/Security/CompletePasswordReset', JSON.stringify(data))
+              CompletePasswordReset(data)
                 .then(isSuccessfull => { 
                   if(isSuccessfull) {
 

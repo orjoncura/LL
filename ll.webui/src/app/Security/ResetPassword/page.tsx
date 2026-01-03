@@ -2,7 +2,7 @@
 import React, {useState, useRef} from 'react';
 import { useRouter } from 'next/navigation'
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
-import {POST} from "@/utils/Security/httpClient";
+import { ResetPassword as Reset } from '@/utils/Controllers/SecurityController'
 import {getEnv} from '@/utils/Models/EnvironmentVariables';
 import {IsValidEmail} from "@/utils/Security/Validators";
 import FeedbackView from '../../../components/Feedback/FeedbackView';
@@ -39,7 +39,7 @@ export default function ResetPassword() {
             if(IsValidEmail(email)) {
 
                 setLoading(true);
-                POST('/Security/ResetPassword', JSON.stringify(email))
+                Reset(email)
                     .then(isSuccessfull => { 
 
                         if(isSuccessfull) {

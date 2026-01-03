@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 
 import { LanguageEnum } from '@/utils/Models/Enums';
-import { POST } from '@/utils/Security/httpClient'
+import { GetWordsByDifficulty } from '@/utils/Controllers/CourseController'
 import { WordViewModel } from '@/utils/Models/models';
 import { useParams } from 'next/navigation';
 
@@ -26,7 +26,8 @@ export default function WordsLearned() {
 
         setLoading(true);
 
-        POST('/Course/GetWordsByDifficulty', JSON.stringify({"languageId": LanguageEnum.Spanish, "difficultyId": params.id }) )
+        var difficultyId = +params.id;
+        GetWordsByDifficulty(LanguageEnum.Spanish, difficultyId)
         .then(words => setWords(words))
         .finally(() => setLoading(false));
       }

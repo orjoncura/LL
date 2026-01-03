@@ -6,10 +6,10 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import { useRouter } from 'next/navigation';
-import { GET } from '@/utils/Security/httpClient'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { CourseViewModel } from '@/utils/Models/models';
+import { GetCourses, DeleteCourseById } from '@/utils/Controllers/CourseController'
 import './page.css'; 
 
 export default function CourseList() {
@@ -40,7 +40,7 @@ export default function CourseList() {
       if(hasFetchedData == false){
         hasFetchedData = true;
 
-        GET('/Course/GetCourses')
+        GetCourses()
         .then((courseViewModels: CourseViewModel[]) => {
 
           if(courseViewModels == null || courseViewModels == undefined)
@@ -55,7 +55,7 @@ export default function CourseList() {
   const DeleteCourse = async (id: string) => {
       setLoading(true);
 
-      GET('/Course/DeleteCourseById?courseId=' + id)
+      DeleteCourseById(id)
       .then((hasBeenDeleted: boolean) => {
 
         if(hasBeenDeleted)

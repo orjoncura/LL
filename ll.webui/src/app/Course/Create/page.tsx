@@ -3,11 +3,13 @@ import React, { useRef, useState, useEffect, ChangeEvent, KeyboardEvent } from '
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
-import { GET, POST } from '@/utils/Security/httpClient'
+
 import { CourseRequestModel, WordViewModel, VideoInfo } from '@/utils/Models/models';
 import { LanguageEnum } from '@/utils/Models/Enums';
 import { SendLocalNotifications } from '@/utils/System/Notification'
 import { useToast } from '@/components/Toast/Toast'; 
+import { GetKeyWords, Create } from '@/utils/Controllers/CourseController'
+
 import '@/components/Feedback/FeedbackView.css'; 
 import './page.css'; 
 
@@ -57,7 +59,7 @@ const CreateCourse: React.FC = () => {
     if(hasFetchedData == false){
       hasFetchedData = true;
 
-      GET('/Course/GetKeyWords?languageId=' +  LanguageEnum.Spanish)
+      GetKeyWords(LanguageEnum.Spanish)
       .then((words: WordViewModel[]) => {
 
         if(words == null || words == undefined)
@@ -99,7 +101,7 @@ const CreateCourse: React.FC = () => {
           if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
               throw new Error("Missing required field in course creation request");
 
-          POST('/Course/Create', JSON.stringify(courseRequestModel))
+          Create(courseRequestModel)
           .then((isSuccessful: boolean) => {
     
             if(isSuccessful)

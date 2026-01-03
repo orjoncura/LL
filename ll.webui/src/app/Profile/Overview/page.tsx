@@ -6,8 +6,9 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 import Link from 'next/link';
 
-import { GET, POST } from '@/utils/Security/httpClient'
-import { ProfileViewModel, GetWordsByDifficultyModel } from '@/utils/Models/models';
+import { GetWordCountByDifficulty} from '@/utils/Controllers/CourseController'
+import { ResetPassword, GetProfileDetails } from '@/utils/Controllers/SecurityController'
+import { ProfileViewModel } from '@/utils/Models/models';
 import { ImportanceRatingEnum, LanguageEnum } from '@/utils/Models/Enums';
 import { IsValidEmail } from "@/utils/Security/Validators";
 
@@ -44,17 +45,16 @@ export default function Overview() {
 
         setLoading(true);
 
-        var url: string = '/Course/GetWordCountByDifficulty';
-        POST(url, JSON.stringify({"languageId": LanguageEnum.Spanish, "difficultyId": ImportanceRatingEnum.Low}))
+        GetWordCountByDifficulty(LanguageEnum.Spanish, ImportanceRatingEnum.Low)
         .then(wordCount => setEasyWordsLearned(wordCount));
 
-        POST(url, JSON.stringify({"languageId": LanguageEnum.Spanish, "difficultyId": ImportanceRatingEnum.Medium}))
+        GetWordCountByDifficulty(LanguageEnum.Spanish, ImportanceRatingEnum.Medium)
         .then(wordCount => setMediumWordsLearned(wordCount));
 
-        POST(url, JSON.stringify({"languageId": LanguageEnum.Spanish, "difficultyId": ImportanceRatingEnum.High}))
+        GetWordCountByDifficulty(LanguageEnum.Spanish, ImportanceRatingEnum.High)
         .then(wordCount => setHardWordsLearned(wordCount));
 
-        GET('/Security/GetProfileDetails')
+        GetProfileDetails()
         .then((profileViewModel: ProfileViewModel) => {
   
           if(profileViewModel == null || profileViewModel == undefined)
@@ -75,7 +75,7 @@ export default function Overview() {
             if(IsValidEmail(profile?.email)) {
 
                 setLoading(true);
-                POST('/Security/ResetPassword', JSON.stringify(profile?.email))
+                ResetPassword(profile?.email)
                     .then(isSuccessfull => { 
 
                         if(isSuccessfull) {

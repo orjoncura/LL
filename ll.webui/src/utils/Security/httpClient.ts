@@ -4,22 +4,22 @@ import {GetToken} from '@/utils/Security/AuthManager';
 
 const api = getEnv().API_URL || '';
 
-export async function POST(url: string, data: string): Promise<any> {
-    return await fetch(api + url, {
+export async function POST<T>(url: string, data: string): Promise<any> {
+    return fetch(api + url, {
         method: 'POST',
         headers: GetHeader(),
         body: data,
     })
-    .then(response => HandleApiResponse(response))
+    .then(response => HandleApiResponse<T>(response))
     .catch(error => HandleApiError(error));
 }
 
-export async function GET(url: string): Promise<any> {
+export async function GET<T>(url: string): Promise<any> {
     return fetch(api + url, {
         method: 'GET',
         headers: GetHeader()
     })
-    .then(response => HandleApiResponse(response))
+    .then(response => HandleApiResponse<T>(response))
     .catch(error => HandleApiError(error));
 }
 
@@ -56,7 +56,7 @@ function GetHeader(){
     return {'Authorization': `Bearer ${GetToken()}`, 'Content-Type': 'application/json',}
 }
 
-function HandleApiResponse(response: ApiResponse){
+function HandleApiResponse<T>(response: ApiResponse){
 
     try {
        if (response.status === 401) {
@@ -65,7 +65,7 @@ function HandleApiResponse(response: ApiResponse){
             console.log(`HTTP error! status: ${response.status}`);
             return null;
        }else if(response.ok){
-            return response.json()
+            return response.json() as Promise<T>;
        }
     } catch (e) {
        return null;

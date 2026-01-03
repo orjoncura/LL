@@ -2,11 +2,12 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useRouter } from 'next/navigation'
-import { POST } from '@/utils/Security/httpClient'
+import { Authenticate} from '@/utils/Controllers/SecurityController'
 import { StoreToken } from '@/utils/Security/AuthManager'
-import {getEnv} from '@/utils/Models/EnvironmentVariables';
+import { getEnv } from '@/utils/Models/EnvironmentVariables';
 import { IsValidEmail, IsValidPassword } from "@/utils/Security/Validators";
-import {LoginModel, TokenViewModel} from '@/utils/Models/models';
+import { TokenViewModel } from '@/utils/Models/models';
+
 import Link from 'next/link';
 import FeedbackView from '../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
@@ -55,13 +56,8 @@ export default function Login() {
                 return;
             }
   
-            const data: LoginModel = {
-                "email": email,
-                "password": password
-            };
-  
             setLoading(true);
-            POST('/Security/Authenticate', JSON.stringify(data))
+            Authenticate(email, password)
                 .then((tokenModel: TokenViewModel) => {
 
                     if (tokenModel.token != null && tokenModel.token.length > 1) {
