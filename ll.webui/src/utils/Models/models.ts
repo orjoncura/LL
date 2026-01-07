@@ -78,6 +78,7 @@ export interface DateTimeViewModel {
 
 export interface CourseViewModel {
   id: string;
+  title: string;
   text: string;
   createdDate: DateTimeViewModel;
 }

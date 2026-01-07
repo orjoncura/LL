@@ -90,6 +90,8 @@ const CreateCourse: React.FC = () => {
             setCourseTitle(data.title);
           }
 
+          console.log('courseTitle');
+          console.log(courseTitle);
           const courseRequestModel: CourseRequestModel = {
               title: courseTitle,
               url: url,
@@ -156,7 +158,7 @@ const CreateCourse: React.FC = () => {
 
       <Navbar /> 
 
-      <div className="center-container">
+      <div className="container">
         <div  style={{textAlign: 'center'}}>
            <div >
               <b className='mainTxt'>Transform your ideas into a unique and impactful learning experience</b>

@@ -13,6 +13,7 @@ public static class DataFactory
         new()
         {
             Id = id,
+            Title = course.Title,
             Text = course.Value,
             IsCompleted = course.IsCompleted,
             CreatedDate = new DateTimeViewModel(course.CreatedDate) 

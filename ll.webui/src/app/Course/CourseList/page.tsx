@@ -90,7 +90,7 @@ export default function CourseList() {
             <div className="course-card frame" onClick={() =>  navigateToModule(course)}>
               <div className="course-header">
                 <div className="course-title">
-                  {course.text.substring(0, 25)}  
+                  {course.title}  
                 </div>
                 <div className="course-date"><FontAwesomeIcon icon={faCalendar} className="icon" /> <span>{course.createdDate.asString}</span></div>
               </div>

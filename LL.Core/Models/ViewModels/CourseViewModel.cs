@@ -3,6 +3,7 @@
 public class CourseViewModel
 {
     public string Id { get; set; } 
+    public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public bool IsCompleted { get; set; }
     public DateTimeViewModel CreatedDate { get; set; }
