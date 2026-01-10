@@ -56,35 +56,33 @@ export default function Exercises() {
     
     const nextStep = (newIndex: number) => {
 
-      let exercise: ExerciseViewModel = exercises[newIndex];
-      setExercisesIndex(newIndex < exercises.length ? newIndex : 0);
-
-      let exerciseInCorrectOrder: string[] = [];
-      let options: string[] = [];
-
       if(newIndex >= exercises.length){
+        
+        setLoading(true);
         MarkModuleAsComplete(params.id)
         .finally(() => {router.back();});
-      }
 
-      if(exercise == null){
-
-        router.back();
-        
       }else{
+
+        let exercise: ExerciseViewModel = exercises[newIndex];
+        setExercisesIndex(newIndex < exercises.length ? newIndex : 0);
+
+        let exerciseInCorrectOrder: string[] = [];
+        let options: string[] = [];
+
 
         if(exercise.translated != null)
           exerciseInCorrectOrder = exercise.translated.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
 
         if(exercise.extra != null)
           options = exerciseInCorrectOrder.concat(exercise.extra.split(" ").map(w => w.replace(/[^a-zA-Z0-9]/g, '')));
+
+        setCorrectOrder(exerciseInCorrectOrder);
+        setOptions(shuffle(options));    
+        setSelectedWords([]);
+        setShowFeedback(false);
+        setExercises(exercises);
       }
-      
-      setCorrectOrder(exerciseInCorrectOrder);
-      setOptions(shuffle(options));    
-      setSelectedWords([]);
-      setShowFeedback(false);
-      setExercises(exercises);
     }
 
     function shuffle<T>(array: string[]): string[] {

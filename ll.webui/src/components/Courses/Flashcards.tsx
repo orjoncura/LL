@@ -14,7 +14,6 @@ interface FlashcardsProps { text:string, words: WordViewModel[], moduleId?:strin
 export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) => {
     const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
     const [flashcardIndex, setFlashcardIndex] = useState<number>(0);
-    const [currentFlashcard, setCurrentFlashcard] = useState<WordViewModel>();
     const [isDragging, setIsDragging] = useState(false);
     const [showMeaning, setShowMeaning] = useState(false);
 
@@ -22,7 +21,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
      
       var sortedBasedOnAppearance:any = sortBasedOnAppearance(text, words);
       setFlashcards(sortedBasedOnAppearance)
-      setCurrentFlashcard(sortedBasedOnAppearance[0]); 
     }, []);
     
     const navigateToFlashcardByIndex = (newIndex: number) => {
@@ -33,7 +31,6 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
       }else{
 
         setFlashcardIndex(newIndex);
-        setCurrentFlashcard(flashcards[newIndex]);
         setShowMeaning(false);
       }
     }
@@ -151,15 +148,15 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
         navigateToFlashcardByIndex(flashcardIndex + 1);
       }
 
-      if(currentFlashcard == null)
+      if(flashcards[flashcardIndex] == null)
         return;
 
-      SetWordDifficulty(importanceRating, currentFlashcard.id);
+      SetWordDifficulty(importanceRating, flashcards[flashcardIndex].id);
     };
 
   return (
     <div>
-      {currentFlashcard != null &&
+      {flashcards[flashcardIndex] != null &&
         <div className="container">
             <div className="mt-4">
               <div className="d-flex">
@@ -204,8 +201,8 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
               {findSentencesByWord(text)}
             </div>}
 
-            {showMeaning && (currentFlashcard.meanings && currentFlashcard.meanings.length > 0 ? (
-              currentFlashcard.meanings.map((meaning) => (
+            {showMeaning && (flashcards[flashcardIndex].meanings && flashcards[flashcardIndex].meanings.length > 0 ? (
+              flashcards[flashcardIndex].meanings.map((meaning) => (
               <div key={flashcardIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
                 <h3>{meaning.type}</h3>
                 <ul>
@@ -234,7 +231,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                 </div>
 
                 <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => StreamAudio(currentFlashcard.id)}>
+                  <button className="icon-button mb-1" onClick={() => StreamAudio(flashcards[flashcardIndex].id)}>
                     <FontAwesomeIcon icon={faVolumeUp} />
                   </button>
                   <div className="button-label">Audio</div>
