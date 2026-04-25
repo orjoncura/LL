@@ -47,7 +47,12 @@ namespace LL.API.Configs
                 config[Secrets.JwtAudience],
                 config[Secrets.JwtExpiryMinutes]));
 
-            services.AddSingleton(new AgentModel(config[Secrets.GeminiAPI], config[Secrets.LLamaLocation]));
+            services.AddSingleton(new AgentModel(
+                config[Secrets.GeminiAPI] ?? string.Empty,
+                config[Secrets.LLamaLocation] ?? string.Empty,
+                config[Secrets.LocalModelName] ?? "qwen2.5:14b",
+                config[Secrets.OfflineModelName] ?? "qwen2.5:1.5b",
+                config[Secrets.AgentMode] ?? "online"));
             
             return services;
         }

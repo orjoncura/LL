@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Google.GenAI;
+﻿using Google.GenAI;
 using Google.GenAI.Types;
-using LL.Core.Helpers;
 using LL.Core.Interfaces.Extensions;
 using LL.Extensions.Models;
 using LL.Core.Model.DataTransferObjects;
@@ -12,6 +9,14 @@ namespace LL.Resources.Services;
 
 public class AgentService(AgentModel agentModel) : IAgentService
 {
+    private Uri GetOllamaUri()
+    {
+        if (Uri.TryCreate(agentModel.LLamaModeLocation, UriKind.Absolute, out var configuredUri))
+            return configuredUri;
+
+        return new Uri("http://localhost:11434");
+    }
+
     private async Task<string> RunGeminiApi(string input)
     {
         var client = new Client(apiKey: agentModel.GeminiAPI);
@@ -23,9 +28,9 @@ public class AgentService(AgentModel agentModel) : IAgentService
         // Read the response
         return output;
     }
-    private async Task<string> RunLocalOllama(string input)
+    private async Task<string> RunOllama(string input, string modelName)
     { 
-        IChatClient chatClient =  new OllamaChatClient(new Uri(agentModel.LLamaModeLocation), "qwen2.5:14b");
+        IChatClient chatClient =  new OllamaChatClient(GetOllamaUri(), modelName);
         
         List<ChatMessage> chatHistory = new();
 
@@ -44,12 +49,26 @@ public class AgentService(AgentModel agentModel) : IAgentService
         }
     }
 
+    private Task<string> RunLocalOllama(string input) => RunOllama(input, agentModel.LocalModelName);
+    
+    private Task<string> RunOfflineOllama(string input) => RunOllama(input, agentModel.OfflineModelName);
+
     public async Task<string> Run(string input)
     {
-        if (string.IsNullOrWhiteSpace(agentModel.GeminiAPI))
-            return await RunLocalOllama(input);
-        
-        return await RunGeminiApi(input);
+        switch (agentModel.Mode)
+        {
+            case "online":
+                if (string.IsNullOrWhiteSpace(agentModel.GeminiAPI))
+                    throw new InvalidOperationException("Agent:GeminiAPI is required when Agent:Mode is 'online'.");
+                
+                return await RunGeminiApi(input);
+            case "localhost":
+                return await RunLocalOllama(input);
+            case "offline":
+                return await RunOfflineOllama(input);
+            default:
+                throw new InvalidOperationException("Agent:Mode must be one of: online, localhost, offline.");
+        }
     } 
 }
 

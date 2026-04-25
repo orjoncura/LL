@@ -8,6 +8,12 @@ public class Secrets
     
     public const string LLamaLocation = "Agent:LLamaLocation";
     
+    public const string LocalModelName = "Agent:LocalModelName";
+    
+    public const string OfflineModelName = "Agent:OfflineModelName";
+    
+    public const string AgentMode = "Agent:Mode";
+    
     public const string JwtKey = "Jwt:Key";
     
     public const string JwtIssuer = "Jwt:Issuer";

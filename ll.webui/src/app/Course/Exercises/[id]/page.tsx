@@ -1,7 +1,7 @@
 "use client";
 
 import Button from 'react-bootstrap/Button';
-import React, {useState, useEffect, useRef, CSSProperties} from 'react';
+import React, {useState, useEffect, CSSProperties} from 'react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import { GetExercisesByModuleId, MarkModuleAsComplete } from '@/utils/Controllers/CourseController'
@@ -43,7 +43,10 @@ export default function Exercises() {
         .then((exerciseViewModels: ExerciseViewModel[]) => {
 
           if(exerciseViewModels == null || exerciseViewModels.length == 0)
-            return;
+          {
+            setLoading(true);
+            MarkModuleAsComplete(params.id).finally(() => {router.back();});
+          }
 
           exerciseViewModels.forEach(e => exercises.push(e));
 

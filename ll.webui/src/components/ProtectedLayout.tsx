@@ -3,11 +3,20 @@
 import { useEffect, useState } from 'react';
 import { GetToken } from '@/utils/Security/AuthManager'
 import ServiceWorkerRegistration from './System/ServiceWorkerRegistration';
+import { SyncOfflineQueue } from '@/utils/Security/httpClient';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);
 
-  useEffect(() => { setHasMounted(true); }, []);
+  useEffect(() => {
+    setHasMounted(true);
+
+    const handleOnline = () => { void SyncOfflineQueue(); };
+    window.addEventListener('online', handleOnline);
+    void SyncOfflineQueue();
+
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   if (!hasMounted) return null; 
 

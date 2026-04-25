@@ -10,6 +10,7 @@ public class ExerciseRepository(AppDbContext db, IEncryptionService encryptionSe
 {
     public List<ExerciseViewModel> GetByModuleId(string moduleId)
     {
+        var t = encryptionService.Decrypt(moduleId);
         List<Exercise> exercises = db.Exercises.Where(e => e.ModuleId == encryptionService.Decrypt(moduleId) && e.IsActive).ToList();
         List<ExerciseViewModel> exerciseViewModels = exercises.Any() 
             ? exercises.Select(e => DataFactory.Convert(encryptionService.Encrypt(e.Id), e)).ToList() : [];

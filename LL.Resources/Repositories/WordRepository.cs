@@ -73,7 +73,7 @@ public class WordRepository(AppDbContext db,
         return memoryStream;
     }
     
-    public WordShort Insert(string name, int languageId, int userId)
+    public WordShort Insert(string name, int languageId, int userId, int rating = (int)ImportanceRatingEnum.Medium)
     {
         Word? word = GetSingleByName(name, languageId);
         
@@ -92,7 +92,7 @@ public class WordRepository(AppDbContext db,
                 Name = name.Trim().ToLower(),
                 DocumentId = document.Id,
                 LanguageId = languageId,
-                ImportanceRatingId = (int)ImportanceRatingEnum.Medium,
+                ImportanceRatingId = rating,
                 IsActive = true,
                 CreatedById = userId,
                 CreatedDate = DateTime.Now,

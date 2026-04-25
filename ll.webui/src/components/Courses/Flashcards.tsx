@@ -2,7 +2,7 @@ import { useState, useEffect, ReactElement } from 'react';
 import { WordViewModel } from '@/utils/Models/models';
 import { DeleteCourseWord, SetWordDifficulty, StreamAudio} from '@/utils/Controllers/CourseController'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faSmile, faSadCry, faSadTear } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faSmile, faSadCry, faSadTear, faL } from '@fortawesome/free-solid-svg-icons';
 import { ImportanceRatingEnum } from '@/utils/Models/Enums';
 
 import { motion } from "framer-motion";
@@ -154,6 +154,15 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
       SetWordDifficulty(importanceRating, flashcards[flashcardIndex].id);
     };
 
+    const onFlashcardClicked = (): void => {
+
+      setIsDragging(!isDragging);
+      setShowMeaning(!showMeaning);
+
+      if(showMeaning == false)
+        StreamAudio(flashcards[flashcardIndex].id);
+    }
+
   return (
     <div>
       {flashcards[flashcardIndex] != null &&
@@ -179,7 +188,7 @@ export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) =
                     drag
                     dragElastic={1}
                     style={{ zIndex: flashcards.length - index  }}
-                    onClick={() => !isDragging && setShowMeaning(!showMeaning)}
+                    onClick={onFlashcardClicked}
                     onDragStart={() => setIsDragging(true)}
                     onDragEnd={() => {
                       setIsDragging(false);

@@ -1,6 +1,6 @@
 using LL.API.Configs;
 using LL.Core.Constants;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 internal class Program
 {
