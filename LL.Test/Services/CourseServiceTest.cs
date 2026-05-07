@@ -3,17 +3,24 @@ using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Core.Models.Short;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace LL.Test.Services
 {
     public class CourseServiceTest
-    {
+    {   
+        private readonly Mock<IConfiguration> _mockConfiguration;
         private ICourseService courseService { get; set; }
         public CourseServiceTest()
         { 
+            _mockConfiguration = new Mock<IConfiguration>();
+            _mockConfiguration.Setup(c => c["Course:ServiceUrl"]).Returns("https://api.example.com");
+            _mockConfiguration.Setup(c => c["Course:ApiKey"]).Returns("test-api-key");
+            
             var services = Provider.GetRequiredService();
+            services.AddSingleton(_mockConfiguration.Object);
             
             var mockAgentService = new Mock<IAgentService>();
             var expectedResult = "[{\"Word\":\"Creo\",\"Importance\":1}]";

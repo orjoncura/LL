@@ -1,7 +1,11 @@
 using LL.Core.Enums;
+using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
 using LL.Resources.Contexts;
 using LL.Resources.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 
 namespace LL.Test.Repositories;
 
@@ -11,11 +15,29 @@ public class WordLinkRepositoryTest
     private IWordLinkRepository _wordLinkRepository { get; set; }
     private AppDbContext _dbContext { get; set; }
 
+    private readonly Mock<ITextToSpeechService> _mockTextToSpeechService;
+
     public WordLinkRepositoryTest()
     {
-        _wordRepository = Provider.GetRequiredService<IWordRepository>();
-        _wordLinkRepository = Provider.GetRequiredService<IWordLinkRepository>();
-        _dbContext = Provider.GetRequiredService<AppDbContext>();
+        // Create a mock for TextToSpeechService that doesn't require credentials
+        _mockTextToSpeechService = new Mock<ITextToSpeechService>();
+
+        // Setup the mock to avoid Google Cloud credentials issue
+        _mockTextToSpeechService.Setup(x => x.CreateAudio(It.IsAny<string>(), It.IsAny<LanguageEnum>()))
+            .Returns(new byte[] { 0x00, 0x01, 0x02 }); // Return mock byte array instead of trying to create real audio
+
+        // Create services with the mock
+        var services = Provider.GetRequiredService();
+
+        // Override the TextToSpeechService registration with our mock
+        services.RemoveAll<ITextToSpeechService>();
+        services.AddSingleton<ITextToSpeechService>(_mockTextToSpeechService.Object);
+
+        // Build the service provider
+        var serviceProvider = services.BuildServiceProvider();
+        _wordRepository = serviceProvider.GetRequiredService<IWordRepository>();
+        _wordLinkRepository = serviceProvider.GetRequiredService<IWordLinkRepository>();
+        _dbContext = serviceProvider.GetRequiredService<AppDbContext>();
     }
 
     [Fact]
@@ -45,3 +67,4 @@ public class WordLinkRepositoryTest
         Assert.Equal(existing.Id, result.Id);
     }
 }
+

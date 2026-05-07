@@ -7,6 +7,7 @@ using LL.Resources.Contexts;
 using LL.Resources.Repositories;
 using LL.Resources.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LL.Test;
@@ -18,7 +19,13 @@ public static class Provider
     public static ServiceCollection GetRequiredService()
     {
         var services = new ServiceCollection();
-
+        
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .Build();
+        
+        services.AddSingleton<IConfiguration>(configuration);
+        
         //Core Services
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ISecurityService, SecurityService>();
@@ -43,6 +50,7 @@ public static class Provider
         services.AddScoped<IAppMonitoringService, AppMonitoringService>();
         services.AddScoped<ITextToSpeechService, TextToSpeechService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
+        services.AddScoped<ITranscriptionService, TranscriptionService>();
 
         //Singletons
         services.AddSingleton(new TokenConfigModel(string.Empty,string.Empty,string.Empty,string.Empty));

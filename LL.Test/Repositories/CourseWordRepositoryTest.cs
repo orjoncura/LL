@@ -1,5 +1,9 @@
 using LL.Core.Enums;
+using LL.Core.Interfaces.Extensions;
 using LL.Core.Interfaces.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 
 namespace LL.Test.Repositories;
 
@@ -9,15 +13,32 @@ public class CourseWordRepositoryTest
     private ICourseRepository _courseRepository { get; set; }
     private IModuleRepository _moduleRepository { get; set; }
     private ICourseWordRepository _courseWordRepository { get; set; }
+    private readonly Mock<ITextToSpeechService> _mockTextToSpeechService;
 
     public CourseWordRepositoryTest()
     {
-        _wordRepository = Provider.GetRequiredService<IWordRepository>();
-        _courseRepository = Provider.GetRequiredService<ICourseRepository>();
-        _moduleRepository = Provider.GetRequiredService<IModuleRepository>();
-        _courseWordRepository = Provider.GetRequiredService<ICourseWordRepository>();
-    }
+        // Create a mock for TextToSpeechService that doesn't require credentials
+        _mockTextToSpeechService = new Mock<ITextToSpeechService>();
 
+        // Setup the mock to avoid Google Cloud credentials issue
+        _mockTextToSpeechService.Setup(x => x.CreateAudio(It.IsAny<string>(), It.IsAny<LanguageEnum>()))
+            .Returns(new byte[] { 0x00, 0x01, 0x02 }); // Return mock byte array instead of trying to create real audio
+
+        // Create services with the mock
+        var services = Provider.GetRequiredService();
+
+        // Override the TextToSpeechService registration with our mock
+        services.RemoveAll<ITextToSpeechService>();
+        services.AddSingleton<ITextToSpeechService>(_mockTextToSpeechService.Object);
+
+        // Build the service provider
+        var serviceProvider = services.BuildServiceProvider();
+        _wordRepository = serviceProvider.GetRequiredService<IWordRepository>();
+        _courseRepository = serviceProvider.GetRequiredService<ICourseRepository>();
+        _moduleRepository = serviceProvider.GetRequiredService<IModuleRepository>();
+        _courseWordRepository = serviceProvider.GetRequiredService<ICourseWordRepository>();
+    }
+    
     [Fact]
     public void Insert_ShouldCreateCourseWord()
     {

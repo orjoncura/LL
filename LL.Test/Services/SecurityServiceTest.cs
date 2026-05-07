@@ -1,23 +1,31 @@
-using LL.Core.Constants;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
-using LL.Core.Services;
 using LL.Resources.Contexts;
 using LL.Resources.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace LL.Test.Services;
 
 public class SecurityServiceTest
 {
-    private ISecurityService _securityService { get; set; }
-    
+    private readonly Mock<IConfiguration> _mockConfiguration;
+    private readonly ISecurityService _securityService;
+
     private string Token { get; set; }
     public SecurityServiceTest()
-    {
-        _securityService = Provider.GetRequiredService<ISecurityService>();
+    {     
+        _mockConfiguration = new Mock<IConfiguration>();
+        _mockConfiguration.Setup(c => c["Security:JwtKey"]).Returns("test-secret-key");
+        _mockConfiguration.Setup(c => c["Security:Issuer"]).Returns("test-issuer");
+        _mockConfiguration.Setup(c => c["Security:Audience"]).Returns("test-audience");
+
+        var services = Provider.GetRequiredService();
+        services.AddSingleton(_mockConfiguration.Object);
+        
+        var serviceProvider = services.BuildServiceProvider();
+        _securityService = serviceProvider.GetRequiredService<ISecurityService>();
         
         using (var context = Provider.GetRequiredService<AppDbContext>())
         {
