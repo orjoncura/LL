@@ -2,7 +2,7 @@
  
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
-import Flashcards from '@/components/Courses/Flashcards';
+import { FlashcardViewer } from "@/components/Courses/Flashcards";
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import { useState, useEffect, useRef } from 'react';
@@ -77,7 +77,7 @@ export default function FlashcardsPage()  {
     return (
         <div>
             <Navbar /> 
-            {showCourse && (<Flashcards text={selectedCourse} words={wordViewModels} moduleId={params.id} onDone={() => OnComplete()}  />)}
+            {showCourse && (<FlashcardViewer words={wordViewModels} />)}
             <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
             {loading && <SpinnerOverlay />}
         </div>

@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useRef, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import { Plus, Send } from 'lucide-react';
 import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
@@ -13,7 +15,13 @@ import { GetKeyWords, Create } from '@/utils/Controllers/CourseController'
 import '@/components/Feedback/FeedbackView.css'; 
 import './page.css'; 
 
-const CreateCourse: React.FC = () => {
+interface VideoInfo {
+  title: string;
+  author_name?: string;
+  thumbnail_url?: string;
+}
+
+export default function CreateCourse() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
   const feedbackViewRef = useRef<any>(null); 
@@ -54,6 +62,7 @@ const CreateCourse: React.FC = () => {
   };
 
   let hasFetchedData = false;
+  
   useEffect(() => {
 
     if(hasFetchedData == false){
@@ -126,104 +135,136 @@ const CreateCourse: React.FC = () => {
       setLoading(false);
   };
 
-  function getYouTubeEmbedUrl() : string {
+  const getYouTubeEmbedUrl = (): string => {
     try {
       const urlObj = new URL(url);
 
-      // Case 1: normal YouTube link
       if (urlObj.hostname.includes("youtube.com")) {
         return `https://www.youtube.com/embed/${urlObj.searchParams.get("v")}`;
       }
 
-      // Case 2: short link (youtu.be)
       if (urlObj.hostname.includes("youtu.be")) {
         return `https://www.youtube.com/embed${urlObj.pathname}`;
       }
 
-      return ""; // not a YouTube URL
+      return "";
     } catch {
       return "";
     }
-  }
+  };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSubmit();
     }
   };
 
+  const suggestions = [
+    'Help me plan a trip',
+    'Write a creative story',
+    'Explain quantum physics',
+    'Create a workout plan'
+  ];
+
   return (
+
     <div>
 
       <Navbar /> 
 
-      <div className="container">
-        <div  style={{textAlign: 'center'}}>
-           <div >
-              <b className='mainTxt'>Transform your ideas into a unique and impactful learning experience</b>
-              <br></br>
-              <label>We empower you to leverage provided input to create a customized educational journey that aligns perfectly
-                    with your specific goals and needs.</label>
-           </div> 
-          <br></br>
-          <div className="search-bar glow-frame">
-            <button
-              type="button"
-              className="search-button plus-button"
-              onClick={() => fileInputRef.current?.click()}
-              title="Upload text file"
-            >
-              +
-            </button>
+      <div className="chat-container">
+        <div className="chat-content">
+          <h1 className="chat-title">
+            How can I help you today?
+          </h1>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".txt, .tt"
-              className="hidden-file-input mainTxt glow-frame"
-              onChange={handleFileSelect}
-            />
+          <div className="input-wrapper">
+            <div className="input-container">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt"
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+              />
 
-            <input
-              type="text"
-              value={url}
-              onChange={e => setURL(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="www.youtube.com/watch?v=example"
-              className="search-input mainTxt"
-            />
+              <button
+                className="icon-button"
+                aria-label="Add attachment"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Plus className="icon" />
+              </button>
 
-            <button
-              type="button"
-              className="search-button submit-button"
-              onClick={handleSubmit}
-              title="Submit"
-            >
-              ↑
-            </button>
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setURL(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="www.youtube.com/watch?v=example"
+                className="message-input"
+              />
+
+              <button
+                onClick={handleSubmit}
+                className="icon-button"
+                disabled={loading || (url.length === 0 && courseText.length === 0)}
+                aria-label="Send message"
+              >
+                <Send className="icon" />
+              </button>
+            </div>
           </div>
 
-          {getYouTubeEmbedUrl() &&
-            <div className="flex justify-center p-4" style={{display: 'flex', justifyContent: 'center'}}>
-                <iframe
-                  className="rounded-2xl shadow-lg"
-                  width="560"
-                  height="315"
-                  src={getYouTubeEmbedUrl()}
-                  title="YouTube video preview"
+          {getYouTubeEmbedUrl() && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+              <iframe
+                width="560"
+                height="315"
+                src={getYouTubeEmbedUrl()}
+                title="YouTube video preview"
+                style={{ borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}
                 allowFullScreen
               ></iframe>
-            </div> }
+            </div>
+          )}
+
+          <div className="suggestions-grid">
+            {suggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                onClick={() => setURL(suggestion)}
+                className="suggestion-button"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+
+          {loading && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '20px'
+            }}>
+              Loading...
+            </div>
+          )}
         </div>
       </div>
 
         <ToastContainer />
         {loading && <SpinnerOverlay />}
         <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody}/>
-
     </div>
   );
-};
-
-export default CreateCourse;
+}

@@ -1,22 +1,19 @@
-"use client";
+"use client"
+
 import React, {useState, useRef, useEffect} from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import { useRouter } from 'next/navigation'
 import { Authenticate} from '@/utils/Controllers/SecurityController'
 import { StoreToken } from '@/utils/Security/AuthManager'
 import { getEnv } from '@/utils/Models/EnvironmentVariables';
 import { IsValidEmail, IsValidPassword } from "@/utils/Security/Validators";
 import { TokenViewModel } from '@/utils/Models/models';
-
+import { useRouter } from 'next/navigation'
+import './LoginPage.css';
 import Link from 'next/link';
+
 import FeedbackView from '../components/Feedback/FeedbackView';
 import SpinnerOverlay from '../components/Spinner/SpinnerOverlay';
-import './globals.css'; 
-
-const applicationName = getEnv().Application_Name || '';
 
 export default function Login() {
-
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const feedbackViewRef = useRef<any>(null); 
@@ -39,92 +36,110 @@ export default function Login() {
         }
     };
 
-    const handleSubmit = (event: any) => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
 
-        event.preventDefault();
-  
-        try {
-            if (IsValidEmail(email) == false) {
+    try {
+        if (IsValidEmail(email) == false) {
 
-                showFeedback("Error", "Invalid email address format.");
-                return;
-            }
+            showFeedback("Error", "Invalid email address format.");
+            return;
+        }
 
-            if (IsValidPassword(password) == false) {
+        if (IsValidPassword(password) == false) {
 
-                showFeedback("Error", "Invalid password format.");
-                return;
-            }
-  
-            setLoading(true);
-            Authenticate(email, password)
-                .then((tokenModel: TokenViewModel) => {
+            showFeedback("Error", "Invalid password format.");
+            return;
+        }
 
-                    if (tokenModel.token != null && tokenModel.token.length > 1) {
+        setLoading(true);
+        Authenticate(email, password)
+            .then((tokenModel: TokenViewModel) => {
 
-                        StoreToken(tokenModel.token);
-                        router.push('/Course/Create', { scroll: false });
-  
-                    } else {
-                        showFeedback("Error", "It looks like the username or password you entered doesn't match our records." 
-                        + " Please double - check and try again.");
-                    }
-  
-                    setLoading(false);
-                }).catch(e => {
-                    setLoading(false);
-                    showFeedback("Error", "The server was unable to complete your request. Please try again later.");
-                });
-            
-  
-        } catch (error) {
-            console.error('Error making API call:', error);
-        };
-    }
+                if (tokenModel.token != null && tokenModel.token.length > 1) {
+
+                    StoreToken(tokenModel.token);
+                    router.push('/Course/Create', { scroll: false });
+
+                } else {
+                    showFeedback("Error", "It looks like the username or password you entered doesn't match our records." 
+                    + " Please double - check and try again.");
+                }
+
+                setLoading(false);
+            }).catch(e => {
+                setLoading(false);
+                showFeedback("Error", "The server was unable to complete your request. Please try again later.");
+            });
+        
+
+    } catch (error) {
+        console.error('Error making API call:', error);
+    };
+  };
+
+  const handleCreateAccount = () => {
+    console.log('Create account clicked');
+  };
 
   return (
-    <Container onKeyDown={(e) => {
-        if (e.key === "Enter" && !e.shiftKey && "form" in e.target) {
-          handleSubmit(e);
-        }
-      }}>
+    <div className="login-container">
+      <div className="login-wrapper">
+        <div className="login-card">
+          <h1 className="login-title">Welcome Back</h1>
+          <p className="login-subtitle">Sign in to your account</p>
 
-      <Row className="justify-content-md-center mt-5">
-          <Col xs={12} md={6}>
-              <h2 className="mainTxt text-center mb-4">{applicationName}</h2>
-
-              <Form.Control
-                  type="email"
-                  placeholder="Email address"
-                  className='mainTxt'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-input"
+                placeholder="you@example.com"
+                required
               />
-              
-              <br/>
-              <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  className='mainTxt'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="form-input"
+                placeholder="Enter your password"
+                required
               />
-              <br/>
-              <Button type="submit" className="mainBtn w-100" style={{height: "38px"}} onClick={handleSubmit}> Login </Button>
+            </div>
 
-              <hr/>
-              <div className="center">
-                  <Link href="/Security/ResetPassword" className='mainTxt hyperLink'>Forgotten password?</Link>
-              </div>
+            <div className="forgot-password-wrapper">
+                <Link href="/Security/ResetPassword" className='mainLink'>Forgot password?</Link>
+            </div>
 
-              <br/>
-              <Link href="/Security/RegisterUser" className="mainTxt w-100 button-link btn btn-success">
+            <button type="submit" className="mainBtn">
+              Sign In
+            </button>
+          </form>
+
+          <div className="create-account-section">
+            <p className="create-account-text">Don't have an account?</p>
+            <Link href="/Security/RegisterUser" className="mainBtn w-100 button-link">
                   Create new account
-              </Link>
-          </Col>
-      </Row>
-      {loading && <SpinnerOverlay />}
-      <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
-    </Container>
+            </Link>
+          </div>
+          
+        </div>
+      </div>
+    {loading && <SpinnerOverlay />}
+    <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />
+    </div>
   );
 }

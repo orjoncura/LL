@@ -1,178 +1,175 @@
-.audio{
-  display: 'inline-block';
-  background: 'none';
-  border: 'none';
-  font-Weight: 'bold';
-  color: 'black';
-  font-size: '22px'
-}
-
-.title {
-  font-size: 1.5em;
-  font-weight: 900;
-  text-align: center;
-  margin: 0;
-}
-
-.card-con {
-  width: 290px;
-  height: 354px;
-  margin: 20px auto;
-  margin-bottom: 0px;
-  position: relative;
-}
-
-.flip-card {
-  position: absolute;
-  width: 290px;
-  height: 354px;
-  border-radius: 12px;
-  perspective: 1000px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card-inner {
-  position: relative;
+.flashcard-viewer {
   width: 100%;
   height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d; /* iOS fix */
-  will-change: transform; /* GPU hint */
-}
-
-.card-inner.flipped {
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-}
-
-.flip-card.main {
-  box-shadow: 0 8px 14px 0 rgba(0, 0, 0, .2);
-}
-
-.card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden; /* iOS fix */
-  transform: translateZ(0); /* ✅ forces GPU layer, prevents crash */
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  border-radius: 12px;
-  user-select: none;
-  background-color: rgb(195, 177, 225);
-}
-
-.card-back {
-  transform: rotateY(180deg) translateZ(1px); 
-  -webkit-transform: rotateY(180deg) translateZ(1px); /* ✅ iOS fix */
-  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
-  color: white;
-}
-
-
-.flashcardCon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    border-top: 2px solid #fccde2; /* Light pink border */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
-    gap: 16px; /* Spacing between elements */
-    background: #fef0f6;
-    display: "flex"
-  }
-  
-.flashcardBtn{
-  padding: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100px; 
-}
-
-.icon-button {
-  color: #d63384;
-  width: 60px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: transparent;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.button-label {
+.flashcard-instructions {
+  margin-bottom: 32px;
+}
+
+.flashcard-instructions-text {
   font-size: 14px;
-  color: #333;
-}
-
-.buttonDiv {
-  margin-bottom: 5px;
+  color: #4b5563;
   text-align: center;
-  width: 85px
 }
 
-.highlight-word {
-  display: inline-block;
-  position: relative;
-}
-
-.tooltip-button {
-  text-decoration-line: underline;
-  cursor: pointer;
-  margin-right: 2px;
-  padding: 0px;
-  border: inherit;
-  background: inherit;
-  color: inherit;
-}
-
-.tooltip-content {
-  display: none;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 5px;
-  padding: 4px 8px;
-  background-color: black;
-  color: white;
+.flashcard-counter {
   font-size: 12px;
-  border-radius: 4px;
-  white-space: nowrap;
-  z-index: 10;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 4px;
 }
 
-.tooltip-button:active + .tooltip-content,
-.tooltip-button:focus + .tooltip-content,
-.tooltip-button:hover + .tooltip-content {
-  display: block;
+.flashcard-cards-container {
+  position: relative;
+  width: 360px;
+  height: 500px;
+  margin-bottom: 32px;
 }
 
-.sen {
-    margin-bottom: 40%;
-    display: inline-flex;
-    flex-wrap: wrap;
-    margin-top: 2%;
+.no-words {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
-.feedback-buttons .icon-button:hover {
-  transform: scale(1.08);
-  transition: 0.15s ease-in-out;
+.no-words-text {
+  font-size: 24px;
+  color: #9ca3af;
+}
+
+.flashcard-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.flashcard-nav-button:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.flashcard-nav-button:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.flashcard-nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.flashcard-nav-button-left {
+  left: -60px;
+}
+
+.flashcard-nav-button-right {
+  right: -60px;
+}
+
+.flashcard-icon-nav {
+  width: 24px;
+  height: 24px;
+  color: #374151;
+}
+
+.flashcard-rating-section {
+  margin-bottom: 16px;
+}
+
+.flashcard-rating-label {
+  font-size: 14px;
+  color: #4b5563;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.flashcard-rating-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.flashcard-rating-button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  background-color: white;
+}
+
+.flashcard-rating-button:hover {
+  transform: scale(1.1);
+}
+
+.flashcard-rating-button:active {
+  transform: scale(0.95);
+}
+
+.flashcard-active-hard {
+  background-color: #ef4444;
+}
+
+.flashcard-active-medium {
+  background-color: #f59e0b;
+}
+
+.flashcard-active-easy {
+  background-color: #10b981;
+}
+
+.flashcard-icon-hard {
+  width: 24px;
+  height: 24px;
+  color: #ef4444;
+}
+
+.flashcard-icon-medium {
+  width: 24px;
+  height: 24px;
+  color: #f59e0b;
+}
+
+.flashcard-icon-easy {
+  width: 24px;
+  height: 24px;
+  color: #10b981;
+}
+
+.flashcard-active-hard .flashcard-icon-hard,
+.flashcard-active-medium .flashcard-icon-medium,
+.flashcard-active-easy .flashcard-icon-easy {
+  color: white;
+}
+
+.flashcard-rating-button-label {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #4b5563;
+}
+
+.flashcard-active-hard .flashcard-rating-button-label,
+.flashcard-active-medium .flashcard-rating-button-label,
+.flashcard-active-easy .flashcard-rating-button-label {
+  color: white;
 }

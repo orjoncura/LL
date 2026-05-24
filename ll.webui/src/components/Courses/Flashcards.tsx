@@ -1,289 +1,160 @@
-import { useState, useEffect, ReactElement } from 'react';
-import { WordViewModel } from '@/utils/Models/models';
-import { DeleteCourseWord, SetWordDifficulty, StreamAudio} from '@/utils/Controllers/CourseController'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeUp, faSquareCaretLeft, faSquareCaretRight, faSmile, faSadCry, faSadTear, faL } from '@fortawesome/free-solid-svg-icons';
-import { ImportanceRatingEnum } from '@/utils/Models/Enums';
+import { useState } from "react";
+import { SwipeCard } from "./SwipeCard";
+import { ThumbsDown, Minus, ThumbsUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import "./Flashcards.css";
 
-import { motion } from "framer-motion";
-import '@/components/Feedback/FeedbackView.css';
-import './Flashcards.css'; 
+export interface meaningShort {
+  id: string;
+  value: string;
+}
 
-interface FlashcardsProps { text:string, words: WordViewModel[], moduleId?:string; onDone: (result: boolean) => void;}
+export interface WordViewModel {
+  id: string;
+  name: string;
+  translation?: string;
+  language?: string;
+  meanings?: meaningShort[];
+  importanceRatingId: number;
+}
 
-export const Flashcards = ({ text, words, moduleId, onDone }: FlashcardsProps) => {
-    const [flashcards, setFlashcards] = useState<WordViewModel[]>(words);  
-    const [flashcardIndex, setFlashcardIndex] = useState<number>(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [showMeaning, setShowMeaning] = useState(false);
+interface FlashcardViewerProps {
+  words: WordViewModel[];
+}
 
-    useEffect(() => {
-     
-      var sortedBasedOnAppearance:any = sortBasedOnAppearance(text, words);
-      setFlashcards(sortedBasedOnAppearance)
-    }, []);
-    
-    const navigateToFlashcardByIndex = (newIndex: number) => {
+export function FlashcardViewer({ words }: FlashcardViewerProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [ratings, setRatings] = useState<Record<string, "easy" | "medium" | "hard">>({});
 
-      if(newIndex >= flashcards.length){
-
-        onDone(true);
-      }else{
-
-        setFlashcardIndex(newIndex);
-        setShowMeaning(false);
-      }
+  const handleSwipe = (swipeDirection: "left" | "right") => {
+    if (swipeDirection === "right" && currentIndex < words.length - 1) {
+      setDirection(1);
+      setCurrentIndex((prev) => prev + 1);
+    } else if (swipeDirection === "left" && currentIndex > 0) {
+      setDirection(-1);
+      setCurrentIndex((prev) => prev - 1);
     }
-        
-    function highlightWord(word:string): ReactElement {
+  };
 
-      if(!word) return <p></p>;
+  const handleRating = (difficulty: "easy" | "medium" | "hard") => {
+    setRatings((prev) => ({
+      ...prev,
+      [words[currentIndex].id]: difficulty,
+    }));
+  };
 
-        const escapedWord = word.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]/g, '') ;
-
-        if(escapedWord == flashcards[flashcardIndex].name)
-          return <b style={{ marginRight: 2 }}>{word}</b>;
-
-        // Check if any of the extracted words match the paragraphWords list
-        if(flashcards.some(w => w.name == escapedWord)){
-             
-          const flashcard = flashcards.filter(w => w.name == escapedWord)[0];
-
-          if(word.length > 1 && flashcard.translation != null && flashcard.translation?.length > 1 && flashcard.translation != word)
-            return <span  className="highlight-word"
-                          style={{ textDecorationLine: 'underline', 
-                          WebkitTextDecorationLine: 'underline',
-                          cursor:'pointer', marginRight: 2}}
-                          onClick={() => StreamAudio(flashcard.id)}>
-                      <button className="tooltip-button">{word}</button>
-                      <div className="tooltip-content">{flashcard.translation}</div>
-                  </span>
-        }
-
-        return <p style={{ marginRight: 2 }}>{word}</p>;
+  const navigate = (dir: "prev" | "next") => {
+    if (dir === "next" && currentIndex < words.length - 1) {
+      setDirection(1);
+      setCurrentIndex((prev) => prev + 1);
+    } else if (dir === "prev" && currentIndex > 0) {
+      setDirection(-1);
+      setCurrentIndex((prev) => prev - 1);
     }
+  };
 
-    function sortBasedOnAppearance(text: string, wordsList:WordViewModel[]): WordViewModel[] {
+  const mapImportanceToRating = (importanceId: number): "easy" | "medium" | "hard" | undefined => {
+    if (importanceId === 1) return "easy";
+    if (importanceId === 2) return "medium";
+    if (importanceId === 3) return "hard";
+    return undefined;
+  };
 
-      if(text == null || wordsList.length == 0) return [];
+  if (words.length === 0) {
+    return (
+      <div className="flashcard-viewer">
+        <div className="no-words">
+          <p className="no-words-text">No flashcards available</p>
+        </div>
+      </div>
+    );
+  }
 
-      wordsList = wordsList.filter(w => text.includes(w.name) && w.name.length > 0 && w.translation && w.translation.length > 0);
+  const currentWord = words[currentIndex];
+  const cardData = {
+    id: parseInt(currentWord.id) || 0,
+    title: currentWord.name,
+    description: currentWord.language || "",
+    backContent: currentWord.translation || "No translation available",
+  };
 
-      // Normalize the sample text: split into words and convert to lowercase without punctuation
-      const normalizedText = text.split(/\s+/).map(word => word.trim().toLowerCase()).filter(word => word.length > 0);
-
-      // Create an array of objects with each word's position in the text
-      const wordIndices = wordsList.map(word => {
-          const lowerWord = word.name.trim().toLowerCase();
-          // Find the first occurrence index or a large number if not found
-          const index = normalizedText.indexOf(lowerWord);
-          return { originalWord: word, index };
-      });
-
-      // Sort based on the index; handle missing words by placing them last
-      const sorted = [...wordIndices]
-          .sort((a, b) => {
-              if (a.index === -1 && b.index === -1) return 0;
-              if (a.index === -1) return 1;
-              if (b.index === -1) return -1;
-              return a.index - b.index;
-          })
-          .map(item => item.originalWord);
-
-        return sorted;
-    };
-
-    function stripHtml(html: string): string {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      return doc.body.textContent || "";
-    }
-
-    function findSentencesByWord(html: string): ReactElement[] {
-
-      const word = flashcards[flashcardIndex].name;
-      const plainText = stripHtml(html);
-
-      //Split into sentences
-      const sentences = plainText
-        .split(/(?<=[.!?])\s+/)
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-
-      //Find sentences containing the word
-      const regex = new RegExp(`\\b${word}\\b`, "i");
-      const matchingSentences = sentences.filter(s => regex.test(s));
-
-      //Join with blank line
-      const tx = matchingSentences.join("\n\n");
-
-      //Highlight every word in the final text
-      return tx.split(/\s+/).map((w, i) => (
-        <span key={i}>
-          {highlightWord(w)}{" "}
-        </span>))
-    }
-  
-    const handleFeedback = (importanceRating: ImportanceRatingEnum): void => {
-
-        if(importanceRating == ImportanceRatingEnum.Low){
-
-        const word: WordViewModel = flashcards[flashcardIndex]
-
-        DeleteCourseWord(decodeURIComponent(moduleId || "" ), word.id)                
-        .then(isSuccessfull => { 
-
-            if(isSuccessfull) {
-                var wordsList = flashcards.filter(p => p.id !== word.id);
-                setFlashcards(wordsList);
-
-                if(wordsList[flashcardIndex] != null) 
-                  navigateToFlashcardByIndex(flashcardIndex);
-                else onDone(true);
-            }
-        });
-
-      }else{
-
-        navigateToFlashcardByIndex(flashcardIndex + 1);
-      }
-
-      if(flashcards[flashcardIndex] == null)
-        return;
-
-      SetWordDifficulty(importanceRating, flashcards[flashcardIndex].id);
-    };
-
-    const onFlashcardClicked = (): void => {
-
-      setIsDragging(!isDragging);
-      setShowMeaning(!showMeaning);
-
-      if(showMeaning == false)
-        StreamAudio(flashcards[flashcardIndex].id);
-    }
+  const currentRating = ratings[currentWord.id] || mapImportanceToRating(currentWord.importanceRatingId);
 
   return (
-    <div>
-      {flashcards[flashcardIndex] != null &&
-        <div className="container">
-            <div className="mt-4">
-              <div className="d-flex">
-                {Array.from({ length: flashcards.length }).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`flex-fill me-1 progress-bar ${ index < flashcardIndex ? "bg-success" : "bg-secondary"}`}
-                    style={{height: "20px",marginRight: index < flashcards.length  - 1 ? "2px" : "0",}}
-                  ></div>
-                ))}
-              </div>
-            </div>
-            
-            <div className='card-con'>
-              {flashcards.map((card, index) => 
-                index >= flashcardIndex ?
-                  (<motion.div
-                    key={card.id}
-                    className={`flip-card ${index == flashcardIndex ? "main" : ""}`}
-                    drag
-                    dragElastic={1}
-                    style={{ zIndex: flashcards.length - index  }}
-                    onClick={onFlashcardClicked}
-                    onDragStart={() => setIsDragging(true)}
-                    onDragEnd={() => {
-                      setIsDragging(false);
-                      navigateToFlashcardByIndex(flashcardIndex + 1);
-                    }}
-                    whileTap={{ scale: 1.1 }}
-                  >
-                  <div className={`card-inner mainTxt ${showMeaning && index == flashcardIndex ? "flipped" : ""}`}>
-                    <div className="card-face">{card.name}</div>
-                    <div className="card-face card-back">{card.translation}</div>
-                  </div>
-                </motion.div>)
-                : null)}
-            </div>
+    <div className="flashcard-viewer">
+      <div className="flashcard-instructions">
+        <p className="flashcard-instructions-text">
+          Swipe left for previous • Swipe right for next • Click 🔄 to flip
+        </p>
+        <p className="flashcard-counter">
+          Card {currentIndex + 1} of {words.length}
+        </p>
+      </div>
 
-            <br></br>
- 
-            {showMeaning == false && <div className='sen'>
-              {findSentencesByWord(text)}
-            </div>}
+      <div className="flashcard-cards-container">
+        <AnimatePresence initial={false} custom={direction}>
+          <SwipeCard
+            key={currentWord.id}
+            card={cardData}
+            difficulty={currentRating}
+            onSwipe={handleSwipe}
+            direction={direction}
+          />
+        </AnimatePresence>
 
-            {showMeaning && (flashcards[flashcardIndex].meanings && flashcards[flashcardIndex].meanings.length > 0 ? (
-              flashcards[flashcardIndex].meanings.map((meaning) => (
-              <div key={flashcardIndex} style={{ color: 'black', fontFamily: 'fangsong' }}>
-                <h3>{meaning.type}</h3>
-                <ul>
-                  {meaning.definitions && meaning.definitions.length > 0 ? (
-                    meaning.definitions.map((definition, defIndex) => (
-                      <li key={flashcardIndex}>{definition}</li>
-                    ))
-                  ) : (
-                    <li>No definitions available</li>
-                  )}
-                </ul>
-              </div>
-            ))
-          ) : (<p>No meanings available</p> ))}
-          
-        <div className="flashcardCon fixed-bottom" style={{ justifyContent: "flex-end" }}>
-          <div className="row" style={{ marginTop: "-5px" }}>
+        <button
+          onClick={() => navigate("prev")}
+          disabled={currentIndex === 0}
+          className="flashcard-nav-button flashcard-nav-button-left"
+        >
+          <ChevronLeft className="flashcard-icon-nav" />
+        </button>
 
-            {!showMeaning ? (
-              <>
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex - 1)}>
-                    <FontAwesomeIcon icon={faSquareCaretLeft} />
-                  </button>
-                  <div className="button-label">Back</div>
-                </div>
+        <button
+          onClick={() => navigate("next")}
+          disabled={currentIndex === words.length - 1}
+          className="flashcard-nav-button flashcard-nav-button-right"
+        >
+          <ChevronRight className="flashcard-icon-nav" />
+        </button>
+      </div>
 
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => StreamAudio(flashcards[flashcardIndex].id)}>
-                    <FontAwesomeIcon icon={faVolumeUp} />
-                  </button>
-                  <div className="button-label">Audio</div>
-                </div>
-
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => navigateToFlashcardByIndex(flashcardIndex + 1)}>
-                    <FontAwesomeIcon icon={faSquareCaretRight} />
-                  </button>
-                  <div className="button-label">Next</div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.Low)}>
-                    <FontAwesomeIcon icon={faSmile} />
-                  </button>
-                  <div className="button-label">Easy</div>
-                </div>
-                
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.Medium)}>
-                    <FontAwesomeIcon icon={faSadTear} />
-                  </button>
-                  <div className="button-label">Medium</div>
-                </div>
-                
-                <div className='buttonDiv'>
-                  <button className="icon-button mb-1" onClick={() => handleFeedback(ImportanceRatingEnum.High)}>
-                    <FontAwesomeIcon icon={faSadCry} />
-                  </button>
-                  <div className="button-label">Hard</div>
-                </div>
-              </>
-            )}
-
-          </div>
+      <div className="flashcard-rating-section">
+        <p className="flashcard-rating-label">Rate this card:</p>
+        <div className="flashcard-rating-buttons">
+          <button
+            onClick={() => handleRating("hard")}
+            className={`flashcard-rating-button ${
+              currentRating === "hard" ? "flashcard-active-hard" : ""
+            }`}
+            title="Hard"
+          >
+            <ThumbsDown className="flashcard-icon-hard" />
+            <span className="flashcard-rating-button-label">Hard</span>
+          </button>
+          <button
+            onClick={() => handleRating("medium")}
+            className={`flashcard-rating-button ${
+              currentRating === "medium" ? "flashcard-active-medium" : ""
+            }`}
+            title="Medium"
+          >
+            <Minus className="flashcard-icon-medium" />
+            <span className="flashcard-rating-button-label">Medium</span>
+          </button>
+          <button
+            onClick={() => handleRating("easy")}
+            className={`flashcard-rating-button ${
+              currentRating === "easy" ? "flashcard-active-easy" : ""
+            }`}
+            title="Easy"
+          >
+            <ThumbsUp className="flashcard-icon-easy" />
+            <span className="flashcard-rating-button-label">Easy</span>
+          </button>
         </div>
-
-        </div> }
+      </div>
     </div>
   );
-};
-
-export default Flashcards;
+}

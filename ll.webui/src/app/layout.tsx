@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
       <html lang="en" >
         <link rel="manifest" href="/manifest.json" />
-        <body style={{ background: '#fff0f6', color: '#d63384' }}>
+        <body className="mainTxt">
           <ProtectedLayout children={children} />
         </body>
       </html>

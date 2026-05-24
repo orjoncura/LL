@@ -4,15 +4,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    background-color: #fff0f6;
-    color: #d63384;
-    color: #d63384;
+    color: #ae20e1;
     font-weight: bold !important
   }
   
   .logo h2 {
     margin: 0;
-    color: #d63384;
+    color: #ae20e1;
   }
   
   .links {
@@ -27,7 +25,7 @@
   }
   
   .links a {
-    color: #d63384;
+    color: #ae20e1;
     text-decoration: none;
     font-weight: bold;
   }
@@ -39,7 +37,7 @@
   .linkButton {
     background: none;
     border: none;
-    color:#d63384;
+    color:#ae20e1;
     text-decoration: none;
     cursor: pointer;
     padding: 0;
@@ -50,4 +48,5 @@
   .linkButton:hover {
     text-decoration: underline;
   }
+  
   
