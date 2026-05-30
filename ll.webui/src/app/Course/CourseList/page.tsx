@@ -6,11 +6,8 @@ import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import { useRouter } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { CourseViewModel } from '@/utils/Models/models';
 import { GetCourses, DeleteCourseById } from '@/utils/Controllers/CourseController'
-
 
 export default function CourseList() {
     const feedbackViewRef = useRef<any>(null); 

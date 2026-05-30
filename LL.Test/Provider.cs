@@ -54,8 +54,7 @@ public static class Provider
 
         //Singletons
         services.AddSingleton(new TokenConfigModel(string.Empty,string.Empty,string.Empty,string.Empty));
-        services.AddSingleton(new AgentModel(string.Empty, string.Empty));
-        
+        services.AddSingleton(new AgentModel(string.Empty, string.Empty, "qwen2.5:14b", "qwen2.5:1.5b", "online"));
         //Database
         services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("LL_Local"));
 

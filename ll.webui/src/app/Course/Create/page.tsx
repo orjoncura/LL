@@ -6,24 +6,19 @@ import Navbar from '@/components/Navbar/Navbar';
 import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
-import { CourseRequestModel, WordViewModel, VideoInfo } from '@/utils/Models/models';
+import { CourseRequestModel, CourseViewModel, VideoInfo } from '@/utils/Models/models';
 import { LanguageEnum } from '@/utils/Models/Enums';
 import { SendLocalNotifications } from '@/utils/System/Notification'
 import { useToast } from '@/components/Toast/Toast'; 
-import { GetKeyWords, Create } from '@/utils/Controllers/CourseController'
+import { GetCourses, Create } from '@/utils/Controllers/CourseController'
+import { useRouter } from 'next/navigation';
 
 import '@/components/Feedback/FeedbackView.css'; 
 import './page.css'; 
 
-interface VideoInfo {
-  title: string;
-  author_name?: string;
-  thumbnail_url?: string;
-}
-
 export default function CreateCourse() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [keyWords, setKeyWords] = useState<WordViewModel[]>([]);
+  const [courses, setCourses] = useState<CourseViewModel[]>([]);
   const feedbackViewRef = useRef<any>(null); 
   const [loading, setLoading] = useState(false);
   const [fbTitle, setfbhTitle] = useState('');
@@ -32,6 +27,8 @@ export default function CreateCourse() {
   const [courseTitle, setCourseTitle] = useState<string>('');   
   const [courseText, setCourseText] = useState<string>('');   
   const { showToast, ToastContainer } = useToast();
+
+  const router = useRouter();
 
   const showFeedback = (title: string, body:string, onClick?: Function) => {
       if (feedbackViewRef.current) {
@@ -68,72 +65,65 @@ export default function CreateCourse() {
     if(hasFetchedData == false){
       hasFetchedData = true;
 
-      GetKeyWords(LanguageEnum.Spanish)
-      .then((words: WordViewModel[]) => {
+      GetCourses()
+      .then((courseViewModels: CourseViewModel[]) => {
 
-        if(words == null || words == undefined)
+        if(courseViewModels == null || courseViewModels == undefined)
           return;
 
-        setKeyWords(words.filter(w => w.importanceRatingId == 1));
+        setCourses(courseViewModels.slice(-4));
       });
     }
   }, []);
 
-  const handleSubmit = async () => {
-      setLoading(true);
-
-      try {
-          if (courseText.length === 0 && url.length === 0) 
-              throw new Error("Text can not be empty.");
-          
-          if (courseText.length === 0 && url.length > 0) {
-
-            const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-
-            // Check the status of the response
-            if (!response.ok) {
-                throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
-            }
-
-            const data: VideoInfo = await response.json();
-            setCourseTitle(data.title);
-          }
-
-          console.log('courseTitle');
-          console.log(courseTitle);
-          const courseRequestModel: CourseRequestModel = {
-              title: courseTitle,
-              url: url,
-              text: courseText,
-              languageFromId:  LanguageEnum.Spanish,
-              languageToId:  LanguageEnum.English
-          };
-
-          if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
-              throw new Error("Missing required field in course creation request");
-
-          Create(courseRequestModel)
-          .then((isSuccessful: boolean) => {
+const handleSubmit = async () => {
+  setLoading(true);
+  try {
+    if (courseText.length === 0 && url.length === 0) 
+      throw new Error("Text can not be empty.");
     
-            if(isSuccessful)
-              SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-    
-          });
+    let fetchedTitle = courseTitle; // Store the current title
 
-          showToast("Something exciting is coming… a brand new course for " + courseTitle + " is on the way!");
-
-          setCourseText("");
-          setURL("");
-
-          //let wordList = text.split(" ");
-          //let kw: WordViewModel[] = keyWords.filter(w => wordList.includes(w.name) && w.importanceRatingId == 1);
-
-      } catch (error: any) {  
-          showFeedback("Error", error.message.substring(0, 100));
+    if (courseText.length === 0 && url.length > 0) {
+      const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+      
+      // Check the status of the response
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
       }
+      
+      const data: VideoInfo = await response.json();
+      setCourseTitle(data.title);
+      fetchedTitle = data.title; // Update the fetched title
+    }
 
-      setLoading(false);
-  };
+    console.log('courseTitle', fetchedTitle); // Use the fetched or existing title
+
+    const courseRequestModel: CourseRequestModel = {
+      title: fetchedTitle,
+      url: url,
+      text: courseText,
+      languageFromId: LanguageEnum.Spanish,
+      languageToId: LanguageEnum.English
+    };
+
+    if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
+      throw new Error("Missing required field in course creation request");
+
+    const isSuccessful = await Create(courseRequestModel);
+    
+    if (isSuccessful)
+      SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+
+    showToast("Something exciting is coming… a brand new course for " + fetchedTitle + " is on the way!");
+    setCourseText("");
+    setURL("");
+
+  } catch (error: any) {  
+    showFeedback("Error", error.message.substring(0, 100));
+  }
+  setLoading(false);
+};
 
   const getYouTubeEmbedUrl = (): string => {
     try {
@@ -160,12 +150,11 @@ export default function CreateCourse() {
     }
   };
 
-  const suggestions = [
-    'Help me plan a trip',
-    'Write a creative story',
-    'Explain quantum physics',
-    'Create a workout plan'
-  ];
+  const navigateToCourse = async (course: CourseViewModel) => {
+
+    localStorage.setItem("SelectedCourse", course.text.substring(0, 300));
+    router.push(`/Course/ModuleNavigator/${course.id}`);
+  }
 
   return (
 
@@ -231,13 +220,13 @@ export default function CreateCourse() {
           )}
 
           <div className="suggestions-grid">
-            {suggestions.map((suggestion, index) => (
+            {courses.map((course, index) => (
               <button
                 key={index}
-                onClick={() => setURL(suggestion)}
+                onClick={() => navigateToCourse(course)}
                 className="suggestion-button"
               >
-                {suggestion}
+                {course.title}
               </button>
             ))}
           </div>

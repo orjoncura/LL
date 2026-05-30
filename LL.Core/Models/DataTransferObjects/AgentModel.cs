@@ -6,23 +6,23 @@ public class AgentModel
     
     public string LLamaModeLocation { get; set; } = string.Empty;
     
-    public string LocalModelName { get; set; } = "qwen2.5:14b";
+    public string LocalModelName { get; set; } = string.Empty;
     
-    public string OfflineModelName { get; set; } = "qwen2.5:1.5b";
+    public string OfflineModelName { get; set; } = string.Empty;
     
-    public string Mode { get; set; } = "online";
+    public string Mode { get; set; } = string.Empty;
 
     public AgentModel(
         string geminiAPI,
         string llamaModeLocation,
-        string localModelName = "qwen2.5:14b",
-        string offlineModelName = "qwen2.5:1.5b",
-        string mode = "online")
+        string localModelName,
+        string offlineModelName ,
+        string mode)
     {
         GeminiAPI = geminiAPI;
         LLamaModeLocation = llamaModeLocation;
-        LocalModelName = string.IsNullOrWhiteSpace(localModelName) ? "qwen2.5:14b" : localModelName;
-        OfflineModelName = string.IsNullOrWhiteSpace(offlineModelName) ? "qwen2.5:1.5b" : offlineModelName;
-        Mode = string.IsNullOrWhiteSpace(mode) ? "online" : mode.Trim().ToLowerInvariant();
+        LocalModelName = localModelName;
+        OfflineModelName = offlineModelName;
+        Mode =  mode.Trim().ToLowerInvariant();
     }
 }

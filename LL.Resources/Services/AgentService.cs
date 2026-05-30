@@ -55,20 +55,7 @@ public class AgentService(AgentModel agentModel) : IAgentService
 
     public async Task<string> Run(string input)
     {
-        switch (agentModel.Mode)
-        {
-            case "online":
-                if (string.IsNullOrWhiteSpace(agentModel.GeminiAPI))
-                    throw new InvalidOperationException("Agent:GeminiAPI is required when Agent:Mode is 'online'.");
-                
-                return await RunGeminiApi(input);
-            case "localhost":
-                return await RunLocalOllama(input);
-            case "offline":
-                return await RunOfflineOllama(input);
-            default:
-                throw new InvalidOperationException("Agent:Mode must be one of: online, localhost, offline.");
-        }
+        return await RunGeminiApi(input);
     } 
 }
 
