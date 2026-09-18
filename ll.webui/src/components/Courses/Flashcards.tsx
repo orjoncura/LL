@@ -2,21 +2,8 @@ import { useState } from "react";
 import { SwipeCard } from "./SwipeCard";
 import { ThumbsDown, Minus, ThumbsUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { WordViewModel } from "@/utils/Models/models";
 import "./Flashcards.css";
-
-export interface meaningShort {
-  id: string;
-  value: string;
-}
-
-export interface WordViewModel {
-  id: string;
-  name: string;
-  translation?: string;
-  language?: string;
-  meanings?: meaningShort[];
-  importanceRatingId: number;
-}
 
 interface FlashcardViewerProps {
   words: WordViewModel[];

@@ -155,11 +155,11 @@ export default function ModuleNavigator() {
                 <div>
                   <h3 className="continue-title">Continue Learning</h3>
                   <p className="continue-subtitle">
-                    {nextModule.type === 'flashcard' ? 'Flashcards' : 'Exercises'}: Part {nextModule.part}
+                    {nextModule.typeId === 1 ? 'Flashcards' : 'Exercises'}: {nextModule.title}
                   </p>
                 </div>
                 <button
-                  onClick={() => navigateToModule(nextModule.id)}
+                  onClick={() => navigateToModule(nextModule)}
                   className="continue-button"
                 >
                   Continue
