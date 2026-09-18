@@ -116,6 +116,9 @@ export const Multiselect = ({ words, onDone }: MultiselectProps)  => {
         }
     };
 
+    const isLeftMatched = (word: string) => Object.keys(selectedPairs).includes(word);
+    const isRightMatched = (word: string) => Object.values(selectedPairs).includes(word);
+
     return (pairs[pairIndex] != null 
         && (<div className='mainTxt keyWord-con'>
               <div style={{ gridColumn: 'span 2' }}>
@@ -123,34 +126,31 @@ export const Multiselect = ({ words, onDone }: MultiselectProps)  => {
                 <p>Select the matching pairs from the two columns below.</p>
               </div>
               <div>
-                {pairs[pairIndex].column1.map((word) => (
-                  <div
-                    key={word}
-                    className='keyWord'
-                    style={{
-                      cursor: Object.values(selectedPairs).includes(word) ? 'not-allowed' : 'pointer',
-                      backgroundColor: Object.keys(selectedPairs).includes(word) ? '#e0e0e0' : activeWord === word ? '#cce4ff' : 'transparent',
-                      color: Object.values(selectedPairs).includes(word) ? '#888' : '#000',
-                    }}
-                    onClick={() => handleWordClick(word, 1)}>
-                    {word}
-                  </div>
-                ))}
+                {pairs[pairIndex].column1.map((word, index) => {
+                  const matched = isLeftMatched(word);
+                  const active = !matched && activeWord === word;
+                  return (
+                    <div
+                      key={`left-${index}-${word}`}
+                      className={`keyWord${active ? ' keyWord--active' : ''}${matched ? ' keyWord--matched' : ''}`}
+                      onClick={() => handleWordClick(word, 1)}>
+                      {word}
+                    </div>
+                  );
+                })}
               </div>
               <div>
-                {pairs[pairIndex].column2.map((word) => (
-                  <div
-                    key={word}
-                    className='keyWord'
-                    style={{
-                      cursor: Object.values(selectedPairs).includes(word) ? 'not-allowed' : 'pointer',
-                      backgroundColor: Object.keys(selectedPairs).includes(word) ? '#e0e0e0' : activeWord === word ? '#cce4ff' : 'transparent',
-                      color: Object.values(selectedPairs).includes(word) ? '#888' : '#000',
-                    }}
-                    onClick={() => handleWordClick(word, 2)}>
-                    {word}
-                  </div>
-                ))}
+                {pairs[pairIndex].column2.map((word, index) => {
+                  const matched = isRightMatched(word);
+                  return (
+                    <div
+                      key={`right-${index}-${word}`}
+                      className={`keyWord${matched ? ' keyWord--matched' : ''}`}
+                      onClick={() => handleWordClick(word, 2)}>
+                      {word}
+                    </div>
+                  );
+                })}
               </div>
               {message && (
                 <div className='keyWord-message'>

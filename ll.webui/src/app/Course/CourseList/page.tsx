@@ -9,6 +9,27 @@ import { useRouter } from 'next/navigation';
 import { CourseViewModel } from '@/utils/Models/models';
 import { GetCourses, DeleteCourseById } from '@/utils/Controllers/CourseController'
 
+import './page.css';
+
+function getCourseStatus(course: CourseViewModel): 'Ready' | 'InProgress' | 'Failed' {
+  if (course.status === 'Ready' || course.status === 'InProgress' || course.status === 'Failed')
+    return course.status;
+
+  if (course.hasModules)
+    return 'Ready';
+
+  if (course.createdAt) {
+    const createdAtMs = Date.parse(course.createdAt);
+    if (!Number.isNaN(createdAtMs) && Date.now() - createdAtMs >= 10 * 60 * 60 * 1000)
+      return 'Failed';
+  }
+
+  if (course.hasModules === false)
+    return 'InProgress';
+
+  return 'Ready';
+}
+
 export default function CourseList() {
     const feedbackViewRef = useRef<any>(null); 
   const [loading, setLoading] = useState(true);
@@ -30,22 +51,57 @@ export default function CourseList() {
       }
   };
 
+  const loadCourses = (showSpinner = false) => {
+    if (showSpinner) setLoading(true);
+
+    return GetCourses()
+      .then((courseViewModels: CourseViewModel[]) => {
+        if (courseViewModels == null || courseViewModels == undefined)
+          return;
+
+        setCourses(courseViewModels);
+      })
+      .finally(() => {
+        if (showSpinner) setLoading(false);
+      });
+  };
+
   let hasFetchedData = false;
   useEffect(() => {
 
       if(hasFetchedData == false){
         hasFetchedData = true;
-
-        GetCourses()
-        .then((courseViewModels: CourseViewModel[]) => {
-
-          if(courseViewModels == null || courseViewModels == undefined)
-            return;
-
-          setCourses(courseViewModels);
-        }).finally(() => {setLoading(false)});
+        loadCourses(true);
       }
     
+  }, []);
+
+  const hasInProgressCourses = courses.some(course => getCourseStatus(course) === 'InProgress');
+
+  useEffect(() => {
+    if (!hasInProgressCourses) return;
+
+    const intervalId = window.setInterval(() => {
+      loadCourses(false);
+    }, 4000);
+
+    return () => window.clearInterval(intervalId);
+  }, [hasInProgressCourses]);
+
+  useEffect(() => {
+    const refreshOnFocus = () => loadCourses(false);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible')
+        refreshOnFocus();
+    };
+
+    window.addEventListener('focus', refreshOnFocus);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', refreshOnFocus);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
   
   const DeleteCourse = async (id: string) => {
@@ -66,74 +122,47 @@ export default function CourseList() {
   };
 
   const navigateToModule = async (course: CourseViewModel) => {
+    if (getCourseStatus(course) !== 'Ready') return;
 
-    localStorage.setItem("SelectedCourse", course.text.substring(0, 300));
+    localStorage.setItem("SelectedCourse", (course.text || '').substring(0, 300));
     router.push(`/Course/ModuleNavigator/${course.id}`);
   }
+
+  const renderCourseAction = (course: CourseViewModel) => {
+    const status = getCourseStatus(course);
+
+    if (status === 'InProgress')
+      return <span className="status-in-progress">In progress</span>;
+
+    if (status === 'Failed')
+      return <span className="status-failed">Failed</span>;
+
+    return (
+      <button className="course-start-btn" onClick={() => navigateToModule(course)}>
+        Start
+      </button>
+    );
+  };
 
   return (
     <div>
       <Navbar/> 
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f3e8ff 0%, #fae8ff 50%, #fdf4ff 100%)',
-        padding: '48px 32px'
-      }}>
-        <div style={{
-          maxWidth: '1024px',
-          margin: '0 auto'
-        }}>
-          <h1 style={{ marginBottom: '32px' }}>Available Courses</h1>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="course-list-page">
+        <div className="course-list-inner">
+          <h1 className="course-list-title mainTxt">Available Courses</h1>
+          <div className="course-list-items">
             {courses.map((course) => (
-              <div
-                key={course.id}
-                style={{
-                  background: 'white',
-                  borderRadius: '12px',
-                  padding: '24px',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  transition: 'box-shadow 0.2s',
-                  position: 'relative'
-                }}
-              >
-                <button onClick={() => DeleteCourse(course.id)}
-                style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  background: 'transparent',
-                  color: '#9ca3af',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: '400'
-                }}>
+              <div key={course.id} className="course-card-item">
+                <button className="course-archive-btn" onClick={() => DeleteCourse(course.id)}>
                   Archive
                 </button>
-                <h3 style={{ marginBottom: '8px', paddingRight: '80px' }}>{course.title}</h3>
-                <p style={{ color: '#6b7280', marginBottom: '16px' }}>{course.text.substring(0, 300)}</p>
-                <button onClick={() =>  navigateToModule(course)}
-                  style={{
-                    background: 'linear-gradient(90deg, #7c3aed 0%, #d946ef 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px 20px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                }}>Start
-                </button>
+                <h3 className="course-card-title">{course.title}</h3>
+                <p className="course-card-text">{(course.text || '').substring(0, 300)}</p>
+                {renderCourseAction(course)}
               </div>
             ))}
           </div>
         </div>
-
-
       </div>
       {loading && <SpinnerOverlay />}      
       <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody} onClick={onFeedBackViewClick} />

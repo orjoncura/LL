@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import React, { useRef, useState, useEffect, ChangeEvent } from 'react';
 import { Plus, Send } from 'lucide-react';
 import Navbar from '@/components/Navbar/Navbar';
-import SpinnerOverlay from '@/components/Spinner/SpinnerOverlay';
 import FeedbackView from '@/components/Feedback/FeedbackView';
 
 import { CourseRequestModel, CourseViewModel, VideoInfo } from '@/utils/Models/models';
@@ -71,33 +70,42 @@ export default function CreateCourse() {
         if(courseViewModels == null || courseViewModels == undefined)
           return;
 
-        setCourses(courseViewModels.slice(-4));
+        // API returns newest-first; take the most recent 4.
+        setCourses(courseViewModels.slice(0, 4));
       });
     }
   }, []);
 
+  const refreshRecentCourses = () => {
+    GetCourses()
+      .then((courseViewModels: CourseViewModel[]) => {
+        if(courseViewModels == null || courseViewModels == undefined)
+          return;
+
+        setCourses(courseViewModels.slice(0, 4));
+      });
+  };
+
 const handleSubmit = async () => {
+  if (loading) return;
   setLoading(true);
   try {
     if (courseText.length === 0 && url.length === 0) 
       throw new Error("Text can not be empty.");
     
-    let fetchedTitle = courseTitle; // Store the current title
+    let fetchedTitle = courseTitle;
 
     if (courseText.length === 0 && url.length > 0) {
       const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
       
-      // Check the status of the response
       if (!response.ok) {
         throw new Error(`Failed to fetch video info: ${response.status} ${response.statusText}`);
       }
       
       const data: VideoInfo = await response.json();
       setCourseTitle(data.title);
-      fetchedTitle = data.title; // Update the fetched title
+      fetchedTitle = data.title;
     }
-
-    console.log('courseTitle', fetchedTitle); // Use the fetched or existing title
 
     const courseRequestModel: CourseRequestModel = {
       title: fetchedTitle,
@@ -110,19 +118,29 @@ const handleSubmit = async () => {
     if (!courseRequestModel.title || !courseRequestModel.languageFromId || !courseRequestModel.languageToId) 
       throw new Error("Missing required field in course creation request");
 
-    const isSuccessful = await Create(courseRequestModel);
-    
-    if (isSuccessful)
-      SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
-
     showToast("Something exciting is coming… a brand new course for " + fetchedTitle + " is on the way!");
     setCourseText("");
     setURL("");
+    setCourseTitle("");
+    setLoading(false);
+
+    // Course is inserted immediately on the server; refresh suggestions shortly after.
+    window.setTimeout(refreshRecentCourses, 1500);
+
+    Create(courseRequestModel)
+      .then((isSuccessful) => {
+        if (isSuccessful)
+          SendLocalNotifications("Your new lesson is ready!!", "Please go to courses to start learning!");
+        refreshRecentCourses();
+      })
+      .catch((error: any) => {
+        showFeedback("Error", (error?.message ?? "Course creation failed").substring(0, 100));
+      });
 
   } catch (error: any) {  
     showFeedback("Error", error.message.substring(0, 100));
+    setLoading(false);
   }
-  setLoading(false);
 };
 
   const getYouTubeEmbedUrl = (): string => {
@@ -151,8 +169,10 @@ const handleSubmit = async () => {
   };
 
   const navigateToCourse = async (course: CourseViewModel) => {
+    if (course.status === 'InProgress' || course.status === 'Failed' || course.hasModules === false)
+      return;
 
-    localStorage.setItem("SelectedCourse", course.text.substring(0, 300));
+    localStorage.setItem("SelectedCourse", (course.text || '').substring(0, 300));
     router.push(`/Course/ModuleNavigator/${course.id}`);
   }
 
@@ -231,28 +251,10 @@ const handleSubmit = async () => {
             ))}
           </div>
 
-          {loading && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '20px'
-            }}>
-              Loading...
-            </div>
-          )}
         </div>
       </div>
 
         <ToastContainer />
-        {loading && <SpinnerOverlay />}
         <FeedbackView ref={feedbackViewRef} title={fbTitle} body={fbBody}/>
     </div>
   );

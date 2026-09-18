@@ -32,11 +32,11 @@
 }
 
 .swipe-card-front {
-  background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%);
+  background: var(--gradient-primary);
 }
 
 .swipe-card-back {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary-diagonal);
   transform: rotateY(180deg);
 }
 
@@ -78,7 +78,7 @@
 }
 
 .difficulty-easy {
-  background-color: #10b981;
+  background-color: var(--color-success-start);
 }
 
 .difficulty-medium {

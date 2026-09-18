@@ -4,65 +4,73 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px;
-    border-top: 2px solid #fccde2; /* Light pink border */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
-    gap: 16px; /* Spacing between elements */
-    background: #fef0f6;
+    border-top: 2px solid var(--color-primary-border);
+    box-shadow: var(--shadow-sm);
+    gap: 16px;
+    background: var(--color-bg-end);
     margin-bottom: 0px;
     padding-bottom: 25px;
   }
   
   @media (min-width: 640px) {
     .feedback-container {
-      flex-direction: row; /* Align items side by side on larger screens */
+      flex-direction: row;
     }
   }
   
   .feedback-text {
     display: flex;
     align-self: flex-start;
-    align-items: flex-start; /* Align text to the top */
-    gap: 12px; /* Add spacing between icon and text */
-    flex-grow: 1; /* Make the text section grow to fill available space */
+    align-items: flex-start;
+    gap: 12px;
+    flex-grow: 1;
   }
   
   .feedback-details {
-    line-height: 1.5; /* Proper line spacing for better readability */
+    line-height: 1.5;
   }
   
   .feedback-title {
     font-size: 1rem;
     font-weight: bold;
     margin: 0;
+    color: var(--color-text-strong);
   }
   
   .feedback-detail {
     font-size: 0.875rem;
     margin: 4px 0 0 0;
-    color: #a61d55; /* Slightly lighter pink for detail text */
+    color: var(--color-primary);
   }
   
   .feedback-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Spacing between text and chevron */
+    gap: 8px;
     padding: 12px 16px;
     font-size: 0.875rem;
     font-weight: 600;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    width: 100%; /* Button takes full width by default */
+    color: white;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
     min-width: 100px;
     margin-left: auto;
+  }
+
+  .feedback-button:hover {
+    box-shadow: var(--shadow-primary);
+    transform: scale(1.02);
   }
     
   @media (min-width: 640px) {
     .feedback-button {
-      width: auto; /* Button shrinks to fit content on larger screens */
-      margin-left: auto; /* Aligns button to the right */
+      width: auto;
+      margin-left: auto;
     }
   }

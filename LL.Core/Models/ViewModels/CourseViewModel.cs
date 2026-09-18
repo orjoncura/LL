@@ -6,6 +6,10 @@ public class CourseViewModel
     public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public bool IsCompleted { get; set; }
+    public bool HasModules { get; set; }
+    /// <summary>Ready | InProgress | Failed</summary>
+    public string Status { get; set; } = "Ready";
+    public DateTime CreatedAt { get; set; }
     public DateTimeViewModel CreatedDate { get; set; }
     
     public bool IsValid => Id.Length > 0 && string.IsNullOrEmpty(Text) == false;

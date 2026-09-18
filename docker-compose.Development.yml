@@ -30,7 +30,7 @@ services:
     image: docker.io/ollama/ollama
     container_name: deepseek
     ports:
-      - "11434:11434"
+      - "11435:11435"
     runtime: nvidia
     environment:
       NVIDIA_VISIBLE_DEVICES: all

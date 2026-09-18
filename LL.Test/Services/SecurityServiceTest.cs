@@ -1,116 +1,134 @@
+using LL.Core.Constants;
+using LL.Core.Interfaces.Repositories;
 using LL.Core.Interfaces.Services;
 using LL.Core.Models.Arguments;
 using LL.Resources.Contexts;
 using LL.Resources.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 
 namespace LL.Test.Services;
 
 public class SecurityServiceTest
 {
-    private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly ISecurityService _securityService;
+    private readonly IUserRepository _userRepository;
+    private readonly INewUserRequestRepository _newUserRequestRepository;
+    private readonly IResetPasswordRequestRepository _resetPasswordRequestRepository;
 
-    private string Token { get; set; }
     public SecurityServiceTest()
     {     
-        _mockConfiguration = new Mock<IConfiguration>();
-        _mockConfiguration.Setup(c => c["Security:JwtKey"]).Returns("test-secret-key");
-        _mockConfiguration.Setup(c => c["Security:Issuer"]).Returns("test-issuer");
-        _mockConfiguration.Setup(c => c["Security:Audience"]).Returns("test-audience");
+        var mockConfiguration = new Mock<IConfiguration>();
+        mockConfiguration.Setup(c => c["Security:JwtKey"]).Returns("test-secret-key");
+        mockConfiguration.Setup(c => c["Security:Issuer"]).Returns("test-issuer");
+        mockConfiguration.Setup(c => c["Security:Audience"]).Returns("test-audience");
+        mockConfiguration.Setup(c => c[Secrets.EncryptionKey])
+            .Returns("edTWS52cRCrRB4NDDCwT6mY6dMcWwa3n");
 
         var services = Provider.GetRequiredService();
-        services.AddSingleton(_mockConfiguration.Object);
+        services.RemoveAll<IConfiguration>();
+        services.AddSingleton(mockConfiguration.Object);
         
         var serviceProvider = services.BuildServiceProvider();
         _securityService = serviceProvider.GetRequiredService<ISecurityService>();
+        _userRepository = serviceProvider.GetRequiredService<IUserRepository>();
+        _newUserRequestRepository = serviceProvider.GetRequiredService<INewUserRequestRepository>();
+        _resetPasswordRequestRepository = serviceProvider.GetRequiredService<IResetPasswordRequestRepository>();
         
-        using (var context = Provider.GetRequiredService<AppDbContext>())
-        {
-            // Ensure the database is created
-            context.Database.EnsureCreated();
+        var context = serviceProvider.GetRequiredService<AppDbContext>();
+        context.Database.EnsureCreated();
 
-            // Add data to the context
+        if (!context.Users.Any(u => u.Email == "admin@admin.com"))
+        {
             context.Users.Add(new User()
             {
-                Id = 1,
                 Email = "admin@admin.com",
                 PasswordHash = "password",
-                IsActive = true
+                Salt = "salt",
+                IsActive = true,
+                CreatedDate = DateTime.Now
             });
-
-            // Save changes to the database
             context.SaveChanges();
         }
-        
-        Token = Guid.NewGuid().ToString();
     }
     
     [Fact]
-    public async Task RegisterUser_ShouldRegisterNewUserRequest()
+    public void RegisterUser_ShouldRegisterNewUserRequest()
     {     
-        bool isRequestCreated = false;
-
-        var model = new NewUserModel();
-        model.Email = "test@test.com";
-        model.ConfirmEmail = "test@test.com";
+        var email = $"test-{Guid.NewGuid():N}@test.com";
+        var model = new NewUserModel
+        {
+            Email = email,
+            ConfirmEmail = email
+        };
         
-        string ip = "123.123.123.123";
-        string url = "http://localhost:3000";
-        
-        isRequestCreated = _securityService.RegisterUser(model, ip, url);
-        
-        // Assert
-        Assert.True(isRequestCreated);
+        Assert.True(_securityService.RegisterUser(model, "123.123.123.123", "http://localhost:3000"));
     } 
     
     [Fact]
-    public async Task CompleteUserRegistration_ShouldRegisterNewUser()
-    {     
-        bool isRequestCompleted = false;
+    public void CompleteUserRegistration_ShouldRegisterNewUser()
+    {
+        var email = $"complete-{Guid.NewGuid():N}@test.com";
+        var token = _newUserRequestRepository.Insert(email, "127.0.0.1", 1);
 
-        var model = new ConfirmationModel();
-        model.Password = "Password";
-        model.ConfirmPassword = "Password";
-        model.Token = Token;
+        var model = new ConfirmationModel
+        {
+            Email = email,
+            Password = "Password123!",
+            ConfirmPassword = "Password123!",
+            Token = token
+        };
         
-        isRequestCompleted = _securityService.CompleteUserRegistration(model);
-        
-        // Assert
-        Assert.True(isRequestCompleted);
+        Assert.True(_securityService.CompleteUserRegistration(model));
+        Assert.NotNull(_userRepository.GetByEmail(email));
     } 
     
     [Fact]
-    public async Task ResetPassword_ShouldCreateNewResetPasswordRequest()
-    {     
-        bool isRequestCreated = false;
-        string email = "test@test.com";
-        string ip = "123.123.123.123";
+    public void ResetPassword_ShouldCreateNewResetPasswordRequest()
+    {
+        var email = $"reset-{Guid.NewGuid():N}@test.com";
+        _userRepository.Insert(email, "Password123!", 1);
         
-        int attemptsLimit = 3;
-        string url = "http://localhost:3000";
-        
-        isRequestCreated = _securityService.ResetPassword(email, ip, url);
-        
-        // Assert
-        Assert.True(isRequestCreated);
+        Assert.True(_securityService.ResetPassword(email, "123.123.123.123", "http://localhost:3000"));
     } 
     
     [Fact]
-    public async Task CompletePasswordReset_ShouldCompletePasswordResetRequest()
-    {     
-        bool isRequestCreated = false;
+    public void CompletePasswordReset_ShouldCompletePasswordResetRequest()
+    {
+        var email = $"reset-complete-{Guid.NewGuid():N}@test.com";
+        var userId = _userRepository.Insert(email, "Password123!", 1);
+        var token = _resetPasswordRequestRepository.Insert(userId, "127.0.0.1");
 
-        var model = new ConfirmationModel();
-        model.Password = "Password";
-        model.ConfirmPassword = "Password";
-        model.Token = Token;
+        var model = new ConfirmationModel
+        {
+            Email = email,
+            Password = "NewPassword123!",
+            ConfirmPassword = "NewPassword123!",
+            Token = token
+        };
         
-        isRequestCreated = _securityService.CompletePasswordReset(model);
-        
-        // Assert
-        Assert.True(isRequestCreated);
-    } 
+        Assert.True(_securityService.CompletePasswordReset(model));
+    }
+
+    [Fact]
+    public void GetProfileDetails_ShouldReturnUserProfile()
+    {
+        var email = $"profile-{Guid.NewGuid():N}@test.com";
+        var userId = _userRepository.Insert(email, "Password123!", 1);
+
+        var profile = _securityService.GetProfileDetails(userId);
+
+        Assert.Equal(email, profile.Email);
+        Assert.False(string.IsNullOrWhiteSpace(profile.DateCreated?.AsString));
+    }
+
+    [Fact]
+    public void GetProfileDetails_WithUnknownUser_ShouldReturnEmptyProfile()
+    {
+        var profile = _securityService.GetProfileDetails(-999);
+
+        Assert.True(string.IsNullOrWhiteSpace(profile.Email));
+    }
 }

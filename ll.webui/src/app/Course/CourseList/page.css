@@ -1,75 +1,83 @@
-.course-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 10px;
+.course-list-page {
+  min-height: 100vh;
+  background: var(--gradient-page);
+  padding: 48px 32px;
 }
 
-@media (min-width: 768px) {
-  .course-list {
-    grid-template-columns: 1fr 1fr;
-    padding: 20px;
-  }
+.course-list-inner {
+  max-width: 1024px;
+  margin: 0 auto;
 }
 
-.course-card {
-  padding: 16px;
-  background: transparent;
+.course-list-title {
+  margin-bottom: 32px;
+  color: var(--color-text-strong);
 }
 
-.course-title {
-  font-size: 18px;
-  font-weight: bold;
+.course-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.course-card-item {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-primary-muted);
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+
+.course-card-item:hover {
+  box-shadow: var(--shadow-primary);
+}
+
+.course-card-title {
   margin-bottom: 8px;
+  padding-right: 80px;
+  color: var(--color-text-strong);
 }
 
-.course-divider {
-  border: none;
-  border-top: 2px solid orange;
-  margin: 10px 0;
+.course-card-text {
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
 }
 
-.course-detail {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  margin: 4px 0;
-}
-
-.course-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.course-date {
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.close-button {
+.course-archive-btn {
   position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: #ccc;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  color: var(--color-text-disabled);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 12px;
   cursor: pointer;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
+  font-size: 12px;
+  font-weight: 400;
 }
 
-.close-button:hover {
-  background-color: #999;
+.course-archive-btn:hover {
+  border-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.course-start-btn {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-start-btn:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-primary);
 }

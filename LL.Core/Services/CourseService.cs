@@ -29,22 +29,24 @@ public class CourseService(
         if(!courseRequest.IsValid) 
             return false;
 
+        // Always use a unique placeholder so a new course row is created immediately
+        // (reusing URL/text would match an existing course and hide the in-progress item).
+        int courseId = courseRepository.Insert(
+            courseRequest.Title, 
+            $"pending:{Guid.NewGuid()}",
+            courseRequest.LanguageFromId, 
+            courseRequest.LanguageToId, 
+            userId);
+
         string htmlText = courseRequest.Text.Length > 0 
             ? courseRequest.Text 
             : await transcriptionService.TranscribeFromUrl(courseRequest.URL);
         
         //Strip HTML
         string plainText = Regex.Replace(htmlText, "<.*?>", string.Empty);
+        courseRepository.UpdateValue(courseId, plainText, userId);
         
-        //Strip HTML & create the course.
         List<SentenceGroupResult> sentenceGroupResults = ProcessText(plainText);
-        
-        int courseId = courseRepository.Insert(
-            courseRequest.Title, 
-            plainText,
-            courseRequest.LanguageFromId, 
-            courseRequest.LanguageToId, 
-            userId);
 
         //Get words that already exists in the database.
         var words = sentenceGroupResults.SelectMany(w => w.Words).ToList();

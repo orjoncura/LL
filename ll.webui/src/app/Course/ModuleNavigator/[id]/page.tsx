@@ -111,7 +111,7 @@ export default function ModuleNavigator() {
                     {/* Content */}
                     <div className="module-info">
                       <div className="module-title-row">
-                        <Icon size={16} color={module.completed ? '#7c3aed' : '#9ca3af'} />
+                        <Icon size={16} color={module.completed ? 'var(--color-primary)' : 'var(--color-text-disabled)'} />
                         <h3 className={`module-title ${module.completed ? 'completed' : 'incomplete'}`}>
                           {label}: {module.title}
                         </h3>

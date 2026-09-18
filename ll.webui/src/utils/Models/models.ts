@@ -80,6 +80,11 @@ export interface CourseViewModel {
   id: string;
   title: string;
   text: string;
+  isCompleted: boolean;
+  hasModules: boolean;
+  /** Ready | InProgress | Failed */
+  status: 'Ready' | 'InProgress' | 'Failed' | string;
+  createdAt: string;
   createdDate: DateTimeViewModel;
 }
 

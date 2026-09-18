@@ -1,13 +1,14 @@
-
 .word-page {
   max-width: 600px;
   margin: 40px auto;
-  font-family: Arial, Helvetica, sans-serif;
+  padding: 0 1rem;
+  background: transparent;
 }
 
 .title {
   text-align: center;
   margin-bottom: 20px;
+  color: var(--color-text-strong);
 }
 
 .grid-header {
@@ -15,6 +16,8 @@
   grid-template-columns: 1fr 1fr;
   font-weight: bold;
   padding: 10px 0;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary-muted);
 }
 
 .grid-header div {
@@ -25,15 +28,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: none;
-  overflow: hidden; /* ensures inner cells don’t overflow the rounded corners */
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary-muted);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-md);
 }
 
 .cell {
   padding: 10px 12px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-primary-muted);
 }
 
 .cell:nth-child(2n) {
   border-right: none;
 }
-
-

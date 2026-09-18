@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f3e8ff 0%, #fae8ff 50%, #fdf4ff 100%);
+  background: var(--gradient-page);
 }
 
 .chat-content {
@@ -16,7 +16,7 @@
 .chat-title {
   text-align: center;
   margin-bottom: 32px;
-  color: #374151;
+  color: var(--color-text);
   font-size: 28px;
   font-weight: 500;
 }
@@ -29,11 +29,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
+  background: var(--color-surface);
   border-radius: 50px;
   padding: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9d5ff;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-primary-border);
 }
 
 .icon-button {
@@ -41,7 +41,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%);
+  background: var(--gradient-primary);
   border: none;
   color: white;
   display: flex;
@@ -73,12 +73,12 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #1f2937;
+  color: var(--color-text-strong);
   font-size: 16px;
 }
 
 .message-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-disabled);
 }
 
 .suggestions-grid {
@@ -89,18 +89,18 @@
 
 .suggestion-button {
   padding: 16px;
-  background: white;
+  background: var(--color-surface);
   border-radius: 16px;
-  border: 1px solid #e9d5ff;
+  border: 1px solid var(--color-primary-border);
   text-align: left;
-  color: #374151;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 15px;
 }
 
 .suggestion-button:hover {
-  border-color: #c084fc;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary-soft);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }

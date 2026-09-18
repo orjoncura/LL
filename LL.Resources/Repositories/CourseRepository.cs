@@ -33,6 +33,22 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
         return course.Id;
     }
 
+    public bool UpdateValue(int courseId, string value, int userId)
+    {
+        Course? course = db.Courses.FirstOrDefault(c => c.Id == courseId && c.IsActive);
+
+        if (course == null)
+            return false;
+
+        course.Value = value;
+        course.UpdatedById = userId;
+        course.UpdatedDate = DateTime.Now;
+        db.Courses.Update(course);
+        db.SaveChanges();
+
+        return true;
+    }
+
     public bool MarkCourseAsCompleted(int courseId)
     {
         Course? course = db.Courses.FirstOrDefault(c => c.Id == courseId && c.IsActive);
@@ -88,13 +104,44 @@ public class CourseRepository(AppDbContext db, IEncryptionService encryptionServ
     }
     public List<CourseViewModel> GetCoursesByUserId(int userId)
     {
-         List<CourseViewModel> courseViewModels = db.Courses
+         var courses = db.Courses
             .Where(c => c.CreatedById == userId && c.IsActive)
-            .OrderByDescending(c => c.CreatedDate).ToList()
-            .Select(c => DataFactory.Convert(encryptionService.Encrypt(c.Id), c)).ToList();
+            .OrderByDescending(c => c.CreatedDate)
+            .ToList();
 
-         return courseViewModels;
+         var courseIds = courses.Select(c => c.Id).ToList();
+         var coursesWithModules = db.Modules
+            .Where(m => courseIds.Contains(m.CourseId) && m.IsActive)
+            .Select(m => m.CourseId)
+            .Distinct()
+            .ToList()
+            .ToHashSet();
+
+         var failureCutoff = DateTime.UtcNow.AddHours(-10);
+
+         return courses.Select(c =>
+         {
+             var viewModel = DataFactory.Convert(encryptionService.Encrypt(c.Id), c);
+             viewModel.HasModules = coursesWithModules.Contains(c.Id);
+
+             if (viewModel.HasModules)
+                 viewModel.Status = "Ready";
+             else if (ToUtc(c.CreatedDate) <= failureCutoff)
+                 viewModel.Status = "Failed";
+             else
+                 viewModel.Status = "InProgress";
+
+             return viewModel;
+         }).ToList();
     }
+
+    private static DateTime ToUtc(DateTime value) =>
+        value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+        };
     public CourseViewModel? GetById(string encryptedId)
     {
         var course = db.Courses.SingleOrDefault(c => c.Id == encryptionService.Decrypt(encryptedId) && c.IsActive);

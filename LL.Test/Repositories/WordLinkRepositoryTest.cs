@@ -41,6 +41,22 @@ public class WordLinkRepositoryTest
     }
 
     [Fact]
+    public void Insert_ShouldCreateWordLink()
+    {
+        var wordId = _wordRepository.Insert($"new-link-{Guid.NewGuid():N}", (int)LanguageEnum.Spanish, 1).Id;
+
+        var result = _wordLinkRepository.Insert(
+            wordId,
+            "hello",
+            (int)LanguageEnum.Spanish,
+            (int)LanguageEnum.English,
+            1);
+
+        Assert.True(result.Id > 0);
+        Assert.Equal("hello", result.Translation);
+    }
+
+    [Fact]
     public void Insert_ShouldReturnExistingWordLink()
     {
         var wordId = _wordRepository.Insert($"link-{Guid.NewGuid():N}", (int)LanguageEnum.English, 1).Id;

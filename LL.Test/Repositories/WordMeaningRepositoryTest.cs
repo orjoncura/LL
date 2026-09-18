@@ -44,4 +44,16 @@ public class WordMeaningRepositoryTest
 
         Assert.True(wordMeaningId > 0);
     }
+
+    [Fact]
+    public void GetByWordId_ShouldReturnMeanings()
+    {
+        var wordId = _wordRepository.Insert($"meaning-get-{Guid.NewGuid():N}", (int)LanguageEnum.English, 1).Id;
+        _wordMeaningRepository.Insert(wordId, (int)WordTypeEnum.Verb, 1);
+
+        var meanings = _wordMeaningRepository.GetByWordId(wordId);
+
+        Assert.NotNull(meanings);
+        Assert.NotEmpty(meanings!);
+    }
 }
