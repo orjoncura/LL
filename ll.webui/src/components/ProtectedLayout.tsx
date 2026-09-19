@@ -21,7 +21,8 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   if (!hasMounted) return null; 
 
   const currentPath = window.location.pathname;
-  const isPublicPage = /^\/(Security)?$/.test(currentPath);
+  // Allow home and all auth flows (register, confirm email, reset password, etc.)
+  const isPublicPage = currentPath === '/' || currentPath.startsWith('/Security');
 
   if (!GetToken() && !isPublicPage) {
     window.location.replace('/');
